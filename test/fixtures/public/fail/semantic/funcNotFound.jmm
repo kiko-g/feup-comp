@@ -1,0 +1,14 @@
+/*  REASON:
+    Variable assignments to literals must have the literal be the variable's type.
+*/
+
+class T {
+    public static void main(String[] a) { 
+        io.println(10);
+    }
+
+    public int foo(boolean a){
+        this.bar();
+        return 1;
+    }
+}

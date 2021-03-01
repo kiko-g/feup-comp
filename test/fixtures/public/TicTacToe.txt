@@ -1,0 +1,36 @@
+0|0|0
+- - -
+0|0|0
+- - -
+0|0|0
+Player 1 turn! Enter the row(0-2):  Enter the column(0-2):
+1|0|0
+- - -
+0|0|0
+- - -
+0|0|0
+Player 2 turn! Enter the row(0-2):  Enter the column(0-2):
+1|2|0
+- - -
+0|0|0
+- - -
+0|0|0
+Player 1 turn! Enter the row(0-2):  Enter the column(0-2):
+1|2|0
+- - -
+0|1|0
+- - -
+0|0|0
+Player 2 turn! Enter the row(0-2):  Enter the column(0-2):
+1|2|0
+- - -
+2|1|0
+- - -
+0|0|0
+Player 1 turn! Enter the row(0-2):  Enter the column(0-2):
+1|2|0
+- - -
+2|1|0
+- - -
+0|0|1
+Congratulations, 1, you have won the game.

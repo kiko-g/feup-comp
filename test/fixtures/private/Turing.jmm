@@ -1,0 +1,186 @@
+import static io.println(int) void;
+import static io.println() void;
+class Turing {
+
+    int NUM_SYMBOLS;
+    int NUM_STATES;
+    
+    int[] WTABLE;
+    int[] MTABLE;
+    int[] NTABLE;
+    
+    int H;
+    int L;
+    int R;
+
+    int[] TAPE;
+
+
+    int curState;
+    int curPos;
+
+    public static void main(String[] a) {
+        Turing t;
+        
+        t = new Turing();
+        t.init_bb_3s2sy();
+        t.run();
+    }
+
+    
+    public boolean init_bb_3s2sy() {
+
+        TAPE = this.initGeneric(3, 2, 18);
+
+        this.setTrans(0, 0, 1, R, 1);
+        this.setTrans(0, 1, 1, L, 0);
+        this.setTrans(0, 2, 1, L, 1);
+
+        this.setTrans(1, 0, 1, L, 2);
+        this.setTrans(1, 1, 1, R, 1);
+        this.setTrans(1, 2, 1, R, H);
+
+        return true;
+    }
+
+    
+    public boolean init_bb_4s2sy() {
+
+        TAPE = this.initGeneric(4, 2, 20);
+
+        this.setTrans(0, 0, 1, R, 1);
+        this.setTrans(0, 1, 1, L, 0);
+        this.setTrans(0, 2, 1, R, H);
+        this.setTrans(0, 3, 1, R, 3);
+
+        this.setTrans(1, 0, 1, L, 1);
+        this.setTrans(1, 1, 0, L, 2);
+        this.setTrans(1, 2, 1, L, 3);
+        this.setTrans(1, 3, 0, R, 0);
+
+        return true;
+    }
+
+    public boolean run() {
+        int dummy;
+        boolean halt;
+        Turing t;
+        
+        
+        t = this;
+        
+        halt = false;
+        while (!halt) {
+            this.printTape();
+            
+            
+            dummy = io.read();
+
+            halt = !t.trans();
+        }
+        
+        
+        this.printTape();
+        return true;
+
+    }
+
+    public boolean printTape() {
+        int i;
+
+        
+        i = 0;
+        while (i < TAPE.length) {
+            if (!(!(i < curPos) && !(curPos < i)))
+                io.print(0);
+            else
+                io.print(curState + 1);
+
+            i = i + 1;
+        }
+
+        io.println();
+        
+
+        
+        i = 0;
+        while (i < TAPE.length) {
+            io.print(TAPE[i]);
+
+            i = i + 1;
+        }
+        io.println();
+        io.println();
+
+        return true;
+
+    }
+
+    public boolean trans() {
+        int write;
+        int move;
+        int next;
+
+        int curS;
+        
+        boolean halt;
+        
+        
+        curS = TAPE[curPos];
+
+        write = WTABLE[this.ss2i(curS, curState)];
+        move = MTABLE[this.ss2i(curS, curState)];
+        next = NTABLE[this.ss2i(curS, curState)];
+
+
+        TAPE[curPos] = write;
+        curPos = curPos + move;
+        curState = next;
+
+        
+        if ((!(H < curState) && !(curState < H)))
+            halt = false;
+        else
+            halt = true;
+            
+        return halt;
+
+    }
+
+    public int[] initGeneric(int NUM_ST, int NUM_SY, int TAPE_LENGTH) {
+        int[] TAPE_RET;
+        int tlen;
+
+        NUM_SYMBOLS = NUM_SY;
+        NUM_STATES = NUM_ST;
+
+        tlen = NUM_SYMBOLS * NUM_STATES;
+
+        H = 0-1;
+        L = 0-1;
+        R = 1;
+
+        WTABLE = new int[tlen];
+        MTABLE = new int[tlen];
+        NTABLE = new int[tlen];
+
+        TAPE_RET = new int[TAPE_LENGTH];
+        curState = 0;
+        curPos = TAPE_RET.length / 2;
+
+        return TAPE_RET;
+
+    }
+
+    public int ss2i(int symbol, int state) {
+        return symbol * NUM_STATES + state;
+    }
+
+    public boolean setTrans(int symbol, int state, int write, int move, int next) {
+        WTABLE[this.ss2i(symbol, state)] = write;
+        MTABLE[this.ss2i(symbol, state)] = move;
+        NTABLE[this.ss2i(symbol, state)] = next;
+
+        return true;
+    }
+}

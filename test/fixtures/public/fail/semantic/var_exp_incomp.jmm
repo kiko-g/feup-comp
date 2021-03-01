@@ -1,0 +1,12 @@
+/*  REASON:
+    Variable assignments to another variable must have the RHS be the variable's type.
+*/
+
+class T {
+    public static void main(String[] a) { 
+        int i;
+        boolean j;
+        j = true;
+        i = j;
+    }
+}

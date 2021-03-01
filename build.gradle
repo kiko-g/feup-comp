@@ -1,0 +1,85 @@
+// Import JavaCC
+plugins {
+  id "ca.coglinc.javacc" version "2.4.0"
+}
+
+
+// Java project
+apply plugin: 'java'
+
+
+// Repositories providers
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation  'com.google.code.gson:gson:2.8.2'
+    testImplementation "junit:junit:4.11" 
+}
+
+
+// Execute JJTree
+compileJjtree {
+    inputDirectory = file('javacc')
+    outputDirectory = file('generated/')
+	include '**/*.java'
+}
+
+
+// Execute JavaCC
+compileJavacc {
+    inputDirectory = file('generated/')
+    outputDirectory = file('generated/')
+	arguments = [grammar_encoding: 'UTF-8', static: 'false']	
+}
+
+
+// Project sources
+sourceSets {
+   main {
+      java {
+         srcDir 'src'
+         srcDir 'src-lib'
+         srcDir 'generated'
+      }
+   }
+	
+   test {
+      java {
+         srcDir 'test'
+      }
+	  
+	  resources {
+		srcDir 'test'
+	  }
+   }
+    
+}
+
+
+// Create JAR with main class
+jar {
+   manifest {
+      attributes 'Main-Class': 'Main'
+   }
+}
+
+
+// Copy JAR to root folder
+task copyJar() {
+
+    doFirst {
+		copy {
+			println 'Copying JAR file to ./'
+			from jar
+			into "./"
+		}	
+    }
+}
+build.dependsOn copyJar
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
