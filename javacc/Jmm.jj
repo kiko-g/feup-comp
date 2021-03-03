@@ -81,7 +81,11 @@ TOKEN:
 }
 
 void Program(): { } {
-    VarDeclaration()
+    ImportDeclaration() VarDeclaration()
+}
+
+void ImportDeclaration() : {} {
+    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
 }
 
 void VarDeclaration() : {} {
