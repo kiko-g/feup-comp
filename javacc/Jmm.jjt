@@ -1,0 +1,128 @@
+options {
+    LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(Jmm)
+    public class Jmm
+    {
+        public static void main(String args[]) throws ParseException {
+            System.out.println("Write an arithmetic expression:");
+            Calculator myCalc = new Calculator(System.in);
+            SimpleNode root = myCalc.Expression(); // returns reference to root node
+
+            root.dump(""); // prints the tree on the screen
+
+            //System.out.println("Expression value: "+myCalc.eval(root));
+        }
+
+    }
+PARSER_END(Jmm)
+
+
+SKIP: {
+    " " | "\t" | "\r" | "\n"
+    | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >  /*multiline comment*/
+    | < "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")> //inline comment
+}
+
+/*Reserved Words*/
+TOKEN :
+{
+    <IMPORT: "import">
+    | <CLASS: "class" >
+    | <EXTENDS: "extends">
+    | <PUBLIC: "public">
+    | <RETURN: "return">
+    | <STATIC: "static">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <STRING: "String">
+    | <INT: "int">
+    | <BOOLEAN: "boolean">
+    | <IF: "if">
+    | <ELSE: "else">
+    | <WHILE: "while">
+    | <LENGTH: "length">
+    | <TRUE: "true" >
+    | <FALSE: "false" >
+    | <THIS: "this">
+    | <NEW: "new">
+}
+
+/* Delimitaters*/
+TOKEN : {
+    < SEMICOLON: ";">
+    | < COMMA: ",">
+    | < LBRACKET: "{">
+    | < RBRACKET: "}">
+    | < LSQRBRACKET: "[">
+    | < RSQRBRACKET: "]">
+    | < LPAR: "(">
+    | < RPAR: ")">
+    | < DOT: ".">
+}
+
+/*Operators*/
+TOKEN : {
+    <PLUS: "+">
+    | <MINUS: "-">
+    | <MUL: "*">
+    | <DIV: "/">
+    | <LESS: "<">
+    | <AND: "&&">
+    | <NOT: "!">
+    | <EQUALS: "=">
+}
+
+/*Identifier and IntegerLiteral*/
+TOKEN:
+{
+   <IDENTIFIER: ["a"-"z", "A"-"Z", "_", "$"](["a"-"z", "A"-"Z", "0"-"9", "_", "$"])* >
+
+   | < INTEGER : <DECIMAL> | <HEXADECIMAL> | <BINARY> | <OCTAL> >
+   | < #DECIMAL: (["0"-"9"])+ >
+   | < #HEXADECIMAL: ("0x" | "0X")(["0"-"9", "A"-"F", "a"-"f"])+ >
+   | < #BINARY: ("0b" | "0B")(["0", "1"])+ >
+   | < #OCTAL: "0"(["0"-"7"])* >
+}
+
+SimpleNode Expression(): {}
+{
+   Expr1() {return jjtThis;} // Java code inside brackets
+}
+
+void Expr1() #void: {}
+{
+   Expr2(1) [
+   	("+" Expr2(1) #Add(2)
+   	| "-" Expr2(1) #Sub(2)
+   	)
+   	
+   ]
+}
+
+void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
+{
+   Expr3(sign)  [
+   ("*" Expr3(1) #Mul(2) 
+   | "/" Expr3(1) #Div(2)
+   )
+   
+   ]
+/*
+   Expr3(sign) [
+   ("*" #Mul(2)
+   | "/" #Div(2)
+   )
+   Expr3(1)
+   ]
+   */
+   
+}
+
+void Expr3(int sign) #void: {Token t;}
+{
+    t=<INTEGER> {  jjtThis.val = sign *Integer.parseInt(t.image); } #Term
+    | "-" Expr3(-1)
+    | "(" Expr1() ")"
+}
