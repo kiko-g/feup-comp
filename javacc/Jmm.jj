@@ -3,16 +3,10 @@ options {
 }
 
 PARSER_BEGIN(Jmm)
-    public class Jmm
-    {
+    public class Jmm {
         public static void main(String args[]) throws ParseException {
-            System.out.println("Write an arithmetic expression:");
-            Calculator myCalc = new Calculator(System.in);
-            SimpleNode root = myCalc.Expression(); // returns reference to root node
-
-            root.dump(""); // prints the tree on the screen
-
-            //System.out.println("Expression value: "+myCalc.eval(root));
+            Jmm parser = new Jmm(System.in);
+            parser.Program();
         }
 
     }
@@ -86,43 +80,18 @@ TOKEN:
    | < #OCTAL: "0"(["0"-"7"])* >
 }
 
-SimpleNode Expression(): {}
-{
-   Expr1() {return jjtThis;} // Java code inside brackets
+void Program(): { } {
+    VarDeclaration()
 }
 
-void Expr1() #void: {}
-{
-   Expr2(1) [
-   	("+" Expr2(1) #Add(2)
-   	| "-" Expr2(1) #Sub(2)
-   	)
-   	
-   ]
+void VarDeclaration() : {} {
+    Type() <IDENTIFIER> <SEMICOLON>
 }
 
-void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
-{
-   Expr3(sign)  [
-   ("*" Expr3(1) #Mul(2) 
-   | "/" Expr3(1) #Div(2)
-   )
-   
-   ]
-/*
-   Expr3(sign) [
-   ("*" #Mul(2)
-   | "/" #Div(2)
-   )
-   Expr3(1)
-   ]
-   */
-   
+void Type() : {} {
+   <INT> [<LSQRBRACKET> <RSQRBRACKET>]
+   | <BOOLEAN>
+   | <IDENTIFIER>
+   | <STRING>
 }
 
-void Expr3(int sign) #void: {Token t;}
-{
-    t=<INTEGER> {  jjtThis.val = sign *Integer.parseInt(t.image); } #Term
-    | "-" Expr3(-1)
-    | "(" Expr1() ")"
-}

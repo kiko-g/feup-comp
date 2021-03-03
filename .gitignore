@@ -4,3 +4,6 @@
 /generated/
 *.jar
 .idea/
+gradle
+gradlew
+gradlew.bat
