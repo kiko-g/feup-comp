@@ -68,7 +68,6 @@ TOKEN : {
     | <EQUALS: "=">
 }
 
-/*Identifier and IntegerLiteral*/
 TOKEN:
 {
    <IDENTIFIER: ["a"-"z", "A"-"Z", "_", "$"](["a"-"z", "A"-"Z", "0"-"9", "_", "$"])* >
@@ -81,21 +80,40 @@ TOKEN:
 }
 
 void Program(): { } {
-    ImportDeclaration() VarDeclaration()
+    ImportDeclaration() ClassDeclaration() <EOF>
 }
 
 void ImportDeclaration() : {} {
     (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
 }
 
+void ClassDeclaration() : {} {
+    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>] <LBRACKET> (VarDeclaration())*   (MethodDeclaration())* <RBRACKET>
+}
+
 void VarDeclaration() : {} {
     Type() <IDENTIFIER> <SEMICOLON>
 }
 
-void Type() : {} {
-   <INT> [<LSQRBRACKET> <RSQRBRACKET>]
-   | <BOOLEAN>
-   | <IDENTIFIER>
-   | <STRING>
+void MethodDeclaration() : {} {
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> [Type() <IDENTIFIER>  (<COMMA> Type() <IDENTIFIER>)* ] <RPAR> <LBRACKET>
+        (VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <RBRACKET>
+    | <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> <IDENTIFIER> <RPAR> <LBRACKET>
+        (VarDeclaration())* (Statement())*  <RBRACKET>
 }
 
+void Type() : {} {
+   <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN> | <IDENTIFIER> | <STRING>
+}
+
+void Statement() : {} {
+    <LBRACKET> (Statement())* <RBRACKET>
+    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    | <WHILE> <LPAR> Expression() <RPAR> Statement()
+    | Expression() <SEMICOLON>
+    | <IDENTIFIER> [<LSQRBRACKET> Expression() <RSQRBRACKET>] <EQUALS> Expression() <SEMICOLON>
+}
+
+void Expression() : {} {
+    {}
+}
