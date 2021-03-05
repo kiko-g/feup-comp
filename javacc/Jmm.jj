@@ -3,12 +3,22 @@ options {
 }
 
 PARSER_BEGIN(Jmm)
+    import java.util.Scanner;
+    import java.io.File;
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+
     public class Jmm {
-        public static void main(String args[]) throws ParseException {
-            Jmm parser = new Jmm(System.in);
+        public static void main(String args[]) throws ParseException, FileNotFoundException {
+            Scanner scanner = new Scanner(System.in);
+            String filename = scanner.nextLine();
+
+            File file = new File(filename);
+            FileInputStream fileStream = new FileInputStream(file);
+
+            Jmm parser = new Jmm(fileStream);
             parser.Program();
         }
-
     }
 PARSER_END(Jmm)
 
@@ -80,7 +90,7 @@ TOKEN:
 }
 
 void Program(): { } {
-    ImportDeclaration() ClassDeclaration() ";;"
+    ImportDeclaration() ClassDeclaration() <EOF>
 }
 
 void ImportDeclaration() : {} {
