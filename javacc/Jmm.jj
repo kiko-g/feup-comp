@@ -1,5 +1,5 @@
 options {
-    LOOKAHEAD = 1;
+    LOOKAHEAD = 3;
 }
 
 PARSER_BEGIN(Jmm)
@@ -72,7 +72,7 @@ TOKEN:
 {
    <IDENTIFIER: ["a"-"z", "A"-"Z", "_", "$"](["a"-"z", "A"-"Z", "0"-"9", "_", "$"])* >
 
-   | < INTEGER : <DECIMAL> | <HEXADECIMAL> | <BINARY> | <OCTAL> >
+   | < INTEGER_LITERAL : <DECIMAL> | <HEXADECIMAL> | <BINARY> | <OCTAL> >
    | < #DECIMAL: (["0"-"9"])+ >
    | < #HEXADECIMAL: ("0x" | "0X")(["0"-"9", "A"-"F", "a"-"f"])+ >
    | < #BINARY: ("0b" | "0B")(["0", "1"])+ >
@@ -80,7 +80,7 @@ TOKEN:
 }
 
 void Program(): { } {
-    ImportDeclaration() ClassDeclaration() <EOF>
+    ImportDeclaration() ClassDeclaration() ";;"
 }
 
 void ImportDeclaration() : {} {
@@ -115,5 +115,21 @@ void Statement() : {} {
 }
 
 void Expression() : {} {
-    {}
+    ExpressionFragment() ( "&&" | "<" | "+" | "-" | "*" | "/" ) Expression()
+    | ExpressionFragment() "[" Expression() "]"
+    | ExpressionFragment() "." "length"
+    | ExpressionFragment() "." <IDENTIFIER> "(" [ Expression() ("," Expression())* ] ")"
+    | ExpressionFragment()
+}
+
+void ExpressionFragment() : {} {
+    <INTEGER_LITERAL>
+    | <TRUE>
+    | <FALSE>
+    | <IDENTIFIER>
+    | <THIS>
+    | <NEW> <INT> <LSQRBRACKET> Expression() <RSQRBRACKET>
+    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
+    | <NOT> Expression()
+    | <LPAR> Expression() <RPAR>
 }

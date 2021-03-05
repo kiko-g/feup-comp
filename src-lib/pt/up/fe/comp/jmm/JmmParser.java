@@ -1,13 +1,9 @@
 package pt.up.fe.comp.jmm;
 
+public class Parser implements JmmParser{
 
-/**
- * Parses J-- code.
- * 
- * @author COMP2021
- *
- */
-public interface JmmParser {
-	
-	JmmParserResult parse(String jmmCode);
+    @Override
+    public JmmParserResult parse(String jmmCode) {
+        return null;
+    }
 }

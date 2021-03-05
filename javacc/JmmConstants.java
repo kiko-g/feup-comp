@@ -83,7 +83,7 @@ public interface JmmConstants {
   /** RegularExpression Id. */
   int IDENTIFIER = 43;
   /** RegularExpression Id. */
-  int INTEGER = 44;
+  int INTEGER_LITERAL = 44;
   /** RegularExpression Id. */
   int DECIMAL = 45;
   /** RegularExpression Id. */
@@ -142,11 +142,12 @@ public interface JmmConstants {
     "\"!\"",
     "\"=\"",
     "<IDENTIFIER>",
-    "<INTEGER>",
+    "<INTEGER_LITERAL>",
     "<DECIMAL>",
     "<HEXADECIMAL>",
     "<BINARY>",
     "<OCTAL>",
+    "\";;\"",
   };
 
 }
