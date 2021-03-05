@@ -17,7 +17,7 @@ PARSER_BEGIN(Jmm)
             FileInputStream fileStream = new FileInputStream(file);
 
             Jmm parser = new Jmm(fileStream);
-            parser.Expression();
+            parser.Program();
         }
     }
 PARSER_END(Jmm)
