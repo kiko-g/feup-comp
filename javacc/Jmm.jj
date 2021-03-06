@@ -148,11 +148,14 @@ void TypeNotIdentifier() : {} {
 }
 
 void Statement() : {} {
+    StatementNotIdentifier() | StatementIdentifier()
+}
+
+void StatementNotIdentifier() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | IfStatement()
     | WhileStatement()
-    | Expression() <SEMICOLON> // // TODO: remove LOOKAHEAD(2)
-    //| Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
+    //| Expression() <SEMICOLON>
 }
 
 void IfStatement() : {} {
@@ -161,6 +164,10 @@ void IfStatement() : {} {
 
 void WhileStatement() : {} {
     <WHILE> <LPAR> Expression() <RPAR> Statement()
+}
+
+void StatementIdentifier() : {} {
+    Identifier() ( <EQUALS> Expression() | ArrayAccess()) <SEMICOLON>
 }
 
 /* *
