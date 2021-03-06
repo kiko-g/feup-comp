@@ -151,8 +151,8 @@ void Statement() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | IfStatement()
     | WhileStatement()
-    | LOOKAHEAD(2) Expression() <SEMICOLON> // // TODO: remove LOOKAHEAD(2)
-    | Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
+    | Expression() <SEMICOLON> // // TODO: remove LOOKAHEAD(2)
+    //| Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
 }
 
 void IfStatement() : {} {
