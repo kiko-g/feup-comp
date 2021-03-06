@@ -148,14 +148,11 @@ void TypeNotIdentifier() : {} {
 }
 
 void Statement() : {} {
-    StatementNotIdentifier() | StatementIdentifier()
-}
-
-void StatementNotIdentifier() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | IfStatement()
     | WhileStatement()
-    //| Expression() <SEMICOLON>
+    | Expression() <SEMICOLON>
+    | Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
 }
 
 void IfStatement() : {} {
@@ -164,10 +161,6 @@ void IfStatement() : {} {
 
 void WhileStatement() : {} {
     <WHILE> <LPAR> Expression() <RPAR> Statement()
-}
-
-void StatementIdentifier() : {} {
-    Identifier() ( <EQUALS> Expression() | ArrayAccess()) <SEMICOLON>
 }
 
 /* *
