@@ -1,5 +1,5 @@
 options {
-    LOOKAHEAD = 3;
+    LOOKAHEAD = 1;
 }
 
 PARSER_BEGIN(Jmm)
@@ -21,7 +21,6 @@ PARSER_BEGIN(Jmm)
         }
     }
 PARSER_END(Jmm)
-
 
 SKIP: {
     " " | "\t" | "\r" | "\n"
@@ -93,6 +92,10 @@ void Program(): { } {
     ImportDeclaration() ClassDeclaration() <EOF>
 }
 
+void Identifier() : {} {
+    <IDENTIFIER>
+}
+
 void ImportDeclaration() : {} {
     (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
 }
@@ -101,45 +104,110 @@ void ClassDeclaration() : {} {
     <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>] <LBRACKET> (VarDeclaration())*   (MethodDeclaration())* <RBRACKET>
 }
 
+void VarNormalDeclaration() : {} {
+    TypeNormal() <IDENTIFIER> <SEMICOLON>
+}
+
 void VarDeclaration() : {} {
     Type() <IDENTIFIER> <SEMICOLON>
 }
 
 void MethodDeclaration() : {} {
+    LOOKAHEAD(2)
     <PUBLIC> Type() <IDENTIFIER> <LPAR> [Type() <IDENTIFIER>  (<COMMA> Type() <IDENTIFIER>)* ] <RPAR> <LBRACKET>
-        (VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <RBRACKET>
+        MethodBody() <RETURN> Expression() <SEMICOLON> <RBRACKET>
     | <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> <IDENTIFIER> <RPAR> <LBRACKET>
-        (VarDeclaration())* (Statement())*  <RBRACKET>
+        MethodBody()  <RBRACKET>
+}
+
+void MethodBody() : {} {
+    (VarNormalDeclaration())* (Statement())*
+    //| (VarDeclaration())* (Statement())*
 }
 
 void Type() : {} {
-   <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN> | <IDENTIFIER> | <STRING>
+    TypeNormal() | <IDENTIFIER>
+}
+
+void TypeNormal() : {} {
+    <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN>
+}
+
+void TypeIdentifier() : {} {
+    <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN> | <STRING>
 }
 
 void Statement() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR> Expression() <RPAR> Statement()
-    | Expression() <SEMICOLON>
-    | <IDENTIFIER> [<LSQRBRACKET> Expression() <RSQRBRACKET>] <EQUALS> Expression() <SEMICOLON>
+    | LOOKAHEAD(2) Expression() <SEMICOLON>
+    | <IDENTIFIER> [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
 }
 
+/* *
+* EXPRESSION:
+* https://introcs.cs.princeton.edu/java/11precedence/ -> Operators
+* Operators listed in a javacc file go from the ones with least precedence to the ones with most precedence (from top to bottom)
+* */
 void Expression() : {} {
-    ExpressionFragment() ( "&&" | "<" | "+" | "-" | "*" | "/" ) Expression()
-    | ExpressionFragment() "[" Expression() "]"
-    | ExpressionFragment() "." "length"
-    | ExpressionFragment() "." <IDENTIFIER> "(" [ Expression() ("," Expression())* ] ")"
-    | ExpressionFragment()
+    LogicalAndExp()
 }
 
-void ExpressionFragment() : {} {
+void LogicalAndExp() : {} {
+    RelationalLessExp() (<AND> RelationalLessExp())*
+}
+
+void RelationalLessExp() : {} {
+    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp())*
+}
+
+void ArithmeticAdditiveExp() : {} {
+    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp() | <MINUS> ArithmeticMultiplicativeExp())*
+}
+
+void ArithmeticMultiplicativeExp() : {} {
+    LogicalNotExp() (<MUL> LogicalNotExp() | <DIV> LogicalNotExp())*
+}
+
+void LogicalNotExp() : {} {
+    AccessExp() | (<NOT> LogicalNotExp())
+}
+
+void AccessExp() : {} {
+    TerminalExp() (ArrayAccess() | <DOT> DotExp())*
+}
+
+void DotExp() : {} {
+    <LENGTH> | Identifier() <LPAR> [Expression() ( <COMMA> Expression())* ] <RPAR>
+}
+
+void TerminalExp() : {} {
     <INTEGER_LITERAL>
     | <TRUE>
     | <FALSE>
-    | <IDENTIFIER>
     | <THIS>
-    | <NEW> <INT> <LSQRBRACKET> Expression() <RSQRBRACKET>
-    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
-    | <NOT> Expression()
+    | Identifier()
+    | NewInstance()
     | <LPAR> Expression() <RPAR>
+}
+
+void NewInstance() : {} {
+    <NEW> (NewIntObject() | CallWithParams()) // new int[] | new Identifier(Param1, Param2, ...)
+}
+
+void NewIntObject() : {} {
+    <INT> ArrayAccess()
+}
+
+void ArrayAccess() : {} {
+    <LSQRBRACKET> Expression() <RSQRBRACKET>
+}
+
+void CallWithParams(): {} {
+    Identifier() Params()
+}
+
+void Params() : {} {
+    <LPAR> [Expression() (<COMMA> Expression())*] <RPAR>
 }
