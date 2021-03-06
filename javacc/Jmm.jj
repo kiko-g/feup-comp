@@ -141,10 +141,6 @@ void TypeNormal() : {} {
     <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN>
 }
 
-void TypeIdentifier() : {} {
-    <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN> | <STRING>
-}
-
 void Statement() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
