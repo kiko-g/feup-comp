@@ -92,16 +92,24 @@ void Program(): { } {
     ImportDeclaration() ClassDeclaration() <EOF>
 }
 
-void Identifier() : {} {
-    <IDENTIFIER>
+void Identifier() : {Token id;} {
+    id=<IDENTIFIER>{System.out.println(id.image);}
 }
 
 void ImportDeclaration() : {} {
-    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
+    (<IMPORT> ImportStatement() <SEMICOLON>)*
 }
 
-void ClassDeclaration() : {} {
-    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>] <LBRACKET> (VarDeclaration())*   (MethodDeclaration())* <RBRACKET>
+void ImportStatement() : {} {
+    Identifier() (<DOT> Identifier())*
+}
+
+void ClassDeclaration(): {} {
+    <CLASS> ClassBody() <LBRACKET> (VarDeclaration())* (MethodDeclaration())* <RBRACKET>
+}
+
+void ClassBody(): {} {
+    Identifier() [<EXTENDS> Identifier()]
 }
 
 void VarNormalDeclaration() : {} {
