@@ -93,7 +93,7 @@ void Program(): { } {
 }
 
 void Identifier() : {Token id;} {
-    id=<IDENTIFIER>{System.out.println(id.image);}
+    id=<IDENTIFIER> {System.out.print(id.image + " | ");}
 }
 
 void ImportDeclaration() : {} {
@@ -113,18 +113,18 @@ void ClassBody(): {} {
 }
 
 void VarNormalDeclaration() : {} {
-    TypeNormal() <IDENTIFIER> <SEMICOLON>
+    TypeNormal() Identifier() <SEMICOLON>
 }
 
 void VarDeclaration() : {} {
-    Type() <IDENTIFIER> <SEMICOLON>
+    Type() Identifier() <SEMICOLON>
 }
 
 void MethodDeclaration() : {} {
     LOOKAHEAD(2)
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> [Type() <IDENTIFIER>  (<COMMA> Type() <IDENTIFIER>)* ] <RPAR> <LBRACKET>
+    <PUBLIC> Type() Identifier() <LPAR> [Type() Identifier()  (<COMMA> Type() Identifier())* ] <RPAR> <LBRACKET>
         MethodBody() <RETURN> Expression() <SEMICOLON> <RBRACKET>
-    | <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> <IDENTIFIER> <RPAR> <LBRACKET>
+    | <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> Identifier() <RPAR> <LBRACKET>
         MethodBody()  <RBRACKET>
 }
 
@@ -134,7 +134,7 @@ void MethodBody() : {} {
 }
 
 void Type() : {} {
-    TypeNormal() | <IDENTIFIER>
+    TypeNormal() | Identifier()
 }
 
 void TypeNormal() : {} {
@@ -150,7 +150,7 @@ void Statement() : {} {
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR> Expression() <RPAR> Statement()
     | LOOKAHEAD(2) Expression() <SEMICOLON>
-    | <IDENTIFIER> [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
+    | Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
 }
 
 /* *
