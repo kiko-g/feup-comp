@@ -120,17 +120,29 @@ void VarDeclaration() : {} {
     Type() Identifier() <SEMICOLON>
 }
 
-void MethodDeclaration() : {} {
-    LOOKAHEAD(2)
-    <PUBLIC> Type() Identifier() <LPAR> [Type() Identifier()  (<COMMA> Type() Identifier())* ] <RPAR> <LBRACKET>
-        MethodBody() <RETURN> Expression() <SEMICOLON> <RBRACKET>
-    | <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> Identifier() <RPAR> <LBRACKET>
-        MethodBody()  <RBRACKET>
+void MethodDeclaration() : { } {
+    <PUBLIC> (MainDeclaration() | RegularMethodDeclaration())
 }
 
-void MethodBody() : {} {
-    (VarNormalDeclaration())* (Statement())*
-    //| (VarDeclaration())* (Statement())*
+void MainDeclaration() : {} {
+    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> Identifier() <RPAR> <LBRACKET>
+        MethodBody()
+    <RBRACKET>
+}
+
+void RegularMethodDeclaration()  : {} {
+    MethodName() <LPAR> [Type() Identifier()  (<COMMA> Type() Identifier())*] <RPAR> <LBRACKET>
+        MethodBody()
+        <RETURN> Expression() <SEMICOLON>
+    <RBRACKET>
+}
+
+void MethodName(): {} {
+    Type() Identifier()
+}
+
+void MethodBody(): {} {
+    (LOOKAHEAD(2) VarDeclaration())* (Statement())*
 }
 
 void Type() : {} {
