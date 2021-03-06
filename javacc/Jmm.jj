@@ -29,8 +29,7 @@ SKIP: {
 }
 
 /*Reserved Words*/
-TOKEN :
-{
+TOKEN : {
     <IMPORT: "import">
     | <CLASS: "class" >
     | <EXTENDS: "extends">
@@ -77,8 +76,7 @@ TOKEN : {
     | <EQUALS: "=">
 }
 
-TOKEN:
-{
+TOKEN: {
    <IDENTIFIER: ["a"-"z", "A"-"Z", "_", "$"](["a"-"z", "A"-"Z", "0"-"9", "_", "$"])* >
 
    | < INTEGER_LITERAL : <DECIMAL> | <HEXADECIMAL> | <BINARY> | <OCTAL> >
@@ -112,10 +110,6 @@ void ClassBody(): {} {
     Identifier() [<EXTENDS> Identifier()]
 }
 
-void VarNormalDeclaration() : {} {
-    TypeNormal() Identifier() <SEMICOLON>
-}
-
 void VarDeclaration() : {} {
     Type() Identifier() <SEMICOLON>
 }
@@ -142,23 +136,31 @@ void MethodName(): {} {
 }
 
 void MethodBody(): {} {
-    (LOOKAHEAD(2) VarDeclaration())* (Statement())*
+    (LOOKAHEAD(2) VarDeclaration())* (Statement())* // TODO: remove LOOKAHEAD(2)
 }
 
 void Type() : {} {
-    TypeNormal() | Identifier()
+    TypeNotIdentifier() | Identifier()
 }
 
-void TypeNormal() : {} {
-    <INT> [<LSQRBRACKET> <RSQRBRACKET>] | <BOOLEAN>
+void TypeNotIdentifier() : {} {
+    <BOOLEAN> | <INT> [<LSQRBRACKET> <RSQRBRACKET> ]
 }
 
 void Statement() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
-    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
-    | <WHILE> <LPAR> Expression() <RPAR> Statement()
-    | LOOKAHEAD(2) Expression() <SEMICOLON>
+    | IfStatement()
+    | WhileStatement()
+    | LOOKAHEAD(2) Expression() <SEMICOLON> // // TODO: remove LOOKAHEAD(2)
     | Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
+}
+
+void IfStatement() : {} {
+    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+}
+
+void WhileStatement() : {} {
+    <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 /* *
