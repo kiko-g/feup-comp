@@ -1,9 +1,10 @@
 options {
     LOOKAHEAD = 1;
+    STATIC = false;
 }
 
 PARSER_BEGIN(Jmm)
-    import java.util.Scanner;
+    import java.util.*;
     import java.io.File;
     import java.io.FileInputStream;
     import java.io.FileNotFoundException;
@@ -11,13 +12,26 @@ PARSER_BEGIN(Jmm)
     public class Jmm {
         public static void main(String args[]) throws ParseException, FileNotFoundException {
             Scanner scanner = new Scanner(System.in);
-            String filename = scanner.nextLine();
+            String filename = "";
 
-            File file = new File(filename);
-            FileInputStream fileStream = new FileInputStream(file);
+            System.out.println("Files to read? (e for exit)");
+            try {
+                while(true) {
+                    filename = scanner.nextLine();
 
-            Jmm parser = new Jmm(fileStream);
-            parser.Program();
+                    if(filename.equals("e")) return;
+
+                    File file = new File(filename);
+                    FileInputStream fileStream = new FileInputStream(file);
+
+                    Jmm parser = new Jmm(fileStream);
+                    parser.Program();
+                }
+            } catch (Exception e) {
+                System.out.println(filename);
+                e.printStackTrace();
+            }
+
         }
     }
 PARSER_END(Jmm)
@@ -90,8 +104,8 @@ void Program(): { } {
     ImportDeclaration() ClassDeclaration() <EOF>
 }
 
-void Identifier() : {Token id;} {
-    id=<IDENTIFIER> {System.out.print(id.image + " | ");}
+void Identifier() : {} {
+    <IDENTIFIER>
 }
 
 void ImportDeclaration() : {} {
@@ -151,8 +165,7 @@ void Statement() : {} {
     <LBRACKET> (Statement())* <RBRACKET>
     | IfStatement()
     | WhileStatement()
-    | Expression() <SEMICOLON>
-    | Identifier() [ArrayAccess()] <EQUALS> Expression() <SEMICOLON>
+    | (LOOKAHEAD(2) Identifier() [ArrayAccess()] <EQUALS> Expression() |  Expression()) <SEMICOLON>
 }
 
 void IfStatement() : {} {
@@ -189,7 +202,7 @@ void ArithmeticMultiplicativeExp() : {} {
 }
 
 void LogicalNotExp() : {} {
-    AccessExp() | (<NOT> LogicalNotExp())
+    (<NOT>)* AccessExp()
 }
 
 void AccessExp() : {} {
@@ -197,7 +210,7 @@ void AccessExp() : {} {
 }
 
 void DotExp() : {} {
-    <LENGTH> | Identifier() <LPAR> [Expression() ( <COMMA> Expression())* ] <RPAR>
+    <LENGTH> | CallWithParams()
 }
 
 void TerminalExp() : {} {
