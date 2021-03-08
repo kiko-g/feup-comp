@@ -1,24 +1,26 @@
+import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
+import pt.up.fe.comp.jmm.report.Report;
 
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import static pt.up.fe.specs.util.SpecsIo.toInputStream;
+
 public class Main implements JmmParser {
-
-
 	public JmmParserResult parse(String jmmCode) {
-		
 		try {
-			Jmm parser = new Jmm(new StringReader(jmmCode));
-    		// SimpleNode root = parser.Program(); // returns reference to root node
-    		// root.dump(""); // prints the tree on the screen
-    		// return new JmmParserResult(root, new ArrayList<Report>());
+			InputStream stream = toInputStream(jmmCode);
+			Jmm parser = new Jmm(stream);
+    		SimpleNode root = parser.Program();
+    		root.dump("");
+    		return new JmmParserResult((JmmNode) root, new ArrayList<Report>());
 		} catch(Exception e) {
 			throw new RuntimeException("Error while parsing", e);
 		}
-
-		return null;
 	}
 
     public static void main(String[] args) {

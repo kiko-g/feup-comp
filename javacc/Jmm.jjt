@@ -13,29 +13,7 @@ PARSER_BEGIN(Jmm)
         static final int MAX_NUM_ERRORS = 10;
         private int errno = 0;
 
-        public static void main(String args[]) throws ParseException, FileNotFoundException {
-            Scanner scanner = new Scanner(System.in);
-            String filename = "";
-
-            System.out.println("Files to read? (e for exit)");
-            try {
-                while(true) {
-                    filename = scanner.nextLine();
-
-                    if(filename.equals("e")) return;
-
-                    File file = new File(filename);
-                    FileInputStream fileStream = new FileInputStream(file);
-
-                    Jmm parser = new Jmm(fileStream);
-                    parser.Program();
-                }
-            } catch (Exception e) {
-                System.out.println(filename);
-                e.printStackTrace();
-            }
-
-        }
+        public static void main(String args[]) throws Exception { }
 
         public void processWhileError(ParseException e) {
             System.err.println("Parse Error found on while expression");
@@ -43,7 +21,7 @@ PARSER_BEGIN(Jmm)
             this.errno++;
 
             if (this.errno > Jmm.MAX_NUM_ERRORS) {
-                throw new RuntimeException(String.format("Too many errors(%s). Aborting....", MAX_NUM_ERRORS));
+                throw new RuntimeException(String.format("Too many errors(%d). Aborting....", MAX_NUM_ERRORS));
              }
 
             Token t = getToken(0);
@@ -123,8 +101,11 @@ TOKEN: {
    | < #OCTAL: "0"(["0"-"7"])* >
 }
 
-void Program(): { } {
-    ImportDeclaration() ClassDeclaration() <EOF>
+SimpleNode Program(): { } {
+    ImportDeclaration() ClassDeclaration() {
+        if (this.errno > 0) throw new RuntimeException(String.format("Errors(%d) parsing file. Exiting....", MAX_NUM_ERRORS));
+        return jjtThis;
+    }
 }
 
 void Identifier() : {} {

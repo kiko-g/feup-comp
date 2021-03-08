@@ -97,7 +97,7 @@ public class ParserTest {
         test("test/fixtures/public/WhileAndIF.jmm", false);
     }
 
-    @Test
+    /*@Test
     public void testmiss_type() {
         test("test/fixtures/public/fail/semantic/extra/miss_type.jmm", true);
     }
@@ -150,7 +150,7 @@ public class ParserTest {
     @Test
     public void testvarNotInit() {
         test("test/fixtures/public/fail/semantic/varNotInit.jmm", true);
-    }
+    }*/
 
     @Test
     public void testBlowUp() {
