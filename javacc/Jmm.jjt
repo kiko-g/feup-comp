@@ -143,7 +143,7 @@ SimpleNode Program(): { } {
 }
 
 void ImportDeclaration() #void: {Token t;} {
-    (t=<IMPORT> ImportStatement() <SEMICOLON> {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Import )*
+    (t=<IMPORT> ImportStatement() #Import <SEMICOLON> {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Import )*
 }
 
 void ImportStatement() #void: {} {
@@ -151,40 +151,40 @@ void ImportStatement() #void: {} {
 }
 
 void ClassDeclaration() #void: {} {
-    <CLASS> ClassBody() <LBRACKET> (VarDeclaration())* (MethodDeclaration())* <RBRACKET>
+    <CLASS> ClassBody() <LBRACKET> (VarDeclaration()#ClassVar)* (MethodDeclaration())* <RBRACKET>
 }
 
 void ClassBody() #void: {} {
-    Identifier() [<EXTENDS> Identifier()]
+    <IDENTIFIER> #Name [<EXTENDS> <IDENTIFIER> #Extends]
 }
 
 void VarDeclaration() #void: {} {
-    Type() Identifier() #VarDeclaration(2) <SEMICOLON>
+    Type() <IDENTIFIER>#Name <SEMICOLON>
 }
 
 void MethodDeclaration() #void: { } {
-    <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #Method)
+    <PUBLIC> (MainDeclaration()#Main | RegularMethodDeclaration()#Method)
 }
 
 void MainDeclaration() #void: {} {
-    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> Identifier() #MethodParams(1) <RPAR> <LBRACKET>
-        MethodBody() #MethodBody
+    <STATIC> <VOID> <MAIN> <LPAR> ((<STRING>#Class <LSQRBRACKET> <RSQRBRACKET>#Array(1) <IDENTIFIER>#Name)#Param(2) )#MethodParams(1) <RPAR> <LBRACKET>
+        MethodBody()#MethodBody
     <RBRACKET>
 }
 
 void RegularMethodDeclaration() #void: {} {
-    Type() Identifier() <LPAR> [MethodParameters()] <RPAR> <LBRACKET>
-        MethodBody() #MethodBody
-        <RETURN> Expression() #Return(1) <SEMICOLON>
+    Type() <IDENTIFIER>#Name <LPAR> [MethodParameters() #MethodParams] <RPAR> <LBRACKET>
+        MethodBody()#MethodBody
+        <RETURN> Expression()#Return <SEMICOLON>
     <RBRACKET>
 }
 
 void MethodParameters() #void: {} {
-    Param() (<COMMA> Param())*
+    Param()#Param(true) (<COMMA> Param()#Param)*
 }
 
 void Param() #void: {} {
-    Type() Identifier() #Param(2)
+    Type() <IDENTIFIER>#Name
 }
 
 void MethodBody() #void: {} {
@@ -194,18 +194,18 @@ void MethodBody() #void: {} {
 void Type() #void: {Token t;} {
     t=<BOOLEAN> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Boolean
     | t=<INT> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
-    | t=<IDENTIFIER> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Type
+    | t=<IDENTIFIER> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Class
 }
 
 void Statement() #void: {} {
-    <LBRACKET> (Statement())* #StatementBlock <RBRACKET>
-    | IfStatement()
-    | WhileStatement()
-    | (LOOKAHEAD(2) <IDENTIFIER> #Var [ArrayAccess() #ArrayAccess(1)] <EQUALS> Expression() #Assign(2) |  Expression() #Expression) <SEMICOLON>
+    <LBRACKET> (Statement())*#StatementBlock <RBRACKET>
+    | IfStatement() #If
+    | WhileStatement() #While
+    | (LOOKAHEAD(2) <IDENTIFIER> #Var [ArrayAccess()#ArrayAccess(1)] <EQUALS> Expression()#Assign(2) |  Expression()#Expression) <SEMICOLON>
 }
 
 void IfStatement() #void: {Token t;} {
-    <IF> t=<LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    <IF> t=<LPAR> Expression()#Condition <RPAR> Statement()#ConditionTrue <ELSE> Statement()#ConditionFalse
     {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #If(3)
 }
 
@@ -217,12 +217,13 @@ void IfStatement() #void: {Token t;} {
 void WhileStatement() #void: {Token t;} {
     t=<WHILE>
     try {
-        t=<LPAR> Expression() <RPAR>
+        t=<LPAR> Expression()#Condition <RPAR>
     } catch (ParseException e) {
         processWhileError(e);
     }
-    Statement()
+    Statement()#ConditionTrue
     {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #While(2)
+
 }
 
 /* *
@@ -235,39 +236,48 @@ void Expression() #void: {} {
 }
 
 void LogicalAndExp() #void: {} {
-    RelationalLessExp() (<AND> RelationalLessExp() #And(2))*
+    RelationalLessExp() (<AND> RelationalLessExp()#LogicalAnd(2))*
 }
 
 void RelationalLessExp() #void: {} {
-    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp() #LessThan(2))*
+    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp()#Less(2))*
 }
 
 void ArithmeticAdditiveExp() #void: {} {
-    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2))*
+    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp()#Add(2) | <MINUS> ArithmeticMultiplicativeExp()#Add(2))*
 }
 
 void ArithmeticMultiplicativeExp() #void: {} {
-    LogicalNotExp() (<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2))*
+    LogicalNotExp() (<MUL> LogicalNotExp()#Mul(2) | <DIV> LogicalNotExp()#Div(2))*
 }
 
 void LogicalNotExp() #void: {} {
-    <NOT> LogicalNotExp() #Not(1) | AccessExp()
+    (<NOT> AccessExp()#Not)+ | AccessExp()
 }
 
 void AccessExp() #void: {Token t;} {
-    t=TerminalExp() (ArrayAccess() #ArrayAccess(2) | <DOT> DotExp() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Dot(2))*
+    TerminalExp() (ArrayAccess()#ArrayAccess(1) | <DOT> DotExp(){jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));}#Dot(2))*
 }
 
 void DotExp() #void: {} {
     <LENGTH> #Length | CallWithParams() #Method
 }
 
-void ArrayAccess() #void: {} {
-    <LSQRBRACKET> Expression() <RSQRBRACKET>
+void NewInstance() #void: {} {
+    <INT> <LSQRBRACKET> Expression() #Size <RSQRBRACKET> #ArrayInit(1)
+        | CallWithParams() #Object
 }
 
-void CallWithParams() #void: {Token t;} {
-        Identifier() Params() #Params
+void ArrayAccess() #void: {} {
+    <LSQRBRACKET> Expression() #Index(1) <RSQRBRACKET>
+}
+
+Token CallWithParams() #void: {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Name {return t;} Params()#Params
+}
+
+void Params() #void: {} {
+    <LPAR> [Expression() #Param(true) (<COMMA> Expression() #Param(true))*] <RPAR>
 }
 
 Token TerminalExp() #void: {Token t;} {
@@ -275,20 +285,8 @@ Token TerminalExp() #void: {Token t;} {
     | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #This {return t;}
-    | t=Identifier() {return t;}
-    | t=<NEW> NewInstance() #New {return t;}
-    | t=<LPAR> Expression() <RPAR> {return t;}
+    | t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Var {return t;}
+    | <NEW> NewInstance() #New
+    | <LPAR> Expression() <RPAR>
 }
 
-Token Identifier() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Identifier {return t;}
-}
-
-void NewInstance() #void: {Token t;} {
-    <INT> <LSQRBRACKET> Expression() <RSQRBRACKET> #ArrayInit(1)
-    | t=Identifier() Params() #Params {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Object
-}
-
-void Params() #void: {} {
-    <LPAR> [Expression() #Param(true) (<COMMA> Expression() #Param(true))*] <RPAR>
-}
