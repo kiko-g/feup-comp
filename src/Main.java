@@ -15,10 +15,9 @@ public class Main implements JmmParser {
 			InputStream stream = toInputStream(jmmCode);
 			Jmm parser = new Jmm(stream);
     		SimpleNode root = parser.Program();
-    		root.dump("");
     		return new JmmParserResult((JmmNode) root, new ArrayList<Report>());
 		} catch(Exception e) {
-			throw new RuntimeException("Error while parsing", e);
+			throw new RuntimeException(e);
 		}
 	}
 

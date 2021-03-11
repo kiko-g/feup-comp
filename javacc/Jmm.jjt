@@ -16,22 +16,58 @@ PARSER_BEGIN(Jmm)
         public static void main(String args[]) throws Exception { }
 
         public void processWhileError(ParseException e) {
-            System.err.println("Parse Error found on while expression");
-            System.out.println(e.toString());
-            this.errno++;
-
-            if (this.errno > Jmm.MAX_NUM_ERRORS) {
+            if ((this.errno++) > Jmm.MAX_NUM_ERRORS) {
                 throw new RuntimeException(String.format("Too many errors(%d). Aborting....", MAX_NUM_ERRORS));
-             }
+            }
 
+            Token currentToken = e.currentToken;
+            Token errorToken = currentToken.next;
+            System.err.println(String.format("Error(%d) detected during parsing of while expression. Unexpected token '%s' ....", this.errno, errorToken));
+            System.err.println("Error Details:");
+            System.err.println(String.format("\tBegin Line: %d \t Begin Column: %d \t End Line: %d \t End Column: %d", errorToken.beginLine, errorToken.beginColumn, errorToken.endLine, errorToken.endColumn));
+            System.err.println(getErrorMessage(currentToken, e.expectedTokenSequences, e.tokenImage));
+            System.err.println("------------------------------------------------------------------------");
+            recoverFromWhile();
+        }
+
+        // From ParseException
+        private static String getErrorMessage(Token currentToken,  int[][] expectedTokenSequences, String[] tokenImage) {
+            String eol = System.getProperty("line.separator", "\n");
+            StringBuffer expected = new StringBuffer();
+            int maxSize = 0;
+
+            for (int i = 0; i < expectedTokenSequences.length; i++) {
+                if (maxSize < expectedTokenSequences[i].length) {
+                    maxSize = expectedTokenSequences[i].length;
+                }
+                for (int j = 0; j < expectedTokenSequences[i].length; j++) {
+                    expected.append(tokenImage[expectedTokenSequences[i][j]]);
+                }
+                if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
+                    expected.append(" ...");
+                }
+                expected.append(eol).append("    ");
+            }
+
+            String message = "";
+            if (expectedTokenSequences.length == 1) {
+                message += "Was expecting:" + eol + "    ";
+            } else {
+                message += "Was expecting one of:" + eol + "    ";
+            }
+            message += expected.toString();
+            return message;
+          }
+
+        public void recoverFromWhile() {
             Token t = getToken(0);
             do {
-                 if(t.kind == RPAR && getToken(1).kind != RPAR) { // In case of the last ")"
+                if(t.kind == RPAR && getToken(1).kind != RPAR) { // If it finds the last ")"
                     return;
-                 } else if(getToken(1).kind == LBRACKET) { // If it finds first the "{"
+                } else if(getToken(1).kind == LBRACKET) { // If it finds the first "{"
                     return;
-                 }
-                 t = getNextToken();
+                }
+                t = getNextToken();
             } while (true);
         }
     }
@@ -103,7 +139,7 @@ TOKEN: {
 
 SimpleNode Program(): { } {
     ImportDeclaration() ClassDeclaration() {
-        if (this.errno > 0) throw new RuntimeException(String.format("Errors(%d) parsing file. Exiting....", MAX_NUM_ERRORS));
+        if (this.errno > 0) throw new RuntimeException(String.format("Too many errors(%d). Aborting....", MAX_NUM_ERRORS));
         return jjtThis;
     }
 }

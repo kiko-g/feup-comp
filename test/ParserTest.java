@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import org.junit.Test;
 
 public class ParserTest {
+    static final int MAX_NUM_ERRORS = 10;
+
     private void test(String resource, boolean mustFail) {
         String jmmExtension = ".jmm";
 
@@ -26,10 +28,11 @@ public class ParserTest {
         boolean success = true;
 
         try {
+            System.out.println(String.format("-- Starting test for file %s --", resource));
             TestUtils.parse(content);
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            e.printStackTrace();
+            System.err.println("Exception: " + e.getMessage());
+            System.err.println("------------------------------------------------------------------------");
             success = false;
         } finally { }
 
@@ -43,7 +46,11 @@ public class ParserTest {
             } else {
                 fail("Expected parser to succeed!");
             }
+        } else {
+            System.out.println("\tSuccessful test!");
         }
+
+        System.out.println(String.format("-- Ending test for file %s --", resource));
     }
 
 
