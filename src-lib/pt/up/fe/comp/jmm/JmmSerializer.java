@@ -31,5 +31,4 @@ class JmmSerializer implements JsonSerializer<JmmNode> {
         jsonObject.add("children", jsonSerializationContext.serialize(jsonElement.getChildren(), this.ListOfJmm));
         return jsonObject;
     }
-
 }

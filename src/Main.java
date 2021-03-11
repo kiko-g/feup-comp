@@ -15,6 +15,7 @@ public class Main implements JmmParser {
 			InputStream stream = toInputStream(jmmCode);
 			Jmm parser = new Jmm(stream);
     		SimpleNode root = parser.Program();
+			System.out.println(root.toJson());
     		return new JmmParserResult((JmmNode) root, new ArrayList<Report>());
 		} catch(Exception e) {
 			throw new RuntimeException(e);
