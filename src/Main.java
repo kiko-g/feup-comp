@@ -1,21 +1,24 @@
-import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.report.Report;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static pt.up.fe.specs.util.SpecsIo.toInputStream;
 
 public class Main implements JmmParser {
 	public static void main(String[] args) {
-		String resource = args[0];
+		if(args.length != 2) {
+			String usage = "java -jar comp2021-1a.jar Main";
+			System.err.println("Usage: " + usage + " <jmm file path>\n" +
+							   "Example: " + usage + " test/fixtures/public/Simple.jmm");
+			return;
+		}
+
+		String resource = args[1];
 		String fileName = resource.substring(resource.lastIndexOf("/"));
 		String content = null;
 
@@ -37,7 +40,7 @@ public class Main implements JmmParser {
 		String jmmExtension = ".jmm";
 		String extension = filename.substring(filename.indexOf("."));
 		if(!extension.equals(jmmExtension)) {
-			throw new IllegalArgumentException(String.format("Test resource must have a %s extension", jmmExtension));
+			throw new IllegalArgumentException(String.format("Resource must have a %s extension", jmmExtension));
 		}
 
 		Path fileName = Path.of(resource);
