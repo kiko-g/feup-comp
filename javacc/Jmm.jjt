@@ -5,13 +5,17 @@ options {
 
 PARSER_BEGIN(Jmm)
     import java.util.*;
-    import java.io.File;
-    import java.io.FileInputStream;
-    import java.io.FileNotFoundException;
+    import pt.up.fe.comp.jmm.report.Report;
+    import static pt.up.fe.comp.jmm.report.ReportType.*;
+    import static pt.up.fe.comp.jmm.report.Stage.*;
+
+    import java.util.ArrayList;
+    import java.util.List;
 
     public class Jmm {
-        static final int MAX_NUM_ERRORS = 10;
         private int errno = 0;
+        private static final int MAX_NUM_ERRORS = 10;
+        private final List<Report> reports = new ArrayList<Report>();
 
         public static void main(String args[]) throws Exception { }
 
@@ -22,6 +26,7 @@ PARSER_BEGIN(Jmm)
 
             Token currentToken = e.currentToken;
             Token errorToken = currentToken.next;
+            this.reports.add(new Report(ERROR, SYNTATIC, errorToken.beginLine, errorToken.endLine, getErrorMessage(currentToken, e.expectedTokenSequences, e.tokenImage)));
             System.err.println(String.format("Error(%d) detected during parsing of while expression. Unexpected token '%s' ....", this.errno, errorToken));
             System.err.println("Error Details:");
             System.err.println(String.format("\tBegin Line: %d \t Begin Column: %d \t End Line: %d \t End Column: %d", errorToken.beginLine, errorToken.beginColumn, errorToken.endLine, errorToken.endColumn));
@@ -30,11 +35,9 @@ PARSER_BEGIN(Jmm)
             recoverFromWhile();
         }
 
-        // From ParseException
         private static String getErrorMessage(Token currentToken,  int[][] expectedTokenSequences, String[] tokenImage) {
-            String eol = System.getProperty("line.separator", "\n");
-            StringBuffer expected = new StringBuffer();
             int maxSize = 0;
+            StringBuilder expected = new StringBuilder("\t");
 
             for (int i = 0; i < expectedTokenSequences.length; i++) {
                 if (maxSize < expectedTokenSequences[i].length) {
@@ -43,20 +46,15 @@ PARSER_BEGIN(Jmm)
                 for (int j = 0; j < expectedTokenSequences[i].length; j++) {
                     expected.append(tokenImage[expectedTokenSequences[i][j]]);
                 }
-                if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-                    expected.append(" ...");
+
+                if(i != expectedTokenSequences.length - 1) {
+                    expected.append(" | ");
+                } else {
+                    expected.append("\n");
                 }
-                expected.append(eol).append("    ");
             }
 
-            String message = "";
-            if (expectedTokenSequences.length == 1) {
-                message += "Was expecting:" + eol + "    ";
-            } else {
-                message += "Was expecting one of:" + eol + "    ";
-            }
-            message += expected.toString();
-            return message;
+            return "Was expecting:\n" + expected;
           }
 
         public void recoverFromWhile() {
@@ -69,6 +67,10 @@ PARSER_BEGIN(Jmm)
                 }
                 t = getNextToken();
             } while (true);
+        }
+
+        public List<Report> getReports() {
+            return this.reports;
         }
     }
 PARSER_END(Jmm)
@@ -138,10 +140,7 @@ TOKEN: {
 }
 
 SimpleNode Program(): { } {
-    ImportDeclaration() ClassDeclaration() {
-        if (this.errno > 0) throw new RuntimeException(String.format("Too many errors(%d). Aborting....", MAX_NUM_ERRORS));
-        return jjtThis;
-    }
+    ImportDeclaration() ClassDeclaration() { if (this.errno > 0) throw new RuntimeException((Throwable)this.reports); return jjtThis; }
 }
 
 void Identifier() : {} {

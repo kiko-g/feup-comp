@@ -11,15 +11,22 @@ import static pt.up.fe.specs.util.SpecsIo.toInputStream;
 
 public class Main implements JmmParser {
 	public JmmParserResult parse(String jmmCode) {
+		InputStream stream = toInputStream(jmmCode);
+		Jmm parser = new Jmm(stream);
+		SimpleNode root = null;
+		
 		try {
-			InputStream stream = toInputStream(jmmCode);
-			Jmm parser = new Jmm(stream);
-    		SimpleNode root = parser.Program();
-			System.out.println(root.toJson());
-    		return new JmmParserResult((JmmNode) root, new ArrayList<Report>());
+			root = parser.Program();
+			//System.out.println(root.toJson()); // TODO: Save into file
 		} catch(Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			for(Report report:  parser.getReports()) {
+				System.out.println(report);
+			}
+			//return new JmmParserResult(root, parser.getReports()); // TODO: If the report has errors then an exception will be released and line 18 and 19 will be skipped
 		}
+		return new JmmParserResult(root, parser.getReports());
 	}
 
     public static void main(String[] args) {

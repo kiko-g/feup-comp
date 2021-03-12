@@ -30,7 +30,7 @@ public class TestUtils {
 			JmmParser parser = (JmmParser) parserClass.getConstructor().newInstance();
 			return parser.parse(code);
         } catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException("Could not parse code\n\t at TestUtils.parse()");
         }
 	}
