@@ -3,23 +3,15 @@ import pt.up.fe.comp.jmm.JmmNode;
 import java.lang.RuntimeException;
 import java.util.*;
 
-public class SimpleNode implements Node, JmmNode {
+public class SimpleNode implements Node {
   protected Node parent;
   protected Node[] children;
   protected int id;
-  protected Object value;
-  protected Jmm parser;
-
   private final Map<String, String> attributes;
 
   public SimpleNode(int i) {
       id = i;
       this.attributes = new HashMap<String, String>();
-  }
-
-  public SimpleNode(Jmm p, int i) {
-      this(i);
-      parser = p;
   }
 
   public String getKind() {
@@ -39,7 +31,14 @@ public class SimpleNode implements Node, JmmNode {
   }
 
   public List<JmmNode> getChildren() {
-      return (children == null) ? new ArrayList<>() : Arrays.asList((JmmNode[])children);
+      List<JmmNode> childNodes = new ArrayList<>();
+
+      if(this.children == null) {
+          return childNodes;
+      }
+
+      Collections.addAll(childNodes, this.children);
+      return childNodes;
   }
 
   public int getNumChildren() {
@@ -83,14 +82,6 @@ public class SimpleNode implements Node, JmmNode {
 
   public int jjtGetNumChildren() {
       return (children == null) ? 0 : children.length;
-  }
-
-  public void jjtSetValue(Object value) {
-      this.value = value;
-  }
-
-  public Object jjtGetValue() {
-      return value;
   }
 
   public String toString() {

@@ -17,7 +17,7 @@ PARSER_BEGIN(Jmm)
         private static final int MAX_NUM_ERRORS = 10;
         private final List<Report> reports = new ArrayList<Report>();
 
-        public static void main(String args[]) throws Exception { }
+        public static void main(String args[]) throws RuntimeException { }
 
         public void processWhileError(ParseException e) {
             if ((this.errno++) > Jmm.MAX_NUM_ERRORS) {
@@ -140,7 +140,7 @@ TOKEN: {
 }
 
 SimpleNode Program(): { } {
-    ImportDeclaration() ClassDeclaration() { if (this.errno > 0) throw new RuntimeException((Throwable)this.reports); return jjtThis; }
+    ImportDeclaration() ClassDeclaration() { if (this.errno > 0) throw new RuntimeException(); return jjtThis; }
 }
 
 void Identifier() : {} {

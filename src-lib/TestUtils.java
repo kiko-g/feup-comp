@@ -22,15 +22,12 @@ public class TestUtils {
 
 	public static JmmParserResult parse(String code) {
 		try {
-			// Get Parser class
 			String parserClassName = PARSER_CONFIG.getProperty("ParserClass");
-            // Get class with main
             Class<?> parserClass = Class.forName(parserClassName);
-            // It is expected that the Parser class can be instantiated without arguments
 			JmmParser parser = (JmmParser) parserClass.getConstructor().newInstance();
 			return parser.parse(code);
         } catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			throw new RuntimeException("Could not parse code\n\t at TestUtils.parse()");
         }
 	}
