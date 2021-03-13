@@ -29,7 +29,7 @@ public interface JmmNode {
      * @param attribute
      * @param value
      */
-    void put(String attribute, String value);
+    void put(AttributeType attribute, String value);
 
     /**
      * 

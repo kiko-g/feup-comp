@@ -1,0 +1,1209 @@
+{
+  "kind": "Program",
+  "attributes": {},
+  "children": [
+    {
+      "kind": "Package",
+      "attributes": {},
+      "children": []
+    },
+    {
+      "kind": "Import",
+      "attributes": {
+        "COLUMN": "1",
+        "LINE": "1"
+      },
+      "children": []
+    },
+    {
+      "kind": "Package",
+      "attributes": {},
+      "children": []
+    },
+    {
+      "kind": "Import",
+      "attributes": {
+        "COLUMN": "1",
+        "LINE": "2"
+      },
+      "children": []
+    },
+    {
+      "kind": "Class",
+      "attributes": {},
+      "children": [
+        {
+          "kind": "Identifier",
+          "attributes": {
+            "COLUMN": "7",
+            "LINE": "4",
+            "VALUE": "MonteCarloPi"
+          },
+          "children": []
+        },
+        {
+          "kind": "Method",
+          "attributes": {},
+          "children": [
+            {
+              "kind": "Boolean",
+              "attributes": {
+                "COLUMN": "9",
+                "LINE": "5",
+                "VALUE": "boolean"
+              },
+              "children": []
+            },
+            {
+              "kind": "Identifier",
+              "attributes": {
+                "COLUMN": "17",
+                "LINE": "5",
+                "VALUE": "performSingleEstimate"
+              },
+              "children": []
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "6",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "6",
+                        "VALUE": "rand1"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "7",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "7",
+                        "VALUE": "rand2"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Boolean",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "8",
+                        "VALUE": "boolean"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "11",
+                        "LINE": "8",
+                        "VALUE": "in_circle"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "9",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "9",
+                        "VALUE": "squareDist"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "11",
+                        "LINE": "11"
+                      },
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "11",
+                            "LINE": "11",
+                            "VALUE": "MathUtils"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Method",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "21",
+                                "LINE": "11",
+                                "VALUE": "random"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Sub",
+                                      "attributes": {},
+                                      "children": [
+                                        {
+                                          "kind": "Int",
+                                          "attributes": {
+                                            "COLUMN": "28",
+                                            "LINE": "11",
+                                            "VALUE": "0"
+                                          },
+                                          "children": []
+                                        },
+                                        {
+                                          "kind": "Int",
+                                          "attributes": {
+                                            "COLUMN": "30",
+                                            "LINE": "11",
+                                            "VALUE": "100"
+                                          },
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Int",
+                                      "attributes": {
+                                        "COLUMN": "35",
+                                        "LINE": "11",
+                                        "VALUE": "100"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "11",
+                        "LINE": "12"
+                      },
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "11",
+                            "LINE": "12",
+                            "VALUE": "MathUtils"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Method",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "21",
+                                "LINE": "12",
+                                "VALUE": "random"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Sub",
+                                      "attributes": {},
+                                      "children": [
+                                        {
+                                          "kind": "Int",
+                                          "attributes": {
+                                            "COLUMN": "28",
+                                            "LINE": "12",
+                                            "VALUE": "0"
+                                          },
+                                          "children": []
+                                        },
+                                        {
+                                          "kind": "Int",
+                                          "attributes": {
+                                            "COLUMN": "30",
+                                            "LINE": "12",
+                                            "VALUE": "100"
+                                          },
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Int",
+                                      "attributes": {
+                                        "COLUMN": "35",
+                                        "LINE": "12",
+                                        "VALUE": "100"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Add",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Mul",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "17",
+                                    "LINE": "14",
+                                    "VALUE": "rand1"
+                                  },
+                                  "children": []
+                                },
+                                {
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "25",
+                                    "LINE": "14",
+                                    "VALUE": "rand1"
+                                  },
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "Mul",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "33",
+                                    "LINE": "14",
+                                    "VALUE": "rand2"
+                                  },
+                                  "children": []
+                                },
+                                {
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "41",
+                                    "LINE": "14",
+                                    "VALUE": "rand2"
+                                  },
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "Int",
+                          "attributes": {
+                            "COLUMN": "50",
+                            "LINE": "14",
+                            "VALUE": "100"
+                          },
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "If",
+                  "attributes": {
+                    "COLUMN": "6",
+                    "LINE": "15"
+                  },
+                  "children": [
+                    {
+                      "kind": "LessThan",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "7",
+                            "LINE": "15",
+                            "VALUE": "squareDist"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Int",
+                          "attributes": {
+                            "COLUMN": "20",
+                            "LINE": "15",
+                            "VALUE": "100"
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "StatementBlock",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Assign",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Var",
+                              "attributes": {},
+                              "children": []
+                            },
+                            {
+                              "kind": "Bool",
+                              "attributes": {
+                                "COLUMN": "16",
+                                "LINE": "16",
+                                "VALUE": "true"
+                              },
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "StatementBlock",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Assign",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Var",
+                              "attributes": {},
+                              "children": []
+                            },
+                            {
+                              "kind": "Bool",
+                              "attributes": {
+                                "COLUMN": "16",
+                                "LINE": "18",
+                                "VALUE": "false"
+                              },
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "kind": "Return",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "10",
+                    "LINE": "21",
+                    "VALUE": "in_circle"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Method",
+          "attributes": {},
+          "children": [
+            {
+              "kind": "Int",
+              "attributes": {
+                "COLUMN": "9",
+                "LINE": "24",
+                "VALUE": "int"
+              },
+              "children": []
+            },
+            {
+              "kind": "Identifier",
+              "attributes": {
+                "COLUMN": "13",
+                "LINE": "24",
+                "VALUE": "estimatePi100"
+              },
+              "children": []
+            },
+            {
+              "kind": "Param",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Int",
+                  "attributes": {
+                    "COLUMN": "27",
+                    "LINE": "24",
+                    "VALUE": "int"
+                  },
+                  "children": []
+                },
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "31",
+                    "LINE": "24",
+                    "VALUE": "n"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "25",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "25",
+                        "VALUE": "samples_in_circle"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "26",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "26",
+                        "VALUE": "samples_so_far"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "27",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "27",
+                        "VALUE": "pi_estimate"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "20",
+                        "LINE": "29",
+                        "VALUE": "0"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "23",
+                        "LINE": "30",
+                        "VALUE": "0"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "While",
+                  "attributes": {
+                    "COLUMN": "9",
+                    "LINE": "32"
+                  },
+                  "children": [
+                    {
+                      "kind": "LessThan",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "10",
+                            "LINE": "32",
+                            "VALUE": "samples_so_far"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "27",
+                            "LINE": "32",
+                            "VALUE": "n"
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "StatementBlock",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "If",
+                          "attributes": {
+                            "COLUMN": "7",
+                            "LINE": "33"
+                          },
+                          "children": [
+                            {
+                              "kind": "Dot",
+                              "attributes": {
+                                "COLUMN": "8",
+                                "LINE": "33"
+                              },
+                              "children": [
+                                {
+                                  "kind": "This",
+                                  "attributes": {
+                                    "COLUMN": "8",
+                                    "LINE": "33",
+                                    "VALUE": "this"
+                                  },
+                                  "children": []
+                                },
+                                {
+                                  "kind": "Method",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "13",
+                                        "LINE": "33",
+                                        "VALUE": "performSingleEstimate"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "kind": "Params",
+                                      "attributes": {},
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "StatementBlock",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Assign",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Var",
+                                      "attributes": {},
+                                      "children": []
+                                    },
+                                    {
+                                      "kind": "Add",
+                                      "attributes": {},
+                                      "children": [
+                                        {
+                                          "kind": "Identifier",
+                                          "attributes": {
+                                            "COLUMN": "25",
+                                            "LINE": "34",
+                                            "VALUE": "samples_in_circle"
+                                          },
+                                          "children": []
+                                        },
+                                        {
+                                          "kind": "Int",
+                                          "attributes": {
+                                            "COLUMN": "45",
+                                            "LINE": "34",
+                                            "VALUE": "1"
+                                          },
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "StatementBlock",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "Assign",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Var",
+                              "attributes": {},
+                              "children": []
+                            },
+                            {
+                              "kind": "Add",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "21",
+                                    "LINE": "37",
+                                    "VALUE": "samples_so_far"
+                                  },
+                                  "children": []
+                                },
+                                {
+                                  "kind": "Int",
+                                  "attributes": {
+                                    "COLUMN": "38",
+                                    "LINE": "37",
+                                    "VALUE": "1"
+                                  },
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "kind": "Mul",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Int",
+                              "attributes": {
+                                "COLUMN": "17",
+                                "LINE": "40",
+                                "VALUE": "400"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "23",
+                                "LINE": "40",
+                                "VALUE": "samples_in_circle"
+                              },
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "43",
+                            "LINE": "40",
+                            "VALUE": "n"
+                          },
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "kind": "Return",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "10",
+                    "LINE": "41",
+                    "VALUE": "pi_estimate"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Main",
+          "attributes": {},
+          "children": [
+            {
+              "kind": "MethodParams",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "35",
+                    "LINE": "44",
+                    "VALUE": "args"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "45",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "45",
+                        "VALUE": "pi_estimate_times_100"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "46",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "46",
+                        "VALUE": "num_samples"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "17",
+                        "LINE": "48"
+                      },
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "17",
+                            "LINE": "48",
+                            "VALUE": "ioPlus"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Method",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "24",
+                                "LINE": "48",
+                                "VALUE": "requestNumber"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "27",
+                        "LINE": "49"
+                      },
+                      "children": [
+                        {
+                          "kind": "New",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "31",
+                                "LINE": "49",
+                                "VALUE": "MonteCarloPi"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": []
+                            },
+                            {
+                              "kind": "Object",
+                              "attributes": {
+                                "COLUMN": "31",
+                                "LINE": "49"
+                              },
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "Method",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "46",
+                                "LINE": "49",
+                                "VALUE": "estimatePi100"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "60",
+                                        "LINE": "49",
+                                        "VALUE": "num_samples"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Expression",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "3",
+                        "LINE": "51"
+                      },
+                      "children": [
+                        {
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "3",
+                            "LINE": "51",
+                            "VALUE": "ioPlus"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Method",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "10",
+                                "LINE": "51",
+                                "VALUE": "printResult"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
+                              "attributes": {},
+                              "children": [
+                                {
+                                  "kind": "Param",
+                                  "attributes": {},
+                                  "children": [
+                                    {
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "22",
+                                        "LINE": "51",
+                                        "VALUE": "pi_estimate_times_100"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

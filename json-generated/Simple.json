@@ -3,280 +3,184 @@
   "attributes": {},
   "children": [
     {
-      "kind": "ImportDeclaration",
+      "kind": "Package",
       "attributes": {},
-      "children": [
-        {
-          "kind": "ImportStatement",
-          "attributes": {},
-          "children": [
-            {
-              "kind": "Identifier",
-              "attributes": {},
-              "children": []
-            }
-          ]
-        }
-      ]
+      "children": []
     },
     {
-      "kind": "ClassDeclaration",
+      "kind": "Import",
+      "attributes": {
+        "COLUMN": "1",
+        "LINE": "1"
+      },
+      "children": []
+    },
+    {
+      "kind": "Class",
       "attributes": {},
       "children": [
         {
-          "kind": "ClassBody",
-          "attributes": {},
-          "children": [
-            {
-              "kind": "Identifier",
-              "attributes": {},
-              "children": []
-            }
-          ]
+          "kind": "Identifier",
+          "attributes": {
+            "COLUMN": "7",
+            "LINE": "2",
+            "VALUE": "Simple"
+          },
+          "children": []
         },
         {
-          "kind": "MethodDeclaration",
+          "kind": "Method",
           "attributes": {},
           "children": [
             {
-              "kind": "RegularMethodDeclaration",
+              "kind": "Int",
+              "attributes": {
+                "COLUMN": "12",
+                "LINE": "4",
+                "VALUE": "int"
+              },
+              "children": []
+            },
+            {
+              "kind": "Identifier",
+              "attributes": {
+                "COLUMN": "16",
+                "LINE": "4",
+                "VALUE": "add"
+              },
+              "children": []
+            },
+            {
+              "kind": "Param",
               "attributes": {},
               "children": [
                 {
-                  "kind": "MethodName",
+                  "kind": "Int",
+                  "attributes": {
+                    "COLUMN": "20",
+                    "LINE": "4",
+                    "VALUE": "int"
+                  },
+                  "children": []
+                },
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "24",
+                    "LINE": "4",
+                    "VALUE": "a"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "kind": "Param",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Int",
+                  "attributes": {
+                    "COLUMN": "27",
+                    "LINE": "4",
+                    "VALUE": "int"
+                  },
+                  "children": []
+                },
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "31",
+                    "LINE": "4",
+                    "VALUE": "b"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
                   "attributes": {},
                   "children": [
                     {
-                      "kind": "Type",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "TypeNotIdentifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "5",
+                        "VALUE": "int"
+                      },
+                      "children": []
                     },
                     {
                       "kind": "Identifier",
-                      "attributes": {},
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "5",
+                        "VALUE": "c"
+                      },
                       "children": []
                     }
                   ]
                 },
                 {
-                  "kind": "Type",
+                  "kind": "Assign",
                   "attributes": {},
                   "children": [
                     {
-                      "kind": "TypeNotIdentifier",
+                      "kind": "Var",
                       "attributes": {},
                       "children": []
-                    }
-                  ]
-                },
-                {
-                  "kind": "Identifier",
-                  "attributes": {},
-                  "children": []
-                },
-                {
-                  "kind": "Type",
-                  "attributes": {},
-                  "children": [
-                    {
-                      "kind": "TypeNotIdentifier",
-                      "attributes": {},
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "kind": "Identifier",
-                  "attributes": {},
-                  "children": []
-                },
-                {
-                  "kind": "MethodBody",
-                  "attributes": {},
-                  "children": [
-                    {
-                      "kind": "VarDeclaration",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Type",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "TypeNotIdentifier",
-                              "attributes": {},
-                              "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
                     },
                     {
-                      "kind": "Statement",
+                      "kind": "Add",
                       "attributes": {},
                       "children": [
                         {
                           "kind": "Identifier",
-                          "attributes": {},
+                          "attributes": {
+                            "COLUMN": "13",
+                            "LINE": "6",
+                            "VALUE": "a"
+                          },
                           "children": []
                         },
                         {
-                          "kind": "Expression",
-                          "attributes": {},
+                          "kind": "Dot",
+                          "attributes": {
+                            "COLUMN": "17",
+                            "LINE": "6"
+                          },
                           "children": [
                             {
-                              "kind": "LogicalAndExp",
+                              "kind": "This",
+                              "attributes": {
+                                "COLUMN": "17",
+                                "LINE": "6",
+                                "VALUE": "this"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Method",
                               "attributes": {},
                               "children": [
                                 {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "Identifier",
-                                                          "attributes": {},
-                                                          "children": []
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    },
-                                                    {
-                                                      "kind": "DotExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "CallWithParams",
-                                                          "attributes": {},
-                                                          "children": [
-                                                            {
-                                                              "kind": "Identifier",
-                                                              "attributes": {},
-                                                              "children": []
-                                                            },
-                                                            {
-                                                              "kind": "Params",
-                                                              "attributes": {},
-                                                              "children": []
-                                                            }
-                                                          ]
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "kind": "Expression",
-                  "attributes": {},
-                  "children": [
-                    {
-                      "kind": "LogicalAndExp",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "RelationalLessExp",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "ArithmeticAdditiveExp",
-                              "attributes": {},
-                              "children": [
+                                  "kind": "Identifier",
+                                  "attributes": {
+                                    "COLUMN": "22",
+                                    "LINE": "6",
+                                    "VALUE": "constInstr"
+                                  },
+                                  "children": []
+                                },
                                 {
-                                  "kind": "ArithmeticMultiplicativeExp",
+                                  "kind": "Params",
                                   "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "LogicalNotExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "AccessExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "TerminalExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "Identifier",
-                                                  "attributes": {},
-                                                  "children": []
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
+                                  "children": []
                                 }
                               ]
                             }
@@ -287,1214 +191,291 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "kind": "MethodDeclaration",
-          "attributes": {},
-          "children": [
+            },
             {
-              "kind": "MainDeclaration",
+              "kind": "Return",
               "attributes": {},
               "children": [
                 {
                   "kind": "Identifier",
-                  "attributes": {},
+                  "attributes": {
+                    "COLUMN": "16",
+                    "LINE": "7",
+                    "VALUE": "c"
+                  },
                   "children": []
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Main",
+          "attributes": {},
+          "children": [
+            {
+              "kind": "MethodParams",
+              "attributes": {},
+              "children": [
                 {
-                  "kind": "MethodBody",
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "38",
+                    "LINE": "10",
+                    "VALUE": "args"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
                   "attributes": {},
                   "children": [
                     {
-                      "kind": "VarDeclaration",
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "11",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "11",
+                        "VALUE": "a"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "12",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "12",
+                        "VALUE": "b"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "13",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "13",
+                        "VALUE": "c"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Type",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "14",
+                        "VALUE": "Simple"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "16",
+                        "LINE": "14",
+                        "VALUE": "s"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "15",
+                        "VALUE": "20"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "16",
+                        "VALUE": "10"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "New",
                       "attributes": {},
                       "children": [
                         {
-                          "kind": "Type",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "TypeNotIdentifier",
-                              "attributes": {},
-                              "children": []
-                            }
-                          ]
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "17",
+                            "LINE": "17",
+                            "VALUE": "Simple"
+                          },
+                          "children": []
                         },
                         {
-                          "kind": "Identifier",
+                          "kind": "Params",
                           "attributes": {},
+                          "children": []
+                        },
+                        {
+                          "kind": "Object",
+                          "attributes": {
+                            "COLUMN": "17",
+                            "LINE": "17"
+                          },
                           "children": []
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
                     },
                     {
-                      "kind": "VarDeclaration",
-                      "attributes": {},
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "18"
+                      },
                       "children": [
-                        {
-                          "kind": "Type",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "TypeNotIdentifier",
-                              "attributes": {},
-                              "children": []
-                            }
-                          ]
-                        },
                         {
                           "kind": "Identifier",
-                          "attributes": {},
+                          "attributes": {
+                            "COLUMN": "13",
+                            "LINE": "18",
+                            "VALUE": "s"
+                          },
                           "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "VarDeclaration",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Type",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "TypeNotIdentifier",
-                              "attributes": {},
-                              "children": []
-                            }
-                          ]
                         },
                         {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "VarDeclaration",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Type",
+                          "kind": "Method",
                           "attributes": {},
                           "children": [
                             {
                               "kind": "Identifier",
-                              "attributes": {},
+                              "attributes": {
+                                "COLUMN": "15",
+                                "LINE": "18",
+                                "VALUE": "add"
+                              },
                               "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
+                            },
                             {
-                              "kind": "LogicalAndExp",
+                              "kind": "Params",
                               "attributes": {},
                               "children": [
                                 {
-                                  "kind": "RelationalLessExp",
+                                  "kind": "Param",
                                   "attributes": {},
                                   "children": [
                                     {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "19",
+                                        "LINE": "18",
+                                        "VALUE": "a"
+                                      },
+                                      "children": []
                                     }
                                   ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
+                                },
                                 {
-                                  "kind": "RelationalLessExp",
+                                  "kind": "Param",
                                   "attributes": {},
                                   "children": [
                                     {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "NewInstance",
-                                                          "attributes": {},
-                                                          "children": [
-                                                            {
-                                                              "kind": "CallWithParams",
-                                                              "attributes": {},
-                                                              "children": [
-                                                                {
-                                                                  "kind": "Identifier",
-                                                                  "attributes": {},
-                                                                  "children": []
-                                                                },
-                                                                {
-                                                                  "kind": "Params",
-                                                                  "attributes": {},
-                                                                  "children": []
-                                                                }
-                                                              ]
-                                                            }
-                                                          ]
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "Identifier",
-                                                          "attributes": {},
-                                                          "children": []
-                                                        }
-                                                      ]
-                                                    },
-                                                    {
-                                                      "kind": "DotExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "CallWithParams",
-                                                          "attributes": {},
-                                                          "children": [
-                                                            {
-                                                              "kind": "Identifier",
-                                                              "attributes": {},
-                                                              "children": []
-                                                            },
-                                                            {
-                                                              "kind": "Params",
-                                                              "attributes": {},
-                                                              "children": [
-                                                                {
-                                                                  "kind": "Expression",
-                                                                  "attributes": {},
-                                                                  "children": [
-                                                                    {
-                                                                      "kind": "LogicalAndExp",
-                                                                      "attributes": {},
-                                                                      "children": [
-                                                                        {
-                                                                          "kind": "RelationalLessExp",
-                                                                          "attributes": {},
-                                                                          "children": [
-                                                                            {
-                                                                              "kind": "ArithmeticAdditiveExp",
-                                                                              "attributes": {},
-                                                                              "children": [
-                                                                                {
-                                                                                  "kind": "ArithmeticMultiplicativeExp",
-                                                                                  "attributes": {},
-                                                                                  "children": [
-                                                                                    {
-                                                                                      "kind": "LogicalNotExp",
-                                                                                      "attributes": {},
-                                                                                      "children": [
-                                                                                        {
-                                                                                          "kind": "AccessExp",
-                                                                                          "attributes": {},
-                                                                                          "children": [
-                                                                                            {
-                                                                                              "kind": "TerminalExp",
-                                                                                              "attributes": {},
-                                                                                              "children": [
-                                                                                                {
-                                                                                                  "kind": "Identifier",
-                                                                                                  "attributes": {},
-                                                                                                  "children": []
-                                                                                                }
-                                                                                              ]
-                                                                                            }
-                                                                                          ]
-                                                                                        }
-                                                                                      ]
-                                                                                    }
-                                                                                  ]
-                                                                                }
-                                                                              ]
-                                                                            }
-                                                                          ]
-                                                                        }
-                                                                      ]
-                                                                    }
-                                                                  ]
-                                                                },
-                                                                {
-                                                                  "kind": "Expression",
-                                                                  "attributes": {},
-                                                                  "children": [
-                                                                    {
-                                                                      "kind": "LogicalAndExp",
-                                                                      "attributes": {},
-                                                                      "children": [
-                                                                        {
-                                                                          "kind": "RelationalLessExp",
-                                                                          "attributes": {},
-                                                                          "children": [
-                                                                            {
-                                                                              "kind": "ArithmeticAdditiveExp",
-                                                                              "attributes": {},
-                                                                              "children": [
-                                                                                {
-                                                                                  "kind": "ArithmeticMultiplicativeExp",
-                                                                                  "attributes": {},
-                                                                                  "children": [
-                                                                                    {
-                                                                                      "kind": "LogicalNotExp",
-                                                                                      "attributes": {},
-                                                                                      "children": [
-                                                                                        {
-                                                                                          "kind": "AccessExp",
-                                                                                          "attributes": {},
-                                                                                          "children": [
-                                                                                            {
-                                                                                              "kind": "TerminalExp",
-                                                                                              "attributes": {},
-                                                                                              "children": [
-                                                                                                {
-                                                                                                  "kind": "Identifier",
-                                                                                                  "attributes": {},
-                                                                                                  "children": []
-                                                                                                }
-                                                                                              ]
-                                                                                            }
-                                                                                          ]
-                                                                                        }
-                                                                                      ]
-                                                                                    }
-                                                                                  ]
-                                                                                }
-                                                                              ]
-                                                                            }
-                                                                          ]
-                                                                        }
-                                                                      ]
-                                                                    }
-                                                                  ]
-                                                                }
-                                                              ]
-                                                            }
-                                                          ]
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "Identifier",
-                                                          "attributes": {},
-                                                          "children": []
-                                                        }
-                                                      ]
-                                                    },
-                                                    {
-                                                      "kind": "DotExp",
-                                                      "attributes": {},
-                                                      "children": [
-                                                        {
-                                                          "kind": "CallWithParams",
-                                                          "attributes": {},
-                                                          "children": [
-                                                            {
-                                                              "kind": "Identifier",
-                                                              "attributes": {},
-                                                              "children": []
-                                                            },
-                                                            {
-                                                              "kind": "Params",
-                                                              "attributes": {},
-                                                              "children": [
-                                                                {
-                                                                  "kind": "Expression",
-                                                                  "attributes": {},
-                                                                  "children": [
-                                                                    {
-                                                                      "kind": "LogicalAndExp",
-                                                                      "attributes": {},
-                                                                      "children": [
-                                                                        {
-                                                                          "kind": "RelationalLessExp",
-                                                                          "attributes": {},
-                                                                          "children": [
-                                                                            {
-                                                                              "kind": "ArithmeticAdditiveExp",
-                                                                              "attributes": {},
-                                                                              "children": [
-                                                                                {
-                                                                                  "kind": "ArithmeticMultiplicativeExp",
-                                                                                  "attributes": {},
-                                                                                  "children": [
-                                                                                    {
-                                                                                      "kind": "LogicalNotExp",
-                                                                                      "attributes": {},
-                                                                                      "children": [
-                                                                                        {
-                                                                                          "kind": "AccessExp",
-                                                                                          "attributes": {},
-                                                                                          "children": [
-                                                                                            {
-                                                                                              "kind": "TerminalExp",
-                                                                                              "attributes": {},
-                                                                                              "children": [
-                                                                                                {
-                                                                                                  "kind": "Identifier",
-                                                                                                  "attributes": {},
-                                                                                                  "children": []
-                                                                                                }
-                                                                                              ]
-                                                                                            }
-                                                                                          ]
-                                                                                        }
-                                                                                      ]
-                                                                                    }
-                                                                                  ]
-                                                                                }
-                                                                              ]
-                                                                            }
-                                                                          ]
-                                                                        }
-                                                                      ]
-                                                                    }
-                                                                  ]
-                                                                }
-                                                              ]
-                                                            }
-                                                          ]
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "kind": "MethodDeclaration",
-          "attributes": {},
-          "children": [
-            {
-              "kind": "RegularMethodDeclaration",
-              "attributes": {},
-              "children": [
-                {
-                  "kind": "MethodName",
-                  "attributes": {},
-                  "children": [
-                    {
-                      "kind": "Type",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "TypeNotIdentifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Identifier",
-                      "attributes": {},
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "kind": "MethodBody",
-                  "attributes": {},
-                  "children": [
-                    {
-                      "kind": "VarDeclaration",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Type",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "TypeNotIdentifier",
-                              "attributes": {},
-                              "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "kind": "Statement",
-                      "attributes": {},
-                      "children": [
-                        {
-                          "kind": "Identifier",
-                          "attributes": {},
-                          "children": []
-                        },
-                        {
-                          "kind": "Expression",
-                          "attributes": {},
-                          "children": [
-                            {
-                              "kind": "LogicalAndExp",
-                              "attributes": {},
-                              "children": [
-                                {
-                                  "kind": "RelationalLessExp",
-                                  "attributes": {},
-                                  "children": [
-                                    {
-                                      "kind": "ArithmeticAdditiveExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "ArithmeticMultiplicativeExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "LogicalNotExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "AccessExp",
-                                                  "attributes": {},
-                                                  "children": [
-                                                    {
-                                                      "kind": "TerminalExp",
-                                                      "attributes": {},
-                                                      "children": []
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "21",
+                                        "LINE": "18",
+                                        "VALUE": "b"
+                                      },
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -1511,43 +492,50 @@
                   "attributes": {},
                   "children": [
                     {
-                      "kind": "LogicalAndExp",
-                      "attributes": {},
+                      "kind": "Dot",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "19"
+                      },
                       "children": [
                         {
-                          "kind": "RelationalLessExp",
+                          "kind": "Identifier",
+                          "attributes": {
+                            "COLUMN": "9",
+                            "LINE": "19",
+                            "VALUE": "io"
+                          },
+                          "children": []
+                        },
+                        {
+                          "kind": "Method",
                           "attributes": {},
                           "children": [
                             {
-                              "kind": "ArithmeticAdditiveExp",
+                              "kind": "Identifier",
+                              "attributes": {
+                                "COLUMN": "12",
+                                "LINE": "19",
+                                "VALUE": "println"
+                              },
+                              "children": []
+                            },
+                            {
+                              "kind": "Params",
                               "attributes": {},
                               "children": [
                                 {
-                                  "kind": "ArithmeticMultiplicativeExp",
+                                  "kind": "Param",
                                   "attributes": {},
                                   "children": [
                                     {
-                                      "kind": "LogicalNotExp",
-                                      "attributes": {},
-                                      "children": [
-                                        {
-                                          "kind": "AccessExp",
-                                          "attributes": {},
-                                          "children": [
-                                            {
-                                              "kind": "TerminalExp",
-                                              "attributes": {},
-                                              "children": [
-                                                {
-                                                  "kind": "Identifier",
-                                                  "attributes": {},
-                                                  "children": []
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
+                                      "kind": "Identifier",
+                                      "attributes": {
+                                        "COLUMN": "20",
+                                        "LINE": "19",
+                                        "VALUE": "c"
+                                      },
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -1558,6 +546,255 @@
                       ]
                     }
                   ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Method",
+          "attributes": {},
+          "children": [
+            {
+              "kind": "Int",
+              "attributes": {
+                "COLUMN": "12",
+                "LINE": "22",
+                "VALUE": "int"
+              },
+              "children": []
+            },
+            {
+              "kind": "Identifier",
+              "attributes": {
+                "COLUMN": "16",
+                "LINE": "22",
+                "VALUE": "constInstr"
+              },
+              "children": []
+            },
+            {
+              "kind": "MethodBody",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "VarDeclaration",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "9",
+                        "LINE": "23",
+                        "VALUE": "int"
+                      },
+                      "children": []
+                    },
+                    {
+                      "kind": "Identifier",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "23",
+                        "VALUE": "c"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "24",
+                        "VALUE": "0"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "25",
+                        "VALUE": "4"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "26",
+                        "VALUE": "8"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "27",
+                        "VALUE": "14"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "28",
+                        "VALUE": "250"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "29",
+                        "VALUE": "400"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "30",
+                        "VALUE": "1000"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "13",
+                        "LINE": "31",
+                        "VALUE": "100474650"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "kind": "Assign",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "kind": "Var",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "kind": "Int",
+                      "attributes": {
+                        "COLUMN": "7",
+                        "LINE": "32",
+                        "VALUE": "10"
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "kind": "Return",
+              "attributes": {},
+              "children": [
+                {
+                  "kind": "Identifier",
+                  "attributes": {
+                    "COLUMN": "16",
+                    "LINE": "33",
+                    "VALUE": "c"
+                  },
+                  "children": []
                 }
               ]
             }

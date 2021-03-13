@@ -28,7 +28,7 @@ PARSER_BEGIN(Jmm)
             this.reports.add(new Report(ERROR, SYNTATIC, errorToken.beginLine, errorToken.endLine, getErrorMessage(currentToken, e.expectedTokenSequences, e.tokenImage)));
             System.err.println(String.format("Error(%d) detected during parsing of while expression. Unexpected token '%s' ....", this.errno, errorToken));
             System.err.println("Error Details:");
-            System.err.println(String.format("\tBegin Line: %d \t Begin Column: %d \t End Line: %d \t End Column: %d", errorToken.beginLine, errorToken.beginColumn, errorToken.endLine, errorToken.endColumn));
+            System.err.println(String.format("\tLine: %d \t Column: %d", errorToken.beginLine, errorToken.beginColumn));
             System.err.println(getErrorMessage(currentToken, e.expectedTokenSequences, e.tokenImage));
             System.err.println("------------------------------------------------------------------------");
             recoverFromWhile();
@@ -142,70 +142,71 @@ SimpleNode Program(): { } {
     ImportDeclaration() ClassDeclaration() #Class { if (this.errno > 0) throw new RuntimeException(); return jjtThis; }
 }
 
-void ImportDeclaration() #void: {} {
-    (<IMPORT> ImportStatement() #Import <SEMICOLON>)*
+void ImportDeclaration() #void: {Token t;} {
+    (t=<IMPORT> ImportStatement() <SEMICOLON> {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Import )*
 }
 
 void ImportStatement() #void: {} {
-    <IDENTIFIER>#Package(true) (<DOT> <IDENTIFIER>#Package(1))*
+    <IDENTIFIER> #Package(true) (<DOT> <IDENTIFIER> #Package(1))*
 }
 
 void ClassDeclaration() #void: {} {
-    <CLASS> ClassBody() <LBRACKET> (VarDeclaration()#ClassVar)* (MethodDeclaration())* <RBRACKET>
+    <CLASS> ClassBody() <LBRACKET> (VarDeclaration())* (MethodDeclaration())* <RBRACKET>
 }
 
 void ClassBody() #void: {} {
-    <IDENTIFIER> #Name [<EXTENDS> <IDENTIFIER> #Extends]
+    Identifier() [<EXTENDS> Identifier()]
 }
 
 void VarDeclaration() #void: {} {
-    Type() <IDENTIFIER>#Name <SEMICOLON>
+    Type() Identifier() #VarDeclaration(2) <SEMICOLON>
 }
 
 void MethodDeclaration() #void: { } {
-    <PUBLIC> (MainDeclaration()#Main | RegularMethodDeclaration()#Method)
+    <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #Method)
 }
 
 void MainDeclaration() #void: {} {
-    <STATIC> <VOID> <MAIN> <LPAR> ((<STRING>#Class <LSQRBRACKET> <RSQRBRACKET>#Array(1) <IDENTIFIER>#Name)#Param(2) )#MethodParams(1) <RPAR> <LBRACKET>
-        MethodBody()#MethodBody
+    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LSQRBRACKET> <RSQRBRACKET> Identifier() #MethodParams(1) <RPAR> <LBRACKET>
+        MethodBody() #MethodBody
     <RBRACKET>
 }
 
 void RegularMethodDeclaration() #void: {} {
-    Type() <IDENTIFIER>#Name <LPAR> [MethodParameters() #MethodParams] <RPAR> <LBRACKET>
-        MethodBody()#MethodBody
-        <RETURN> Expression()#Return <SEMICOLON>
+    Type() Identifier() <LPAR> [MethodParameters()] <RPAR> <LBRACKET>
+        MethodBody() #MethodBody
+        <RETURN> Expression() #Return(1) <SEMICOLON>
     <RBRACKET>
 }
 
 void MethodParameters() #void: {} {
-    Param()#Param(true) (<COMMA> Param()#Param)*
+    Param() (<COMMA> Param())*
 }
 
 void Param() #void: {} {
-    Type() <IDENTIFIER>#Name
+    Type() Identifier() #Param(2)
 }
 
 void MethodBody() #void: {} {
     (LOOKAHEAD(2) VarDeclaration())* (Statement())*
 }
 
-void Type() #void: {} {
-    <BOOLEAN> #Boolean
-    | <INT>#Int [<LSQRBRACKET> <RSQRBRACKET>#Array(1) ]
-    | <IDENTIFIER>#Class
+void Type() #void: {Token t;} {
+    t=<BOOLEAN> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Boolean
+    | t=<INT> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
+    | t=<IDENTIFIER> {jjtThis.put(VALUE,  t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Type
 }
 
 void Statement() #void: {} {
-    <LBRACKET> (Statement())*#StatementBlock <RBRACKET>
-    | IfStatement() #If
-    | WhileStatement() #While
-    | (LOOKAHEAD(2) <IDENTIFIER>#Var [ArrayAccess()#ArrayAccess(1)] <EQUALS> Expression()#Assign(2) |  Expression()#Expression) <SEMICOLON>
+    <LBRACKET> (Statement())* #StatementBlock <RBRACKET>
+    | IfStatement()
+    | WhileStatement()
+    | (LOOKAHEAD(2) <IDENTIFIER> #Var [ArrayAccess() #ArrayAccess(1)] <EQUALS> Expression() #Assign(2) |  Expression() #Expression) <SEMICOLON>
 }
 
-void IfStatement() #void: {} {
-    <IF> <LPAR> Expression()#Condition <RPAR> Statement()#ConditionTrue <ELSE> Statement()#ConditionFalse
+void IfStatement() #void: {Token t;} {
+    <IF> t=<LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #If(3)
 }
 
 /* *
@@ -213,14 +214,15 @@ void IfStatement() #void: {} {
 * https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
 * https://www.cs.purdue.edu/homes/hosking/javacc/doc/apiroutines.html
 * */
-void WhileStatement() #void: {} {
-    <WHILE>
+void WhileStatement() #void: {Token t;} {
+    t=<WHILE>
     try {
-        <LPAR> Expression()#Condition <RPAR>
+        t=<LPAR> Expression() <RPAR>
     } catch (ParseException e) {
         processWhileError(e);
     }
-    Statement()#ConditionTrue
+    Statement()
+    {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #While(2)
 }
 
 /* *
@@ -275,7 +277,7 @@ Token TerminalExp() #void: {Token t;} {
     | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #This {return t;}
     | t=Identifier() {return t;}
     | t=<NEW> NewInstance() #New {return t;}
-    | <LPAR> Expression() <RPAR>
+    | t=<LPAR> Expression() <RPAR> {return t;}
 }
 
 Token Identifier() #void: {Token t;} {
