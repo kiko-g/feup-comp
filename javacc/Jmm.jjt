@@ -4,13 +4,12 @@ options {
 }
 
 PARSER_BEGIN(Jmm)
-    import java.util.*;
-    import pt.up.fe.comp.jmm.report.Report;
-    import static pt.up.fe.comp.jmm.report.ReportType.*;
-    import static pt.up.fe.comp.jmm.report.Stage.*;
-
     import java.util.ArrayList;
     import java.util.List;
+    import pt.up.fe.comp.jmm.report.Report;
+    import static pt.up.fe.comp.jmm.AttributeType.*;
+    import static pt.up.fe.comp.jmm.report.Stage.*;
+    import static pt.up.fe.comp.jmm.report.ReportType.*;
 
     public class Jmm {
         private int errno = 0;
@@ -261,29 +260,33 @@ void DotExp() #void: {} {
     <LENGTH> #Length | CallWithParams() #Method
 }
 
-void NewInstance() #void: {} {
-    <NEW> (<INT> <LSQRBRACKET> Expression() #Size <RSQRBRACKET>#Array(1)  | CallWithParams() #Class) // new int[] | new Identifier(Param1, Param2, ...)
-}
-
 void ArrayAccess() #void: {} {
     <LSQRBRACKET> Expression() #Index(1) <RSQRBRACKET>
 }
 
-void CallWithParams() #void: {} {
-    <IDENTIFIER> #Name Params()#Params
+void CallWithParams() #void: {Token t;} {
+        Identifier() Params() #Params
+}
+
+Token TerminalExp() #void: {Token t;} {
+    t=<INTEGER_LITERAL> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Int {return t;}
+    | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Bool {return t;}
+    | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Bool {return t;}
+    | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Self {return t;}
+    | t=Identifier() {return t;}
+    | t=<NEW> NewInstance() #New {return t;}
+    | <LPAR> Expression() <RPAR>
+}
+
+Token Identifier() #void: {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Identifier {return t;}
+}
+
+void NewInstance() #void: {} {
+    <INT> <LSQRBRACKET> Expression() <RSQRBRACKET> #ArrayInit(1)
+    | t=Identifier() Params() #Params {jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Object
 }
 
 void Params() #void: {} {
     <LPAR> [Expression() #Param(true) (<COMMA> Expression() #Param(true))*] <RPAR>
 }
-
-void TerminalExp() #void: {} {
-    <INTEGER_LITERAL> #Int
-    | <TRUE> #Bool
-    | <FALSE> #Bool
-    | <THIS> #Self
-    | <IDENTIFIER> #Var
-    | NewInstance() #New
-    | <LPAR> Expression() <RPAR>
-}
-
