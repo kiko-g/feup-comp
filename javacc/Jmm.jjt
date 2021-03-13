@@ -233,27 +233,27 @@ void Expression() #void: {} {
 }
 
 void LogicalAndExp() #void: {} {
-    RelationalLessExp() (<AND> RelationalLessExp()#LogicalAnd(2))*
+    RelationalLessExp() (<AND> RelationalLessExp() #And(2))*
 }
 
 void RelationalLessExp() #void: {} {
-    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp()#Less(2))*
+    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp() #LessThan(2))*
 }
 
 void ArithmeticAdditiveExp() #void: {} {
-    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp()#Add(2) | <MINUS> ArithmeticMultiplicativeExp()#Add(2))*
+    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2))*
 }
 
 void ArithmeticMultiplicativeExp() #void: {} {
-    LogicalNotExp() (<MUL> LogicalNotExp()#Mul(2) | <DIV> LogicalNotExp()#Div(2))*
+    LogicalNotExp() (<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2))*
 }
 
 void LogicalNotExp() #void: {} {
-    (<NOT> AccessExp()#Not)+ | AccessExp()
+    <NOT> LogicalNotExp() #Not(1) | AccessExp()
 }
 
-void AccessExp() #void: {} {
-    TerminalExp() (ArrayAccess()#ArrayAccess(1) | <DOT> DotExp()#Dot(2))*
+void AccessExp() #void: {Token t;} {
+    t=TerminalExp() (ArrayAccess() #ArrayAccess(2) | <DOT> DotExp() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Dot(2))*
 }
 
 void DotExp() #void: {} {
@@ -261,7 +261,7 @@ void DotExp() #void: {} {
 }
 
 void ArrayAccess() #void: {} {
-    <LSQRBRACKET> Expression() #Index(1) <RSQRBRACKET>
+    <LSQRBRACKET> Expression() <RSQRBRACKET>
 }
 
 void CallWithParams() #void: {Token t;} {
@@ -269,22 +269,22 @@ void CallWithParams() #void: {Token t;} {
 }
 
 Token TerminalExp() #void: {Token t;} {
-    t=<INTEGER_LITERAL> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Int {return t;}
-    | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Bool {return t;}
-    | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Bool {return t;}
-    | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Self {return t;}
+    t=<INTEGER_LITERAL> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Int {return t;}
+    | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
+    | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
+    | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #This {return t;}
     | t=Identifier() {return t;}
     | t=<NEW> NewInstance() #New {return t;}
     | <LPAR> Expression() <RPAR>
 }
 
 Token Identifier() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Identifier {return t;}
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Identifier {return t;}
 }
 
-void NewInstance() #void: {} {
+void NewInstance() #void: {Token t;} {
     <INT> <LSQRBRACKET> Expression() <RSQRBRACKET> #ArrayInit(1)
-    | t=Identifier() Params() #Params {jjtThis.put(LINE, t.beginLine); jjtThis.put(COLUMN, t.beginColumn);} #Object
+    | t=Identifier() Params() #Params {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Object
 }
 
 void Params() #void: {} {
