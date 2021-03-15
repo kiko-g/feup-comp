@@ -1,6 +1,7 @@
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,7 @@ public class Main implements JmmParser {
 		}
 
 		String resource = args[1];
-		String fileName = resource.substring(resource.lastIndexOf("/"));
+		String fileName = resource.substring(resource.lastIndexOf(File.separator));
 		String content = null;
 
 		JmmParser main = new Main();

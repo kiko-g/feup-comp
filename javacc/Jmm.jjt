@@ -142,12 +142,16 @@ SimpleNode Program(): { } {
     ImportDeclaration() ClassDeclaration() #Class { if (this.errno > 0) throw new RuntimeException(); return jjtThis; }
 }
 
-void ImportDeclaration() #void: {Token t;} {
-    (t=<IMPORT> ImportStatement() #Import <SEMICOLON> {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Import )*
+void ImportDeclaration() #void: {} {
+    (<IMPORT> ImportStatement() <SEMICOLON>)*
 }
 
 void ImportStatement() #void: {} {
-    Identifier() #Package(1) (<DOT> Identifier() #Package(1))*
+    Import() (<DOT> Import() #SubImport(2))*
+}
+
+Token Import() #void: {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Import {return t;}
 }
 
 void ClassDeclaration() #void: {} {
@@ -155,11 +159,11 @@ void ClassDeclaration() #void: {} {
 }
 
 void ClassBody() #void: {} {
-    Identifier() #Name [<EXTENDS> Identifier()#Extends]
+    Name() [<EXTENDS> Name()]
 }
 
 void VarDeclaration() #void: {} {
-    Type() Identifier()#Name <SEMICOLON>
+    Type() Name() <SEMICOLON>#VarDecl(2)
 }
 
 void MethodDeclaration() #void: { } {
@@ -167,24 +171,24 @@ void MethodDeclaration() #void: { } {
 }
 
 void MainDeclaration() #void: {} {
-    <STATIC> <VOID> <MAIN> <LPAR> ((<STRING>#Class <LSQRBRACKET> <RSQRBRACKET>#Array(1) Identifier()#Name)#Param(2) )#MethodParams(1) <RPAR> <LBRACKET>
-        MethodBody()#MethodBody
+    <STATIC> <VOID> <MAIN> <LPAR> (<STRING>#Class <LSQRBRACKET> <RSQRBRACKET>#Array(1) Name())#MethodParam(2) <RPAR>#MethodParameters <LBRACKET>
+        MethodBody()
     <RBRACKET>
 }
 
 void RegularMethodDeclaration() #void: {} {
-    Type() Identifier()#Name <LPAR> [MethodParameters() #MethodParams] <RPAR> <LBRACKET>
-        MethodBody()#MethodBody
+    Type() Name() <LPAR> [MethodParameters()] <RPAR> <LBRACKET>
+        MethodBody()
         <RETURN> Expression()#Return <SEMICOLON>
     <RBRACKET>
 }
 
-void MethodParameters() #void: {} {
-    MethodParam()#MethodParam(true) (<COMMA> MethodParam()#MethodParam)*
+void MethodParameters() : {} {
+    MethodParam() (<COMMA> MethodParam())*
 }
 
-void MethodParam() #void: {} {
-    Type() Identifier()#Name
+void MethodParam() : {} {
+    Type() Name()
 }
 
 void MethodBody() #void: {} {
@@ -199,8 +203,8 @@ void Type() #void: {Token t;} {
 
 void Statement() #void: {} {
     <LBRACKET> (Statement())* #StatementBlock <RBRACKET>
-    | IfStatement() #If
-    | WhileStatement() #While
+    | IfStatement()
+    | WhileStatement()
     | AssignOrExpression() <SEMICOLON>
 }
 
@@ -255,7 +259,7 @@ void LogicalNotExp() #void: {} {
 }
 
 void AccessExp() #void: {Token t;} {
-    t=TerminalExp() (ArrayAccess() #ArrayAccess(1) | <DOT> DotExp() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Dot(2))*
+    t=TerminalExp() (ArrayAccess() #ArrayAccess(2) | <DOT> DotExp() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Dot(2))*
 }
 
 void DotExp() #void: {} {
@@ -267,7 +271,7 @@ void ArrayAccess() #void: {} {
 }
 
 void CallWithParams() #void: {} {
-    Identifier() #Name Params()#Params
+    Name() Params()#Params
 }
 
 Token TerminalExp() #void: {Token t;} {
@@ -275,7 +279,7 @@ Token TerminalExp() #void: {Token t;} {
     | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #This {return t;}
-    | t=Identifier() #Var {return t;}
+    | t=Var() {return t;}
     | t=<NEW> NewInstance() #New {return t;}
     | t=<LPAR> Expression() #Important <RPAR> {return t;}
 }
@@ -313,13 +317,13 @@ Token TerminalExpressionOrAssign() #void: {Token t;} {
     | t=<TRUE> {jjtThis.put(VALUE, "true"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<FALSE> {jjtThis.put(VALUE, "false"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Bool {return t;}
     | t=<THIS> {jjtThis.put(VALUE, "this"); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #This {return t;}
-    | t=Identifier() #Var ArrayAccessExpressionOrAssign() {return t;}
+    | t=Var() ArrayAccessExpressionOrAssign() {return t;}
     | t=<NEW> NewInstance() #New {return t;}
     | t=<LPAR> Expression() #Important <RPAR> {return t;}
 }
 
 void ArrayAccessExpressionOrAssign() #void: {Token t;} {
-    [<LSQRBRACKET> (Expression() #Expression) #Index(1) <RSQRBRACKET>] [<EQUALS> (LogicalNotExpressionOrAssignNoDot() #Expression) #Assign(2)]
+    [<LSQRBRACKET> (Expression() #Expression) #Index(1) <RSQRBRACKET>#ArrayAccess(2) ] [<EQUALS>#Assign(1) LogicalNotExpressionOrAssignNoDot() ]
 }
 
 void LogicalNotExpressionOrAssignNoDot() #void: {} {
@@ -327,13 +331,16 @@ void LogicalNotExpressionOrAssignNoDot() #void: {} {
 }
 
 void AccessExpressionOrAssignNoDot() #void: {Token t;} {
-    t=TerminalExp() (ArrayAccess() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #ArrayAccess(1))*
+    t=TerminalExp() (ArrayAccess() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #ArrayAccess(2))*
 }
 
-Token Identifier() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Identifier {return t;}
+Token Var() #void: {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Var {return t;}
 }
 
+Token Name() #void: {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Name {return t;}
+}
 void NewInstance() #void: {} {
     <INT> <LSQRBRACKET> (Expression() #Expression) #Size(1) <RSQRBRACKET> #IntArray(1)
         | CallWithParams() #Object // new int[] | new Identifier(Param1, Param2, ...)
