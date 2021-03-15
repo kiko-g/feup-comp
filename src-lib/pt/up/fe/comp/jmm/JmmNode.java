@@ -1,9 +1,13 @@
 package pt.up.fe.comp.jmm;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import pt.up.fe.specs.util.SpecsCollections;
 
 /**
  * This interface represents a node in the Jmm AST.
@@ -29,7 +33,7 @@ public interface JmmNode {
      * @param attribute
      * @param value
      */
-    void put(AttributeType attribute, String value);
+    void put(String attribute, String value);
 
     /**
      * 
@@ -76,4 +80,16 @@ public interface JmmNode {
                 .create();
         return gson.toJson(this, JmmNode.class);
     }
+
+    static <T> List<JmmNode> convertChildren(T[] children) {
+        if (children == null) {
+            return new ArrayList<>();
+        }
+
+        JmmNode[] jmmChildren = SpecsCollections.convert(children, new JmmNode[children.length],
+                child -> (JmmNode) child);
+
+        return Arrays.asList(jmmChildren);
+    }
+
 }
