@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Report {
-
     private final ReportType type;
     private final Stage stage;
     private final int line;
