@@ -11,6 +11,7 @@ public class ParserTest {
         try {
             String content = Utils.getResourceContent(resource, resource.substring(resource.lastIndexOf("/")));
             JmmParserResult result = TestUtils.parse(content);
+            Utils.saveJson(Utils.getFilename(resource), result.toJson());
             if (mustFail) {
                 TestUtils.mustFail(result.getReports());
             } else {

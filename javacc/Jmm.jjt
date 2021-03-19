@@ -16,7 +16,7 @@ public class Jmm {
     private int errno = 0;
     private final List<Report> reports = new ArrayList<Report>();
 
-    public static void main(String args[]) throws RuntimeException { }
+    public static void main(String args[]) { }
 
     public void processWhileError(ParseException e) {
         Token currentToken = e.currentToken;
@@ -208,7 +208,7 @@ void Statement() #void: {} {
 }
 
 void IfStatement() #void: {Token t;} {
-    <IF> t=<LPAR> Expression()#Condition <RPAR> Statement()#ConditionTrue <ELSE> Statement()#ConditionFalse
+    <IF> t=<LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #If(3)
 }
 
@@ -220,12 +220,11 @@ void IfStatement() #void: {Token t;} {
 void WhileStatement() #void: {Token t;} {
     t=<WHILE>
     try {
-        t=<LPAR> Expression() #Condition <RPAR>
+        t=<LPAR> Expression() <RPAR>
     } catch (ParseException e) {
         processWhileError(e);
     }
-    Statement() #ConditionTrue
-    {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #While(2)
+    Statement() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #While(2)
 }
 
 /* *
