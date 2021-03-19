@@ -265,7 +265,7 @@ void DotExp() #void: {} {
 }
 
 void ArrayAccess() #void: {} {
-    <LSQRBRACKET> (Expression() #Expression) #Index(1) <RSQRBRACKET>
+    <LSQRBRACKET> (Expression()) #Index(1) <RSQRBRACKET>
 }
 
 void CallWithParams() #void: {} {
@@ -282,32 +282,12 @@ Token TerminalExp() #void: {Token t;} {
     | t=<LPAR> Expression() #Important <RPAR> {return t;}
 }
 
-void AssignOrExpression() #void: {} {
-    LogicalAndExpressionOrAssign()
-}
-
-void LogicalAndExpressionOrAssign() #void: {} {
-    RelationalLessExpressionOrAssign() (<AND> RelationalLessExp() #LogicalAnd(2))*
-}
-
-void RelationalLessExpressionOrAssign() #void: {} {
-    ArithmeticAdditiveExpressionOrAssign() (<LESS> ArithmeticAdditiveExp() #Less(2))*
-}
-
-void ArithmeticAdditiveExpressionOrAssign() #void: {} {
-    ArithmeticMultiplicativeExpressionOrAssign() (<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2))*
-}
-
-void ArithmeticMultiplicativeExpressionOrAssign() #void: {} {
-    LogicalNotExpressionOrAssign() (<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2))*
-}
-
-void LogicalNotExpressionOrAssign() #void: {} {
-    AccessExpressionOrAssign() | (<NOT> AccessExp() #Not)+
-}
-
-void AccessExpressionOrAssign() #void: {Token t;} {
-    t=TerminalExpressionOrAssign() (<DOT> DotExp() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Dot(2))*
+void AssignOrExpression(): {} {
+    (TerminalExpressionOrAssign() | (<NOT> LogicalNotExp() #Not(1)))
+    ((<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2)))*
+    ((<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2)))*
+    (<LESS> ArithmeticAdditiveExp() #Less(2))*
+    (<AND> LogicalAndExp() #And(2))*
 }
 
 Token TerminalExpressionOrAssign() #void: {Token t;} {
@@ -321,7 +301,7 @@ Token TerminalExpressionOrAssign() #void: {Token t;} {
 }
 
 void ArrayAccessExpressionOrAssign() #void: {Token t;} {
-    [<LSQRBRACKET> (Expression() #Expression) #Index(1) <RSQRBRACKET>#ArrayAccess(2) ] [<EQUALS>#Assign(1) LogicalNotExpressionOrAssignNoDot() ]
+    [<LSQRBRACKET> (Expression()) #Index(1) <RSQRBRACKET>#ArrayAccess(2) ] [<EQUALS>#Assign(1) LogicalNotExpressionOrAssignNoDot() ]
 }
 
 void LogicalNotExpressionOrAssignNoDot() #void: {} {
@@ -332,18 +312,18 @@ void AccessExpressionOrAssignNoDot() #void: {Token t;} {
     t=TerminalExp() (ArrayAccess() {jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #ArrayAccess(2))*
 }
 
-Token Var() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Var {return t;}
+Token Var(): {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} {return t;}
 }
 
-Token Name() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} #Name {return t;}
+Token Name(): {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put(VALUE, t.image); jjtThis.put(LINE,  String.valueOf(t.beginLine)); jjtThis.put(COLUMN, String.valueOf(t.beginColumn));} {return t;}
 }
 void NewInstance() #void: {} {
-    <INT> <LSQRBRACKET> (Expression() #Expression) #Size(1) <RSQRBRACKET> #IntArray(1)
+    <INT> <LSQRBRACKET> (Expression()) #Size(1) <RSQRBRACKET> #IntArray(1)
         | CallWithParams() #Object // new int[] | new Identifier(Param1, Param2, ...)
 }
 
 void Params() #void: {} {
-    <LPAR> [(Expression() #Expression(true)) #Param(1) (<COMMA> (Expression() #Expression(true)) #Param(1))*] <RPAR>
+    <LPAR> [(Expression()) #Param(1) (<COMMA> (Expression()) #Param(1))*] <RPAR>
 }
