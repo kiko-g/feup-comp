@@ -44,14 +44,7 @@ public class SimpleNode implements Node {
     }
 
     public List<JmmNode> getChildren() {
-        List<JmmNode> childNodes = new ArrayList<>();
-
-        if(this.children == null) {
-          return childNodes;
-        }
-
-        Collections.addAll(childNodes, this.children);
-        return childNodes;
+        return JmmNode.convertChildren(this.children);
     }
 
     public int getNumChildren() {
