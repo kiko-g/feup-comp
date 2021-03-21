@@ -188,4 +188,22 @@ public class ParserTest {
     public void testNestedLoop() {
         test("test/fixtures/public/fail/syntactical/NestedLoop.jmm", true);
     }
+
+    /**
+     * Private Tests
+     */
+    @Test
+    public void testTuringV2() {
+        test("test/fixtures/private/TuringV2.jmm", false);
+    }
+
+    @Test
+    public void testArrayAssign() {
+        test("test/fixtures/private/ArrayAssign.jmm", false);
+    }
+
+    @Test
+    public void testArrayAssignFail() {
+        test("test/fixtures/private/fail/ArrayAssignFail.jmm", true);
+    }
 }

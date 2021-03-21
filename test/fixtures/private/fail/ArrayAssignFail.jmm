@@ -1,0 +1,7 @@
+import ioPlus;
+
+class Array {
+	public static void main(String[] args) {
+		i[0][0] = i[0];
+	}
+}
