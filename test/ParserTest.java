@@ -70,7 +70,7 @@ public class ParserTest {
 
     @Test
     public void testBlowUp() {
-        test("test/fixtures/public/fail/syntactical/BlowUp.jmm", false);
+        test("test/fixtures/public/fail/syntactical/BlowUp.jmm", true);
     }
 
     @Test
