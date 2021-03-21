@@ -4,28 +4,25 @@ options {
 }
 
 PARSER_BEGIN(Jmm)
-    import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
-import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.Stage;
+import pt.up.fe.comp.jmm.report.ReportType;
 import static pt.up.fe.comp.jmm.AttributeType.*;
-import static pt.up.fe.comp.jmm.report.Stage.*;
-import static pt.up.fe.comp.jmm.report.ReportType.*;
 
 public class Jmm {
-    private int errno = 0;
     private final List<Report> reports = new ArrayList<Report>();
-
     public static void main(String args[]) { }
 
     public void processWhileError(ParseException e) {
         Token currentToken = e.currentToken;
         Token errorToken = currentToken.next;
-        this.reports.add(new Report(ERROR, SYNTATIC, errorToken.beginLine, errorToken.endLine, getErrorMessage(this.errno, currentToken, e.expectedTokenSequences, e.tokenImage)));
+        this.reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, errorToken.beginLine, errorToken.endLine, getErrorMessage(this.reports.size(), errorToken, e.expectedTokenSequences, e.tokenImage)));
         recoverFromWhile();
     }
 
-    private static String getErrorMessage(int errno, Token token,  int[][] expectedTokenSequences, String[] tokenImage) {
+    public static String getErrorMessage(int errno, Token token,  int[][] expectedTokenSequences, String[] tokenImage) {
         int maxSize = 0;
         StringBuilder expected = new StringBuilder("\t\t");
 
@@ -45,7 +42,7 @@ public class Jmm {
         }
 
         String info = String.format("%s\n%s\n%s",
-            String.format("Error(%d) detected during parsing of while expression. Unexpected token '%s' ....", errno, token),
+            String.format("Error(%d) detected during parsing process. Unexpected token '%s' ....", errno, token),
             "\tError Details:",
             String.format("\t\tLine: %d \t Column: %d", token.beginLine, token.beginColumn)
         );
@@ -63,6 +60,10 @@ public class Jmm {
             }
             t = getNextToken();
         } while (true);
+    }
+
+    public List<Report> getReports() {
+        return this.reports;
     }
 }
 PARSER_END(Jmm)
@@ -131,14 +132,8 @@ TOKEN: {
    | < #OCTAL: "0"(["0"-"7"])* >
 }
 
-JmmParserResult Program(): { } {
-    ImportDeclaration() ClassDeclaration() #Class {
-        if(this.errno > 0) {
-            return new JmmParserResult(null, this.reports);
-        } else {
-            return new JmmParserResult(jjtThis, this.reports);
-        }
-    }
+SimpleNode Program(): { } {
+    ImportDeclaration() ClassDeclaration() #Class { return jjtThis; }
 }
 
 void ImportDeclaration() #void: {} {
@@ -284,10 +279,11 @@ Token TerminalExp() #void: {Token t;} {
 
 void AssignOrExpression(): {} {
     (TerminalExpressionOrAssign() | (<NOT> LogicalNotExp() #Not(1)))
+    (<DOT> DotExp() #Dot(2))*
     ((<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2)))*
     ((<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2)))*
     (<LESS> ArithmeticAdditiveExp() #Less(2))*
-    (<AND> LogicalAndExp() #And(2))*
+    (<AND> RelationalLessExp() #And(2))*
 }
 
 Token TerminalExpressionOrAssign() #void: {Token t;} {
