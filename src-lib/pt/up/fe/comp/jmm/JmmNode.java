@@ -7,6 +7,8 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
+import pt.up.fe.comp.jmm.ast.JmmSerializer;
 import pt.up.fe.specs.util.SpecsCollections;
 
 /**
@@ -33,7 +35,7 @@ public interface JmmNode {
      * @param attribute
      * @param value
      */
-    void put(AttributeType attribute, String value);
+    void put(String attribute, String value);
 
     /**
      * 
@@ -42,6 +44,14 @@ public interface JmmNode {
      *          {@link JmmNode#getAttributes()}
      */
     String get(String attribute);
+
+    /**
+     * 
+     * @return the parent of the current node, or null if this is the root node
+     */
+    default JmmNode getParent() {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
 
     /**
      * 
@@ -81,6 +91,15 @@ public interface JmmNode {
         return gson.toJson(this, JmmNode.class);
     }
 
+    static JmmNode fromJson(String json){
+        return JmmNodeImpl.fromJson(json);
+    }
+
+
+    default JmmNode sanitize(){
+        return fromJson(this.toJson());
+    }
+
     static <T> List<JmmNode> convertChildren(T[] children) {
         if (children == null) {
             return new ArrayList<>();
@@ -91,5 +110,4 @@ public interface JmmNode {
 
         return Arrays.asList(jmmChildren);
     }
-
 }
