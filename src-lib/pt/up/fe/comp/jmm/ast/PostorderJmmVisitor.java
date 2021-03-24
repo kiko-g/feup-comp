@@ -57,7 +57,7 @@ public class PostorderJmmVisitor<D, R> extends AJmmVisitor<D, R> {
 
         // Postorder: 1st visit each children
         for (var child : jmmNode.getChildren()) {
-            childrenResults.add(visit.apply(child, data));
+            childrenResults.add(visit(child, data));
         }
 
         // Postorder: then, visit the node

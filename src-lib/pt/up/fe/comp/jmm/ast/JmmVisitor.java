@@ -29,6 +29,10 @@ public interface JmmVisitor<D, R> {
 
     R visit(JmmNode jmmNode, D data);
 
+    default R visit(JmmNode jmmNode) {
+        return visit(jmmNode, null);
+    }
+
     void addVisit(String kind, BiFunction<JmmNode, D, R> method);
 
     void setDefaultVisit(BiFunction<JmmNode, D, R> method);

@@ -3,6 +3,7 @@ package pt.up.fe.comp.jmm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,6 +45,16 @@ public interface JmmNode {
      *          {@link JmmNode#getAttributes()}
      */
     String get(String attribute);
+
+    /**
+     * 
+     * @param attribute
+     * @return the value of the attribute wrapper around an Optional, or Optional.empty() if there is no value for the
+     *         given attribute
+     */
+    default Optional<String> getOptional(String attribute) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
 
     /**
      * 
@@ -91,12 +102,11 @@ public interface JmmNode {
         return gson.toJson(this, JmmNode.class);
     }
 
-    static JmmNode fromJson(String json){
+    static JmmNode fromJson(String json) {
         return JmmNodeImpl.fromJson(json);
     }
 
-
-    default JmmNode sanitize(){
+    default JmmNode sanitize() {
         return fromJson(this.toJson());
     }
 

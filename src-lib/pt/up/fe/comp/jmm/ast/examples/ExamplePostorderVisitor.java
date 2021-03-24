@@ -14,10 +14,11 @@ import pt.up.fe.comp.jmm.ast.PostorderJmmVisitor;
 public class ExamplePostorderVisitor extends PostorderJmmVisitor<Map<String, Integer>, Boolean> {
 
     public ExamplePostorderVisitor() {
-        setDefaultVisit(this::defaultVisit);
+        // setDefaultVisit(ExamplePostorderVisitor::defaultVisit); // This is equivalent to the line below
+        setDefaultVisit((node, map) -> ExamplePostorderVisitor.defaultVisit(node, map));
     }
 
-    private Boolean defaultVisit(JmmNode node, Map<String, Integer> kindCount) {
+    private static Boolean defaultVisit(JmmNode node, Map<String, Integer> kindCount) {
 
         var currentCount = kindCount.get(node.getKind());
 

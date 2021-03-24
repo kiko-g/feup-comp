@@ -47,11 +47,11 @@ public class MainAnalysis implements JmmAnalysis { // }, JmmOptimization, Jasmin
         JmmNode node = parserResult.getRootNode().sanitize();
 
         System.out.println("VISITOR");
-        ExampleVisitor visitor = new ExampleVisitor();
+        ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
         System.out.println(visitor.visit(node, ""));
 
         System.out.println("PREORDER VISITOR");
-        var preOrderVisitor = new ExamplePreorderVisitor();
+        var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
         System.out.println(preOrderVisitor.visit(node, ""));
 
         System.out.println("POSTORDER VISITOR");

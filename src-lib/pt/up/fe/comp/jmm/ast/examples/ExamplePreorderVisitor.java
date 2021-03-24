@@ -15,14 +15,19 @@ import pt.up.fe.specs.util.utilities.StringLines;
  */
 public class ExamplePreorderVisitor extends PreorderJmmVisitor<String, String> {
 
-    public ExamplePreorderVisitor() {
+    private final String identifierAttribute;
+
+    public ExamplePreorderVisitor(String identifierType, String identifierAttribute) {
         super(ExamplePreorderVisitor::reduce);
-        addVisit("Identifier", this::dealWithIdentifier);
+
+        this.identifierAttribute = identifierAttribute;
+
+        addVisit(identifierType, this::dealWithIdentifier);
         setDefaultVisit(this::defaultVisit);
     }
 
     public String dealWithIdentifier(JmmNode node, String space) {
-        if (node.get("id").equals("this")) {
+        if (node.get(identifierAttribute).equals("this")) {
             return space + "THIS_ACCESS";
         }
 

@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.specs.util.SpecsCheck;
 
 public class JmmNodeImpl implements JmmNode {
 
@@ -15,7 +18,6 @@ public class JmmNodeImpl implements JmmNode {
     protected Map<String, String> attributes;
     protected List<JmmNode> children;
     private JmmNode parent;
-    
 
     public JmmNodeImpl(String kind) {
         this.kind = kind;
@@ -23,6 +25,7 @@ public class JmmNodeImpl implements JmmNode {
         this.attributes = new LinkedHashMap<>();
     }
 
+    @Override
     public JmmNode getParent() {
         return this.parent;
     }
@@ -44,16 +47,22 @@ public class JmmNodeImpl implements JmmNode {
 
     @Override
     public String get(String attribute) {
+        var value = this.attributes.get(attribute);
 
-        return this.attributes.get(attribute);
+        SpecsCheck.checkNotNull(value, () -> "Node " + getKind() + " does not contain attribute '" + attribute + "'");
+
+        return value;
+    }
+
+    @Override
+    public Optional<String> getOptional(String attribute) {
+        return Optional.ofNullable(this.attributes.get(attribute));
     }
 
     @Override
     public int getNumChildren() {
         return this.children.size();
     }
-
-
 
     @Override
     public void put(String attribute, String value) {
@@ -62,24 +71,24 @@ public class JmmNodeImpl implements JmmNode {
 
     @Override
     public void add(JmmNode child) {
-        if(!(child instanceof JmmNodeImpl)){
-            throw new RuntimeException(getClass().getName()+" can only have children of his class ("+getClass().getName()+").");
+        if (!(child instanceof JmmNodeImpl)) {
+            throw new RuntimeException(
+                    getClass().getName() + " can only have children of his class (" + getClass().getName() + ").");
         }
-        add((JmmNodeImpl)child);
+        add((JmmNodeImpl) child);
     }
 
     public void add(JmmNodeImpl child) {
         children.add(child);
     }
 
-
-
     @Override
     public void add(JmmNode child, int index) {
-        if(!(child instanceof JmmNodeImpl)){
-            throw new RuntimeException(getClass().getName()+" can only have children of his class ("+getClass().getName()+").");
+        if (!(child instanceof JmmNodeImpl)) {
+            throw new RuntimeException(
+                    getClass().getName() + " can only have children of his class (" + getClass().getName() + ").");
         }
-        add((JmmNodeImpl)child,index);
+        add((JmmNodeImpl) child, index);
     }
 
     public void add(JmmNodeImpl child, int index) {
@@ -103,8 +112,12 @@ public class JmmNodeImpl implements JmmNode {
         return gson.fromJson(source, JmmNodeImpl.class);
     }
 
-
     public void setParent(JmmNodeImpl parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String toString() {
+        return getKind();
     }
 }

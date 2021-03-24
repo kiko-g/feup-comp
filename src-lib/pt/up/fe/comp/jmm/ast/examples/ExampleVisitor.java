@@ -6,14 +6,17 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 
 public class ExampleVisitor extends AJmmVisitor<String, String> {
+    private final String identifierAttribute;
 
-    public ExampleVisitor() {
-        addVisit("Identifier", this::dealWithIdentifier);
-        setDefaultVisit(this::defaultVisit);
+    public ExampleVisitor(String identifierType, String identifierAttribute) {
+        this.identifierAttribute = identifierAttribute;
+
+        addVisit(identifierType, this::dealWithIdentifier); // Method reference
+        setDefaultVisit(this::defaultVisit); // Method reference
     }
 
     public String dealWithIdentifier(JmmNode node, String space) {
-        if (node.get("id").equals("this")) {
+        if (node.get(identifierAttribute).equals("this")) {
             return space + "THIS_ACCESS\n";
         }
         return defaultVisit(node, space);

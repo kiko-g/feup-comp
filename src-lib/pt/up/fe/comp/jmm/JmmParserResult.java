@@ -14,7 +14,7 @@ public class JmmParserResult {
     private final List<Report> reports;
 
     public JmmParserResult(JmmNode rootNode, List<Report> reports) {
-        this.rootNode = rootNode;
+        this.rootNode = rootNode.sanitize();
         this.reports = reports;
     }
 

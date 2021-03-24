@@ -19,6 +19,18 @@ public abstract class AJmmVisitor<D, R> implements JmmVisitor<D, R> {
 
     public AJmmVisitor() {
         this(new HashMap<>(), null);
+        setDefaultVisit(this::defaultVisit);
+    }
+
+    /**
+     * Default visit does nothing, just returns null.
+     * 
+     * @param node
+     * @param data
+     * @return
+     */
+    private R defaultVisit(JmmNode node, D data) {
+        return null;
     }
 
     @Override
