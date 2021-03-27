@@ -43,6 +43,7 @@ public class TestUtils {
             return parser.parse(code);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not parse code", e);
         }
 

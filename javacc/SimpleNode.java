@@ -1,4 +1,3 @@
-import pt.up.fe.comp.jmm.AttributeType;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.*;
@@ -8,7 +7,7 @@ public class SimpleNode implements Node {
     protected Node[] children;
     protected int id;
     protected Jmm parser;
-    private final Map<AttributeType, String> attributes;
+    private final Map<String, String> attributes;
 
     public SimpleNode(int i) {
         id = i;
@@ -25,22 +24,15 @@ public class SimpleNode implements Node {
     }
 
     public List<String> getAttributes() {
-        List<AttributeType> types = new ArrayList<>(this.attributes.keySet());
-        List<String> attributes = new ArrayList<>();
-        for(AttributeType type : types) {
-            attributes.add(type.toString());
-        }
-
-        return attributes;
+        return new ArrayList<>(this.attributes.keySet());
     }
 
-    public void put(AttributeType attribute, String value) {
+    public void put(String attribute, String value) {
         this.attributes.put(attribute, value);
     }
 
     public String get(String attribute) {
-        AttributeType type = AttributeType.valueOf(attribute);
-        return this.attributes.get(type);
+        return this.attributes.get(attribute);
     }
 
     public List<JmmNode> getChildren() {

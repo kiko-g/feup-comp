@@ -2,6 +2,7 @@ import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmParserResult;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main {
 	public static void main(String[] args) {
@@ -13,7 +14,7 @@ public class Main {
 		}
 
 		String resource = args[1];
-        JmmParserResult result = new JmmParserResult();
+        JmmParserResult result = new JmmParserResult(null, new ArrayList<>());
 
 		try {
 			result = Parser.run(resource);
