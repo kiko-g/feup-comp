@@ -1,3 +1,5 @@
+package analysis;
+
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -76,5 +78,9 @@ public class AnalysisTable implements SymbolTable {
     @Override
     public List<Symbol> getLocalVariables(String methodName) {
         return new ArrayList<>(this.symbolTable.get(methodName));
+    }
+
+    public boolean addLocalVariable(String scope, MySymbol symbol) {
+        return this.symbolTable.get(scope).add(symbol);
     }
 }

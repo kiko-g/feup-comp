@@ -1,3 +1,4 @@
+import analysis.Analyzer;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 

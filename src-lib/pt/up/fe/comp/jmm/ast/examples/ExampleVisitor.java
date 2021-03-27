@@ -36,5 +36,4 @@ public class ExampleVisitor extends AJmmVisitor<String, String> {
         }
         return content;
     }
-
 }

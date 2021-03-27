@@ -136,19 +136,19 @@ SimpleNode Program(): { } {
 }
 
 void ImportDeclaration() #void: {} {
-    (<IMPORT> ImportStatement() <SEMICOLON>)*
+    (<IMPORT> ImportStatement() #Import <SEMICOLON>)*
 }
 
 void ImportStatement() #void: {} {
-    Import() (<DOT> Import() #SubImport(2))*
+    Import() (<DOT>Import())*
 }
 
 Token Import() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Import {return t;}
+    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ImportName {return t;}
 }
 
 void ClassDeclaration() #void: {} {
-    <CLASS> ClassBody() <LBRACKET> (VarDeclaration()#ClassVar)* (MethodDeclaration())* <RBRACKET>
+    <CLASS> ClassBody() <LBRACKET> (VarDeclaration() #ClassVar)* (MethodDeclaration())* <RBRACKET>
 }
 
 void ClassBody() #void: {} {
@@ -156,15 +156,19 @@ void ClassBody() #void: {} {
 }
 
 void VarDeclaration() #void: {} {
-    Type() Name() <SEMICOLON>#VarDecl(2)
+    Type() Name() <SEMICOLON>
 }
 
 void MethodDeclaration() #void: { } {
     <PUBLIC> (MainDeclaration()#Main | RegularMethodDeclaration()#Method)
 }
 
-void MainDeclaration() #void: {} {
-    <STATIC> <VOID> <MAIN> <LPAR> (<STRING>#Class <LSQRBRACKET> <RSQRBRACKET>#Array(1) Name())#MethodParam(2) <RPAR>#MethodParameters <LBRACKET>
+void MainDeclaration() #void: {Token t;} {
+    <STATIC> <VOID> <MAIN> <LPAR> (t=<STRING> {
+        jjtThis.put("VALUE",  t.image);
+        jjtThis.put("LINE",  String.valueOf(t.beginLine));
+        jjtThis.put("COLUMN", String.valueOf(t.beginColumn));
+    } #ClassName <LSQRBRACKET> <RSQRBRACKET>#Array(1) Name())#MethodParam(2) <RPAR>#MethodParameters(1) <LBRACKET>
         MethodBody()
     <RBRACKET>
 }
@@ -185,13 +189,13 @@ void MethodParam() : {} {
 }
 
 void MethodBody() #void: {} {
-    (LOOKAHEAD(2) VarDeclaration())* (Statement())*
+    (LOOKAHEAD(2) VarDeclaration() #MethodVar)* (Statement())*
 }
 
 void Type() #void: {Token t;} {
     t=<BOOLEAN> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Boolean
     | t=<INT> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
-    | t=<IDENTIFIER> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Class
+    | t=<IDENTIFIER> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ClassName
 }
 
 void Statement() #void: {} {
