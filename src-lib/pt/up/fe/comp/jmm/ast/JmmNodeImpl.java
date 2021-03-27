@@ -13,7 +13,6 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.specs.util.SpecsCheck;
 
 public class JmmNodeImpl implements JmmNode {
-
     protected String kind;
     protected Map<String, String> attributes;
     protected List<JmmNode> children;
