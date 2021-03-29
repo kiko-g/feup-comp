@@ -1,13 +1,11 @@
 package analysis;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
 
 public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     private final AnalysisTable symbolTable;

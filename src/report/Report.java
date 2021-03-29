@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm.report;
+package report;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

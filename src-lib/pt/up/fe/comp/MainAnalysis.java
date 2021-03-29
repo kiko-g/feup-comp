@@ -10,7 +10,7 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ast.examples.ExamplePostorderVisitor;
 import pt.up.fe.comp.jmm.ast.examples.ExamplePreorderVisitor;
 import pt.up.fe.comp.jmm.ast.examples.ExampleVisitor;
-import pt.up.fe.comp.jmm.report.ReportType;
+import report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
 
 public class MainAnalysis implements JmmAnalysis { // }, JmmOptimization, JasminBackend {

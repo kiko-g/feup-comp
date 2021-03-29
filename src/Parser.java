@@ -1,12 +1,12 @@
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
 
 import java.io.IOException;
 
-import pt.up.fe.comp.jmm.report.ReportType;
-import pt.up.fe.comp.jmm.report.Stage;
+import report.ReportType;
+import report.Stage;
 
 public class Parser implements JmmParser {
     public static JmmParserResult run(String resource) throws IOException {

@@ -6,9 +6,9 @@ options {
 PARSER_BEGIN(Jmm)
 import java.util.ArrayList;
 import java.util.List;
-import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.jmm.report.Stage;
-import pt.up.fe.comp.jmm.report.ReportType;
+import report.Report;
+import report.Stage;
+import report.ReportType;
 
 public class Jmm {
     private final List<Report> reports = new ArrayList<Report>();

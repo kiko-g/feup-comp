@@ -1,8 +1,10 @@
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
+import pt.up.fe.specs.util.SpecsCollections;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -60,5 +62,14 @@ public class Utils {
                     break;
             }
         }
+    }
+
+    public static List<Report> concatReports(List<Report> ... reports) {
+        List<Report> concatReports = new ArrayList<>();
+        for(List<Report> stageReport: reports) {
+            concatReports.addAll(stageReport);
+        }
+
+        return concatReports;
     }
 }
