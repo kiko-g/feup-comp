@@ -1,6 +1,6 @@
 import pt.up.fe.comp.TestUtils;
-import pt.up.fe.comp.jmm.JmmParser;
-import pt.up.fe.comp.jmm.JmmParserResult;
+import parser.JmmParser;
+import parser.JmmParserResult;
 import report.Report;
 
 import java.io.IOException;

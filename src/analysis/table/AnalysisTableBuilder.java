@@ -1,9 +1,8 @@
-package analysis;
+package analysis.table;
 
 import java.util.List;
 
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import report.Report;
 
@@ -54,9 +53,9 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         JmmNode secondChild = node.getChildren().get(1);
 
         if(firstChild.getKind().equals("Array")) {
-            this.symbolTable.addLocalVariable(this.symbolTable.getClassName(), new MySymbol(new Type(visit(firstChild),true), secondChild.get("VALUE")));
+            this.symbolTable.addLocalVariable(this.symbolTable.getClassName(), new Symbol(new Type(visit(firstChild),true), secondChild.get("VALUE")));
         } else {
-            this.symbolTable.addLocalVariable(this.symbolTable.getClassName(), new MySymbol(new Type(firstChild.get("VALUE"),false), secondChild.get("VALUE")));
+            this.symbolTable.addLocalVariable(this.symbolTable.getClassName(), new Symbol(new Type(firstChild.get("VALUE"),false), secondChild.get("VALUE")));
         }
 
         return "";

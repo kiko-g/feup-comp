@@ -1,7 +1,6 @@
-import analysis.Analyzer;
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import parser.JmmParserResult;
+import analysis.JmmSemanticsResult;
 import report.Report;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class Main {
 
 		try {
 			parserResult = Parser.run(resource);
-			semanticsResult = new Analyzer().semanticAnalysis(parserResult);
+			semanticsResult = new Analysis().semanticAnalysis(parserResult);
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) { } finally {

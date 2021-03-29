@@ -5,16 +5,15 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Properties;
 
-import pt.up.fe.comp.jmm.JmmParser;
-import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
-import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import parser.JmmParser;
+import parser.JmmParserResult;
+import analysis.JmmAnalysis;
+import analysis.JmmSemanticsResult;
 import report.Report;
 import report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
 
 public class TestUtils {
-
     private static final Properties PARSER_CONFIG = TestUtils.loadProperties("parser.properties");
     private static final Properties ANALYSIS_CONFIG = TestUtils.loadProperties("analysis.properties");
 
@@ -30,13 +29,10 @@ public class TestUtils {
 
     public static JmmParserResult parse(String code) {
         try {
-
             // Get Parser class
             String parserClassName = PARSER_CONFIG.getProperty("ParserClass");
-
             // Get class with main
             Class<?> parserClass = Class.forName(parserClassName);
-
             // It is expected that the Parser class can be instantiated without arguments
             JmmParser parser = (JmmParser) parserClass.getConstructor().newInstance();
 
@@ -51,13 +47,10 @@ public class TestUtils {
 
     public static JmmSemanticsResult analyse(JmmParserResult parserResult) {
         try {
-
             // Get Parser class
             String analysisClassName = ANALYSIS_CONFIG.getProperty("AnalysisClass");
-
             // Get class with main
             Class<?> analysisClass = Class.forName(analysisClassName);
-
             // It is expected that the Analysis class can be instantiated without arguments
             JmmAnalysis analysis = (JmmAnalysis) analysisClass.getConstructor().newInstance();
 
@@ -74,11 +67,11 @@ public class TestUtils {
      */
     public static void noErrors(List<Report> reports) {
         reports.stream()
-                .filter(report -> report.getType() == ReportType.ERROR)
-                .findFirst()
-                .ifPresent(report -> {
-                    throw new RuntimeException("Found at least one error report: " + report);
-                });
+            .filter(report -> report.getType() == ReportType.ERROR)
+            .findFirst()
+            .ifPresent(report -> {
+                throw new RuntimeException("Found at least one error report: " + report);
+            });
     }
 
     /**
@@ -86,9 +79,9 @@ public class TestUtils {
      */
     public static void mustFail(List<Report> reports) {
         boolean noReports = reports.stream()
-                .filter(report -> report.getType() == ReportType.ERROR)
-                .findFirst()
-                .isEmpty();
+            .filter(report -> report.getType() == ReportType.ERROR)
+            .findFirst()
+            .isEmpty();
 
         if (noReports) {
             throw new RuntimeException("Could not find any Error report");
@@ -97,12 +90,11 @@ public class TestUtils {
 
     public static long getNumReports(List<Report> reports, ReportType type) {
         return reports.stream()
-                .filter(report -> report.getType() == type)
-                .count();
+            .filter(report -> report.getType() == type)
+            .count();
     }
 
     public static long getNumErrors(List<Report> reports) {
         return getNumReports(reports, ReportType.ERROR);
     }
-
 }

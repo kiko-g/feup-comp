@@ -1,16 +1,16 @@
-package analysis;
-
+import analysis.table.AnalysisTable;
+import analysis.table.AnalysisTableBuilder;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
-import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import parser.JmmParserResult;
+import analysis.JmmAnalysis;
+import analysis.JmmSemanticsResult;
 import report.Report;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Analyzer implements JmmAnalysis {
+public class Analysis implements JmmAnalysis {
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
         // Checks input
@@ -23,8 +23,6 @@ public class Analyzer implements JmmAnalysis {
         AnalysisTableBuilder tableBuilder = new AnalysisTableBuilder(symbolTable, reports);
 
         System.out.println(tableBuilder.visit(root, ""));
-        System.out.println("2");
-        System.out.println(symbolTable.getImports().size());
 
         /*System.out.println("Dump tree with Visitor where you control tree traversal");
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");

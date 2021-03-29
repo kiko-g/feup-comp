@@ -1,15 +1,15 @@
-package analysis;
+package analysis.table;
 
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
-import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
-import pt.up.fe.comp.jmm.analysis.table.Type;
+import analysis.table.Symbol;
+import analysis.table.SymbolTable;
+import analysis.table.Type;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnalysisTable implements SymbolTable {
-    private Map<String, Set<MySymbol>> symbolTable = new HashMap<>();
-    private Map<MySymbol, Set<MySymbol>> methods = new HashMap<>();
+    private Map<String, Set<Symbol>> symbolTable = new HashMap<>();
+    private Map<Symbol, Set<Symbol>> methods = new HashMap<>();
     private List<String> imports = new ArrayList<>();
     private String className;
     private String extension;
@@ -46,7 +46,7 @@ public class AnalysisTable implements SymbolTable {
         return this.methods.keySet().stream().map(Symbol::getName).collect(Collectors.toList());
     }
 
-    public void addMethod(MySymbol method) {
+    public void addMethod(Symbol method) {
         this.methods.put(method, new HashSet<>());
     }
 
@@ -57,7 +57,7 @@ public class AnalysisTable implements SymbolTable {
 
     @Override
     public Type getReturnType(String methodName) {
-        for(MySymbol symbol: this.methods.keySet()) {
+        for(Symbol symbol: this.methods.keySet()) {
             if(symbol.getName().equals(methodName)) {
                 return symbol.getType();
             }
@@ -67,7 +67,7 @@ public class AnalysisTable implements SymbolTable {
 
     @Override
     public List<Symbol> getParameters(String methodName) {
-        for(MySymbol symbol: this.methods.keySet()) {
+        for(Symbol symbol: this.methods.keySet()) {
             if(symbol.getName().equals(methodName)) {
                 return new ArrayList<>(this.methods.get(symbol));
             }
@@ -80,7 +80,7 @@ public class AnalysisTable implements SymbolTable {
         return new ArrayList<>(this.symbolTable.get(methodName));
     }
 
-    public boolean addLocalVariable(String scope, MySymbol symbol) {
+    public boolean addLocalVariable(String scope, Symbol symbol) {
         return this.symbolTable.get(scope).add(symbol);
     }
 }

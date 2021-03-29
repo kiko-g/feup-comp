@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm;
+package parser;
 
 /**
  * Parses J-- code.

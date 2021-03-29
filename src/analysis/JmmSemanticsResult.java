@@ -1,11 +1,10 @@
-package pt.up.fe.comp.jmm.analysis;
+package analysis;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
+import parser.JmmParserResult;
+import analysis.table.SymbolTable;
 import report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 

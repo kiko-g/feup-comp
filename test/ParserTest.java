@@ -1,10 +1,8 @@
 import static org.junit.Assert.*;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 import org.junit.Test;
 import pt.up.fe.comp.TestUtils;
-import pt.up.fe.comp.jmm.JmmParserResult;
+import parser.JmmParserResult;
 
 public class ParserTest {
     private void test(String resource, boolean mustFail) {

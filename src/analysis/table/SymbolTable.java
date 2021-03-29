@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm.analysis.table;
+package analysis.table;
 
 import java.util.List;
 

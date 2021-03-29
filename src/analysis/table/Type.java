@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm.analysis.table;
+package analysis.table;
 
 public class Type {
     private final String name;

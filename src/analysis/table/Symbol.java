@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm.analysis.table;
+package analysis.table;
 
 public class Symbol {
     private final Type type;
@@ -15,5 +15,13 @@ public class Symbol {
   
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Symbol symbol = (Symbol) o;
+        return symbol.getName().equals(this.getName());
     }
 }
