@@ -66,6 +66,24 @@ public interface JmmNode {
 
     /**
      * 
+     * @param kind
+     * @return the first ancestor of the given kind, or Optional.empty() if no ancestor of that kind was found
+     */
+    default Optional<JmmNode> getAncestor(String kind) {
+        var currentParent = getParent();
+        while (currentParent != null) {
+            if (currentParent.getKind().equals(kind)) {
+                return Optional.of(currentParent);
+            }
+
+            currentParent = currentParent.getParent();
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * 
      * @return the children of the node or an empty list if there are no children
      * 
      */
