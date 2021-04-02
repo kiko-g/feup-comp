@@ -1,5 +1,7 @@
 package analysis.table;
 
+import java.util.Objects;
+
 public class Symbol {
     private final Type type;
     private final String name;
@@ -23,5 +25,10 @@ public class Symbol {
         if (o == null || getClass() != o.getClass()) return false;
         Symbol symbol = (Symbol) o;
         return symbol.getName().equals(this.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

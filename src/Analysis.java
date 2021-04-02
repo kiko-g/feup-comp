@@ -23,7 +23,8 @@ public class Analysis implements JmmAnalysis {
         AnalysisTableBuilder tableBuilder = new AnalysisTableBuilder(symbolTable, reports);
 
         tableBuilder.visit(root, "");
-        System.out.println(tableBuilder);
+
+
 
         /*System.out.println("Dump tree with Visitor where you control tree traversal");
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");

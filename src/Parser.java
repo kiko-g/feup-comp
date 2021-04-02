@@ -3,14 +3,16 @@ import parser.JmmParser;
 import parser.JmmParserResult;
 import report.Report;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import report.ReportType;
 import report.Stage;
 
 public class Parser implements JmmParser {
     public static JmmParserResult run(String resource) throws IOException {
-        String content = Utils.getResourceContent(resource, resource.substring(resource.lastIndexOf("/")));
+        String content = Utils.getResourceContent(resource, resource.substring(resource.lastIndexOf(File.separator)));
         JmmParserResult result = new Parser().parse(content);
         Utils.saveJson(Utils.getFilename(resource), result.toJson());
 

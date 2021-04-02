@@ -8,19 +8,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnalysisTable implements SymbolTable {
-    private Map<String, Set<Symbol>> symbolTable = new HashMap<>();
-    private Map<Symbol, Set<Symbol>> methods = new HashMap<>();
-    private List<String> imports = new ArrayList<>();
+    private final Map<String, Set<Symbol>> symbolTable = new HashMap<>();
+    private final Map<Symbol, Set<Symbol>> methods = new HashMap<>();
+    private final Set<String> imports = new HashSet<>();
     private String className;
     private String extension;
 
     @Override
     public List<String> getImports() {
-        return this.imports;
+        return new ArrayList<>(this.imports);
     }
 
-    public void addImport(String name) {
-        this.imports.add(name);
+    public boolean addImport(String name) {
+        return this.imports.add(name);
     }
 
     @Override
@@ -47,9 +47,12 @@ public class AnalysisTable implements SymbolTable {
         return this.methods.keySet().stream().map(Symbol::getName).collect(Collectors.toList());
     }
 
-    public void addMethod(Symbol method) {
-        this.methods.put(method, new HashSet<>());
-        this.symbolTable.put(method.getName(), new HashSet<>());
+    public boolean addMethod(Symbol method) {
+        if (this.methods.put(method, new HashSet<>()) != null) {
+            return false;
+        }
+
+        return this.symbolTable.put(method.getName(), new HashSet<>()) == null;
     }
 
     @Override
@@ -78,10 +81,6 @@ public class AnalysisTable implements SymbolTable {
     }
 
     public boolean addParameter(Symbol method, Symbol param) {
-        if(!this.methods.containsKey(method)) {
-            return false;
-        }
-
         return this.methods.get(method).add(param);
     }
 
@@ -92,16 +91,5 @@ public class AnalysisTable implements SymbolTable {
 
     public boolean addLocalVariable(String scope, Symbol symbol) {
         return this.symbolTable.get(scope).add(symbol);
-    }
-
-    @Override
-    public String toString() {
-        return "AnalysisTable{" +
-                "symbolTable=" + symbolTable +
-                ", methods=" + methods +
-                ", imports=" + imports +
-                ", className='" + className + '\'' +
-                ", extension='" + extension + '\'' +
-                '}';
     }
 }

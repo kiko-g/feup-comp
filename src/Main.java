@@ -9,14 +9,14 @@ import java.util.List;
 
 public class Main {
 	public static void main(String[] args) {
-		if(args.length != 2) {
+		if(args.length != 1) {
 			String usage = "java -jar comp2021-1a.jar Main";
 			System.err.println("Usage: " + usage + " <jmm file path>\n" +
 					"Example: " + usage + " test/fixtures/public/Simple.jmm");
 			return;
 		}
 
-		String resource = args[1];
+		String resource = args[0];
         JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
 		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
 

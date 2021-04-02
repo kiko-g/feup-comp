@@ -28,7 +28,7 @@ public class Utils {
     }
 
     public static String getFilename(String originalFilePath) {
-        return originalFilePath.substring(originalFilePath.lastIndexOf('/') + 1, originalFilePath.lastIndexOf(".")) + ".json";
+        return originalFilePath.substring(originalFilePath.lastIndexOf(File.separator) + 1, originalFilePath.lastIndexOf(".")) + ".json";
     }
 
     public static void saveJson(String jsonFileName, String content) throws IOException {

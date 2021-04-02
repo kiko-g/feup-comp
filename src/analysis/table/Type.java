@@ -15,4 +15,9 @@ public class Type {
     public boolean isArray() {
         return isArray;
     }
+
+    @Override
+    public String toString() {
+        return name + (isArray ? "[]" : "");
+    }
 }

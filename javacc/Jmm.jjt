@@ -160,7 +160,7 @@ void VarDeclaration() #void: {} {
 }
 
 void MethodDeclaration() #void: { } {
-    <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #ClassMethod)
+    <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #Method)
 }
 
 void MainDeclaration() #void: {Token t;} {
@@ -234,36 +234,40 @@ void Expression() #void: {} {
     LogicalAndExp()
 }
 
-void LogicalAndExp() #void: {} {
-    RelationalLessExp() (<AND> RelationalLessExp() #LogicalAnd(2))*
+void LogicalAndExp() #void: {Token t;} {
+    RelationalLessExp() (t=<AND> RelationalLessExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #LogicalAnd(2))*
 }
 
-void RelationalLessExp() #void: {} {
-    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp() #Less(2))*
+void RelationalLessExp() #void: {Token t;} {
+    ArithmeticAdditiveExp() (t=<LESS> ArithmeticAdditiveExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Less(2))*
 }
 
-void ArithmeticAdditiveExp() #void: {} {
-    ArithmeticMultiplicativeExp() (<PLUS> ArithmeticMultiplicativeExp() #Add(2) | <MINUS> ArithmeticMultiplicativeExp() #Sub(2))*
+void ArithmeticAdditiveExp() #void: {Token t;} {
+    ArithmeticMultiplicativeExp()
+    (t=<PLUS> ArithmeticMultiplicativeExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Add(2)
+        | t=<MINUS> ArithmeticMultiplicativeExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Sub(2))*
 }
 
-void ArithmeticMultiplicativeExp() #void: {} {
-    LogicalNotExp() (<MUL> LogicalNotExp() #Mul(2) | <DIV> LogicalNotExp() #Div(2))*
+void ArithmeticMultiplicativeExp() #void: {Token t;} {
+    LogicalNotExp()
+    (t=<MUL> LogicalNotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Mul(2)
+        | t=<DIV> LogicalNotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Div(2))*
 }
 
-void LogicalNotExp() #void: {} {
-    (<NOT> AccessExp() #Not)+ | AccessExp()
+void LogicalNotExp() #void: {Token t;} {
+    (t=<NOT> AccessExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Not)+ | AccessExp()
 }
 
 void AccessExp() #void: {Token t;} {
-    t=TerminalExp() (ArrayAccess() #ArrayAccess(2) | <DOT> DotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Dot(2))*
+    TerminalExp() (t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2) | t=<DOT> DotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Dot(2))*
 }
 
-void DotExp() #void: {} {
-    <LENGTH> #Length | CallWithParams() #MethodCall
+void DotExp() #void: {Token t;} {
+    t=<LENGTH> #Length | CallWithParams() #MethodCall
 }
 
-void ArrayAccess() #void: {} {
-    <LSQRBRACKET> Expression() #Index <RSQRBRACKET>
+Token ArrayAccess() #void: {Token t;} {
+    t=<LSQRBRACKET> Expression() #Index <RSQRBRACKET> {return t;}
 }
 
 void CallWithParams() #void: {} {
@@ -288,28 +292,36 @@ void AssignOrExpression() #void: {Token t;} {
     | Var()  ArrayAccessExpressionOrAssign()
     | <NEW> NewInstance() #New
     | <LPAR> Expression() #Important <RPAR>
-    | <NOT> LogicalNotExp() #Not
+    | t=<NOT> {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} LogicalNotExp() #Not
 }
 
 void ArrayAccessExpressionOrAssign() #void: {Token t;} {
     //Ignore warning, match with first ArrayAccess
-    [LOOKAHEAD(1) ArrayAccess() #ArrayAccess(2)] (<EQUALS> Expression()#Assign(2) | Operations() (ArrayAccess() #ArrayAccess(2))*)
+    [LOOKAHEAD(1) t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2)]
+    (
+        t=<EQUALS> Expression() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Assign(2)
+            | Operations() (t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2))*
+    )
 }
 
-void Operations() #void: {} {
-    RelationalLessOp() (<AND> RelationalLessOp() #LogicalAnd(2))*
+void Operations() #void: {Token t;} {
+    RelationalLessOp() (t=<AND> RelationalLessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #LogicalAnd(2))*
 }
 
-void RelationalLessOp() #void: {} {
-    ArithmeticAdditiveOp() (<LESS> ArithmeticAdditiveOp() #Less(2))*
+void RelationalLessOp() #void: {Token t;} {
+    ArithmeticAdditiveOp() (t=<LESS> ArithmeticAdditiveOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Less(2))*
 }
 
-void ArithmeticAdditiveOp() #void: {} {
-    ArithmeticMultiplicativeOp() (<PLUS> ArithmeticMultiplicativeOp() #Add(2))* (<MINUS> ArithmeticMultiplicativeOp() #Sub(2))*
+void ArithmeticAdditiveOp() #void: {Token t;} {
+    ArithmeticMultiplicativeOp()
+        (t=<PLUS> ArithmeticMultiplicativeOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Add(2))*
+        (t=<MINUS> ArithmeticMultiplicativeOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Sub(2))*
 }
 
-void ArithmeticMultiplicativeOp() #void: {} {
-    AccessOp() (<MUL> AccessOp() #Mul(2))* (<DIV> AccessOp() #Div(2))*
+void ArithmeticMultiplicativeOp() #void: {Token t;} {
+    AccessOp()
+    (t=<MUL> AccessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Mul(2))*
+    (t=<DIV> AccessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Div(2))*
 }
 
 void AccessOp() #void: {Token t;} {

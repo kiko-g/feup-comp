@@ -5,6 +5,8 @@ import java.util.List;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import report.Report;
+import report.ReportType;
+import report.Stage;
 
 public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     private final AnalysisTable symbolTable;
@@ -32,7 +34,20 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         }
 
         importStmt.deleteCharAt(importStmt.length() - 1);
-        this.symbolTable.addImport(importStmt.toString());
+
+        if (!this.symbolTable.addImport(importStmt.toString())) {
+            JmmNode lastChild = node.getChildren().get(node.getNumChildren() - 1);
+
+            this.reports.add(
+                new Report(
+                    ReportType.WARNING,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(lastChild.get("LINE")),
+                    Integer.parseInt(lastChild.get("COLUMN")),
+                    "Duplicated import " + importStmt + "\""
+                )
+            );
+        }
 
         return defaultVisit(node, "");
     }
@@ -45,7 +60,19 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     public String visitVarDecl(JmmNode node, String scope) {
         JmmNode firstChild = node.getChildren().get(0);
         JmmNode secondChild = node.getChildren().get(1);
-        this.symbolTable.addLocalVariable(scope, new Symbol(getType(firstChild), secondChild.get("VALUE")));
+
+        if (!this.symbolTable.addLocalVariable(scope, new Symbol(getType(firstChild), secondChild.get("VALUE")))) {
+            this.reports.add(
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(secondChild.get("LINE")),
+                    Integer.parseInt(secondChild.get("COLUMN")),
+                    "Redeclaration of variable \"" + secondChild.get("VALUE") + "\""
+                )
+            );
+        }
+
         return defaultVisit(node, scope);
     }
 
@@ -53,9 +80,19 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         JmmNode returnType = node.getChildren().get(0);
         JmmNode name = node.getChildren().get(1);
 
-        System.out.println(name);
         Symbol method = new Symbol(getType(returnType), name.get("VALUE"));
-        this.symbolTable.addMethod(method);
+
+        if (!this.symbolTable.addMethod(method)) {
+            this.reports.add(
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(name.get("LINE")),
+                    Integer.parseInt(name.get("COLUMN")),
+                    "Redeclaration of method \"" + name.get("VALUE") + "\""
+                )
+            );
+        }
 
         if(node.getChildren().size() >= 3) {
             this.fillMethodParameters(node.getChildren().get(2), method);
@@ -68,7 +105,18 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         JmmNode params = node.getChildren().get(0);
         Symbol method = new Symbol(new Type("void", false), "main");
 
-        this.symbolTable.addMethod(method);
+        if (!this.symbolTable.addMethod(method)) {
+            this.reports.add(
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    "Redeclaration of method \"main\""
+                )
+            );
+
+            return scope;
+        }
+
         this.fillMethodParameters(params, method);
 
         return defaultVisit(node, method.getName());
@@ -78,7 +126,22 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         for(JmmNode child: node.getChildren()) {
             JmmNode firstChild = child.getChildren().get(0);
             JmmNode secondChild = child.getChildren().get(1);
-            this.symbolTable.addParameter(method, new Symbol(getType(firstChild), secondChild.get("VALUE")));
+
+            Symbol param = new Symbol(getType(firstChild), secondChild.get("VALUE"));
+
+            if (!this.symbolTable.addParameter(method, param)) {
+                this.reports.add(
+                    new Report(
+                        ReportType.ERROR,
+                        Stage.SEMANTIC,
+                        Integer.parseInt(secondChild.get("LINE")),
+                        Integer.parseInt(secondChild.get("COLUMN")),
+                        "Redeclaration of parameter \"" + secondChild.get("VALUE") + "\" in function: \"" + method.getName() + "\""
+                    )
+                );
+            } else {
+                this.symbolTable.addLocalVariable(method.getName(), param);
+            }
         }
     }
 
@@ -96,13 +159,5 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         }
 
         return "";
-    }
-
-    @Override
-    public String toString() {
-        return "AnalysisTableBuilder{" +
-                "symbolTable=" + symbolTable +
-                ", reports=" + reports +
-                '}';
     }
 }
