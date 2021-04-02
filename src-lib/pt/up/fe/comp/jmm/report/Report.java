@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import report.ReportType;
+import report.Stage;
 
 public class Report {
 
