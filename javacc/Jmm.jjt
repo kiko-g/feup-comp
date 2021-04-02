@@ -148,7 +148,7 @@ Token Import() #void: {Token t;} {
 }
 
 void ClassDeclaration() #void: {} {
-    <CLASS> ClassBody() <LBRACKET> (VarDeclaration() #ClassVar)* (MethodDeclaration())* <RBRACKET>
+    <CLASS> ClassBody() <LBRACKET> (VarDeclaration() #VarDecl)* (MethodDeclaration())* <RBRACKET>
 }
 
 void ClassBody() #void: {} {
@@ -160,7 +160,7 @@ void VarDeclaration() #void: {} {
 }
 
 void MethodDeclaration() #void: { } {
-    <PUBLIC> (MainDeclaration()#Main | RegularMethodDeclaration()#Method)
+    <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #ClassMethod)
 }
 
 void MainDeclaration() #void: {Token t;} {
@@ -189,7 +189,7 @@ void MethodParam() : {} {
 }
 
 void MethodBody() #void: {} {
-    (LOOKAHEAD(2) VarDeclaration() #MethodVar)* (Statement())*
+    (LOOKAHEAD(2) VarDeclaration() #VarDecl)* (Statement())*
 }
 
 void Type() #void: {Token t;} {
@@ -259,7 +259,7 @@ void AccessExp() #void: {Token t;} {
 }
 
 void DotExp() #void: {} {
-    <LENGTH> #Length | CallWithParams() #Method
+    <LENGTH> #Length | CallWithParams() #MethodCall
 }
 
 void ArrayAccess() #void: {} {

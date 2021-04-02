@@ -9,7 +9,7 @@ import parser.JmmParser;
 import parser.JmmParserResult;
 import analysis.JmmAnalysis;
 import analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
 import report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
 

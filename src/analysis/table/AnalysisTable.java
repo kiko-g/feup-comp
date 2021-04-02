@@ -28,8 +28,9 @@ public class AnalysisTable implements SymbolTable {
         return this.className;
     }
 
-    public void setClassName(String className) {
+    public void setClassName(String className, String classScope) {
         this.className = className;
+        this.symbolTable.put(classScope, new HashSet<>());
     }
 
     @Override
@@ -48,6 +49,7 @@ public class AnalysisTable implements SymbolTable {
 
     public void addMethod(Symbol method) {
         this.methods.put(method, new HashSet<>());
+        this.symbolTable.put(method.getName(), new HashSet<>());
     }
 
     @Override
@@ -75,6 +77,14 @@ public class AnalysisTable implements SymbolTable {
         return null;
     }
 
+    public boolean addParameter(Symbol method, Symbol param) {
+        if(!this.methods.containsKey(method)) {
+            return false;
+        }
+
+        return this.methods.get(method).add(param);
+    }
+
     @Override
     public List<Symbol> getLocalVariables(String methodName) {
         return new ArrayList<>(this.symbolTable.get(methodName));
@@ -82,5 +92,16 @@ public class AnalysisTable implements SymbolTable {
 
     public boolean addLocalVariable(String scope, Symbol symbol) {
         return this.symbolTable.get(scope).add(symbol);
+    }
+
+    @Override
+    public String toString() {
+        return "AnalysisTable{" +
+                "symbolTable=" + symbolTable +
+                ", methods=" + methods +
+                ", imports=" + imports +
+                ", className='" + className + '\'' +
+                ", extension='" + extension + '\'' +
+                '}';
     }
 }
