@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnalysisTable implements SymbolTable {
+    public final static String CLASS_SCOPE = "";
+    public final static String MAIN_SCOPE = "main";
+
     private final Map<String, Set<Symbol>> symbolTable = new HashMap<>();
     private final Map<Symbol, Set<Symbol>> methods = new HashMap<>();
     private final Set<String> imports = new HashSet<>();
@@ -28,9 +31,9 @@ public class AnalysisTable implements SymbolTable {
         return this.className;
     }
 
-    public void setClassName(String className, String classScope) {
+    public void setClassName(String className) {
         this.className = className;
-        this.symbolTable.put(classScope, new HashSet<>());
+        this.symbolTable.put(CLASS_SCOPE, new HashSet<>());
     }
 
     @Override
@@ -45,6 +48,16 @@ public class AnalysisTable implements SymbolTable {
     @Override
     public List<String> getMethods() {
         return this.methods.keySet().stream().map(Symbol::getName).collect(Collectors.toList());
+    }
+
+    public Symbol getMethodSymbol(String method) {
+        for (Symbol methodSymbol : methods.keySet()) {
+            if (methodSymbol.getName().equals(method)) {
+                return methodSymbol;
+            }
+        }
+
+        return null;
     }
 
     public boolean addMethod(Symbol method) {
@@ -87,6 +100,16 @@ public class AnalysisTable implements SymbolTable {
     @Override
     public List<Symbol> getLocalVariables(String methodName) {
         return new ArrayList<>(this.symbolTable.get(methodName));
+    }
+
+    public Symbol getVariable(String scope, String name) {
+        for (Symbol variable : this.symbolTable.get(scope)) {
+            if (variable.getName().equals(name)) {
+                return variable;
+            }
+        }
+
+        return null;
     }
 
     public boolean addLocalVariable(String scope, Symbol symbol) {

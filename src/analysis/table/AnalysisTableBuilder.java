@@ -11,7 +11,6 @@ import report.Stage;
 public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     private final AnalysisTable symbolTable;
     private final List<Report> reports;
-    public final static String CLASS_SCOPE = "";
 
     public AnalysisTableBuilder(AnalysisTable symbolTable, List<Report> reports) {
         this.symbolTable = symbolTable;
@@ -53,8 +52,8 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     }
 
     public String visitClass(JmmNode node, String scope) {
-        this.symbolTable.setClassName(node.getChildren().get(0).get("VALUE"), CLASS_SCOPE);
-        return defaultVisit(node, CLASS_SCOPE);
+        this.symbolTable.setClassName(node.getChildren().get(0).get("VALUE"));
+        return defaultVisit(node, AnalysisTable.CLASS_SCOPE);
     }
 
     public String visitVarDecl(JmmNode node, String scope) {
@@ -103,7 +102,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
 
     public String visitMain(JmmNode node, String scope) {
         JmmNode params = node.getChildren().get(0);
-        Symbol method = new Symbol(new Type("void", false), "main");
+        Symbol method = new Symbol(new Type("void", false), AnalysisTable.MAIN_SCOPE);
 
         if (!this.symbolTable.addMethod(method)) {
             this.reports.add(
