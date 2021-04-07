@@ -1,4 +1,4 @@
-package pt.up.fe.comp.jmm.jasmin;
+package jasmin;
 
 import java.io.BufferedReader;
 import java.io.File;

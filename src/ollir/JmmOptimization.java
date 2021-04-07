@@ -1,9 +1,9 @@
-package pt.up.fe.comp.jmm.ollir;
+package ollir;
 
-import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import analysis.JmmSemanticsResult;
 
 /**
- * This Stage deals with optimizations performed at the AST level and at the OLLIR level.<br>
+ * This Stage deals with optimizations performed at the AST level and at the OLLIR level.
  * Note that for Checkpoint 2 (CP2) only the @{JmmOptimization#toOllir} has to be developed. The other two methods are
  * for Checkpoint 3 (CP3).
  */
@@ -11,7 +11,7 @@ public interface JmmOptimization {
 
     /**
      * Step 1 (for CP3): otimize code at the AST level
-     * 
+     *
      * @param semanticsResult
      * @return
      */
@@ -21,7 +21,7 @@ public interface JmmOptimization {
 
     /**
      * Step 2 (for CP2): convert the AST to the OLLIR format
-     * 
+     *
      * @param semanticsResult
      * @return
      */
@@ -29,7 +29,7 @@ public interface JmmOptimization {
 
     /**
      * Step 3 (for CP3): otimize code at the OLLIR level
-     * 
+     *
      * @param semanticsResult
      * @return
      */

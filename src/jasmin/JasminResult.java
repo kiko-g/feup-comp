@@ -1,11 +1,11 @@
-package pt.up.fe.comp.jmm.jasmin;
+package jasmin;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import pt.up.fe.comp.TestUtils;
-import pt.up.fe.comp.jmm.ollir.OllirResult;
+import ollir.OllirResult;
 import report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;

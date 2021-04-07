@@ -16,8 +16,9 @@ public class Analysis implements JmmAnalysis {
         // Checks input
         TestUtils.noErrors(parserResult.getReports());
 
-        return  new Analysis().semanticAnalysis(parserResult);
+        return new Analysis().semanticAnalysis(parserResult);
     }
+
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
         JmmNode root = parserResult.getRootNode();
