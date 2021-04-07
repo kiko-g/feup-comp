@@ -14,7 +14,7 @@ public class Parser implements JmmParser {
     public static JmmParserResult run(String resource) throws IOException {
         String content = Utils.getResourceContent(resource, resource.substring(resource.lastIndexOf(File.separator)));
         JmmParserResult result = new Parser().parse(content);
-        Utils.saveJson(Utils.getFilename(resource), result.toJson());
+        Utils.saveFile(Utils.getFilename(resource), "generated/json", result.toJson());
 
         if(result.getRootNode() == null) {
             result.getReports().add(new Report(ReportType.ERROR, Stage.SYNTATIC, "AST Root Node is null!"));

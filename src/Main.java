@@ -18,6 +18,7 @@ public class Main {
 
 		JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
 		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
+		JmmRes
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);

@@ -31,13 +31,13 @@ public class Utils {
         return originalFilePath.substring(originalFilePath.lastIndexOf(File.separator) + 1, originalFilePath.lastIndexOf(".")) + ".json";
     }
 
-    public static void saveJson(String jsonFileName, String content) throws IOException {
-        Path path = Path.of("generated/json");
+    public static void saveFile(String fileName, String folder, String content) throws IOException {
+        Path path = Path.of(folder);
         if (!Files.exists(path)) {
             Files.createDirectory(path);
         }
 
-        Path jsonFile = Path.of(path.toString(), jsonFileName);
+        Path jsonFile = Path.of(path.toString(), fileName);
         FileWriter writer = new FileWriter(String.valueOf(jsonFile));
         writer.write(content);
         writer.close();

@@ -6,7 +6,7 @@ import java.util.List;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -15,7 +15,6 @@ import pt.up.fe.specs.util.SpecsSystem;
  * A semantic analysis returns the analysed tree and the generated symbol table.
  */
 public class JasminResult {
-
     private final String className;
     private final String jasminCode;
     private final List<Report> reports;
@@ -28,7 +27,7 @@ public class JasminResult {
 
     public JasminResult(OllirResult ollirResult, String jasminCode, List<Report> reports) {
         this(ollirResult.getOllirClass().getClassName(), jasminCode,
-                SpecsCollections.concat(ollirResult.getReports(), reports));
+            SpecsCollections.concat(ollirResult.getReports(), reports));
     }
 
     public String getClassName() {
@@ -74,7 +73,6 @@ public class JasminResult {
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> classpath) {
-        // Compile
         var classFile = compile();
 
         var classpathArg = classFile.getParentFile().getAbsolutePath();
@@ -86,9 +84,7 @@ public class JasminResult {
         }
 
         var classname = SpecsIo.removeExtension(classFile.getName());
-
         var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg, classname), true, true);
-
         return output.getOutput();
     }
 
