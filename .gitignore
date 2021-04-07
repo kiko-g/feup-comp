@@ -2,7 +2,7 @@
 .gradle/
 /build/
 /generated/
-*.jar
+#*.jar
 .idea/
 gradle
 gradlew
