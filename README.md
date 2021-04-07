@@ -41,5 +41,5 @@ You can also see a test report by opening ``build/reports/tests/test/index.html`
 
 # Checkpoints
 1. [Checkpoint 1](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-1)
-2. [Checkpoint 2](#)
+2. [Checkpoint 2](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-2)
 3. [Checkpoint 3](#)
