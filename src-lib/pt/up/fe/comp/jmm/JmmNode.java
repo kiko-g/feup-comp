@@ -138,4 +138,18 @@ public interface JmmNode {
 
         return Arrays.asList(jmmChildren);
     }
+
+    default String toTree() {
+        var tree = new StringBuilder();
+        toTree(tree, "");
+        return tree.toString();
+    }
+
+    default void toTree(StringBuilder tree, String prefix) {
+        tree.append(prefix).append(toString()).append("\n");
+
+        for (var child : getChildren()) {
+            child.toTree(tree, prefix + " ");
+        }
+    }
 }
