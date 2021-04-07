@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.report.Report;
+import report.Report;
 import pt.up.fe.specs.util.SpecsIo;
 
 /**
