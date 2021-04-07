@@ -21,7 +21,7 @@ public class Main {
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);
-			semanticsResult = new Analysis().semanticAnalysis(parserResult);
+			semanticsResult = Analysis.run(parserResult);
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) { } finally {

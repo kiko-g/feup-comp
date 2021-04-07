@@ -16,10 +16,6 @@ public class Parser implements JmmParser {
         JmmParserResult result = new Parser().parse(content);
         Utils.saveFile(Utils.getFilename(resource), "generated/json", result.toJson());
 
-        if(result.getRootNode() == null) {
-            result.getReports().add(new Report(ReportType.ERROR, Stage.SYNTATIC, "AST Root Node is null!"));
-        }
-
         return result;
     }
 
@@ -40,6 +36,7 @@ public class Parser implements JmmParser {
         }
 
         if(TestUtils.getNumErrors(parser.getReports()) != 0) {
+            parser.getReports().add(new Report(ReportType.ERROR, Stage.SYNTATIC, "AST Root Node is null!"));
             return new JmmParserResult(null, parser.getReports());
         }
 

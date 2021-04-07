@@ -9,11 +9,10 @@ import report.ReportType;
 import report.Stage;
 
 public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
-    private final AnalysisTable symbolTable;
+    private final AnalysisTable symbolTable = new AnalysisTable();
     private final List<Report> reports;
 
-    public AnalysisTableBuilder(AnalysisTable symbolTable, List<Report> reports) {
-        this.symbolTable = symbolTable;
+    public AnalysisTableBuilder(List<Report> reports) { ;
         this.reports = reports;
 
         addVisit("Import", this::visitImport);
@@ -158,5 +157,13 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         }
 
         return "";
+    }
+
+    public AnalysisTable getSymbolTable() {
+        return this.symbolTable;
+    }
+
+    public List<Report> getReports() {
+        return this.reports;
     }
 }
