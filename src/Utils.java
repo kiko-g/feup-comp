@@ -72,4 +72,12 @@ public class Utils {
 
         return concatReports;
     }
+
+    public static void runTimeExec(String cmd) {
+        try {
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
