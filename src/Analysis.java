@@ -33,7 +33,7 @@ public class Analysis implements JmmAnalysis {
         }
 
         TypeAnalysis typeAnalysis = new TypeAnalysis(tableBuilder.getSymbolTable(), reports);
-        typeAnalysis.visit(root, "");
+        typeAnalysis.visit(root, null);
 
         if(TestUtils.getNumErrors(typeAnalysis.getReports()) != 0) {
             tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));

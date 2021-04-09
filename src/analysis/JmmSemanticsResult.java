@@ -2,9 +2,12 @@ package analysis;
 
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import pt.up.fe.comp.jmm.JmmNode;
 import parser.JmmParserResult;
 import analysis.table.SymbolTable;
+import pt.up.fe.comp.jmm.ast.JmmSerializer;
 import report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 
@@ -37,5 +40,13 @@ public class JmmSemanticsResult {
 
     public List<Report> getReports() {
         return this.reports;
+    }
+
+    public String toJson() {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(JmmNode.class, new JmmSerializer())
+                .create();
+        return gson.toJson(this, JmmParserResult.class);
     }
 }

@@ -12,8 +12,9 @@ import report.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TypeAnalysis extends AJmmVisitor<String, Type> {
+public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     public final static Type INT = new Type("int", false);
+    public final static Type INT_ARRAY = new Type("int", true);
     public final static Type BOOL = new Type("boolean", false);
     public final static Type THIS = new Type("this", false);
     public final static Type LENGTH = new Type("length", false);
@@ -21,13 +22,25 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
     private final AnalysisTable symbolTable;
     private final List<Report> reports;
 
+    protected static class TypeNScope {
+        final private String scope;
+        final private Type expected;
+
+        public TypeNScope(String scope, Type expected) {
+            this.scope = scope;
+            this.expected = expected;
+        }
+    }
 
     public TypeAnalysis(AnalysisTable symbolTable, List<Report> reports) {
         this.symbolTable = symbolTable;
         this.reports = reports;
 
+        addVisit("Class", this::visitClass);
         addVisit("Method", this::visitMethod);
         addVisit("Main", this::visitMain);
+        addVisit("If", this::visitConditionExpression);
+        addVisit("While", this::visitConditionExpression);
         addVisit("Assign", this::visitEqual);
         addVisit("Dot", this::visitDot);
         addVisit("MethodCall", this::visitMethodCall);
@@ -39,8 +52,8 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         addVisit("Less", this::visitIntReturnBool);
         addVisit("Not", this::visitSingleBool);
         addVisit("ArrayAccess", this::visitArray);
-//        addVisit("Object", this::visitObject);
-        addVisit("IntArray", this::returnInt);
+        addVisit("Object", this::visitObject);
+        addVisit("IntArray", this::returnIntArray);
         addVisit("Index", this::visitSingleInt);
         addVisit("Size", this::visitSingleInt);
         addVisit("Var", this::visitVar);
@@ -51,104 +64,135 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         setDefaultVisit(this::defaultVisit);
     }
 
-    private Type visitMethod(JmmNode node, String scope) {
+    private Type visitClass(JmmNode jmmNode, TypeNScope typeNScope) {
+        return defaultVisit(jmmNode, new TypeNScope(AnalysisTable.CLASS_SCOPE, null));
+    }
+
+    private Type visitObject(JmmNode node, TypeNScope typeNScope) {
+        JmmNode nameNode = node.getChildren().get(0);
+
+        return new Type(nameNode.get("VALUE"), false);
+    }
+
+    private Type visitMethod(JmmNode node, TypeNScope typeNScope) {
         JmmNode returnType = node.getChildren().get(0);
         JmmNode name = node.getChildren().get(1);
 
         for (JmmNode child : node.getChildren()){
-            visit(child, name.get("VALUE"));
+            visit(child, new TypeNScope(name.get("VALUE"), null));
         }
 
         return getType(returnType);
     }
 
-    private Type visitMain(JmmNode node, String scope) {
+    private Type visitMain(JmmNode node, TypeNScope typeNScope) {
         for (JmmNode child : node.getChildren()){
-            visit(child, "main");
+            visit(child, new TypeNScope(AnalysisTable.MAIN_SCOPE, null));
         }
 
         return null;
     }
 
-    private Type visitEqual(JmmNode node, String scope) {
+    private Type visitConditionExpression(JmmNode node, TypeNScope typeNScope) {
+        JmmNode conditionalNode = node.getChildren().get(0);
+
+        checkSingleType(conditionalNode, new TypeNScope(typeNScope.scope, BOOL));
+
+        for (int i = 1; i < node.getNumChildren(); i++) {
+            visit(node.getChildren().get(i), typeNScope);
+        }
+
+        return null;
+    }
+
+    private Type visitEqual(JmmNode node, TypeNScope typeNScope) {
         JmmNode leftOperand = node.getChildren().get(0);
         JmmNode rightOperand = node.getChildren().get(1);
 
-        Type leftType = visit(leftOperand, scope);
-        Type rightType = visit(rightOperand, scope);
+        Type leftType = visit(leftOperand, typeNScope);
 
-        if (!leftType.equals(rightType)) {
-            this.reports.add(
-                    new Report(
-                            ReportType.ERROR,
-                            Stage.SEMANTIC,
-                            Integer.parseInt(node.get("LINE")),
-                            Integer.parseInt(node.get("COLUMN")),
-                            "Invalid type found. Expected \"" + leftType + "\", found \"" + rightType + "\""
-                    )
-            );
-        }
+        checkSingleType(rightOperand, new TypeNScope(typeNScope.scope, leftType));
 
         return leftType;
     }
 
-    private Type visitDot(JmmNode node, String scope) {
+    private Type visitDot(JmmNode node, TypeNScope typeNScope) {
         JmmNode leftOperand = node.getChildren().get(0);
         JmmNode rightOperand = node.getChildren().get(1);
 
-        Type leftType = visit(leftOperand, scope);
-        Type rightType = visit(rightOperand, leftType.equals(THIS) ? AnalysisTable.CLASS_SCOPE : scope);
+        Type leftType = visit(leftOperand, typeNScope);
+        Type rightType = visit(
+            rightOperand,
+            new TypeNScope(
+                leftType.equals(THIS) || leftType.getName().equals(symbolTable.getClassName()) ?
+                    AnalysisTable.CLASS_SCOPE :
+                    leftType.getName(),
+                typeNScope.expected
+            )
+        );
 
         if (leftType.equals(INT) || leftType.equals(BOOL) || leftType.equals(LENGTH)) {
-            this.reports.add(
-                    new Report(
-                            ReportType.ERROR,
-                            Stage.SEMANTIC,
-                            Integer.parseInt(node.get("LINE")),
-                            Integer.parseInt(node.get("COLUMN")),
-                            "Invalid type found. Expected \"<class>\" or \"this\", found \"" + leftType + "\""
-                    )
-            );
-        }
-
-        if (rightType.equals(LENGTH) && !leftType.isArray()) {
-            this.reports.add(
-                    new Report(
-                            ReportType.ERROR,
-                            Stage.SEMANTIC,
-                            Integer.parseInt(node.get("LINE")),
-                            Integer.parseInt(node.get("COLUMN")),
-                            "Invalid type found. Expected \"<any_type>[]\", found \"" + rightType + "\""
-                    )
-            );
-        }
-
-        return rightType;
-    }
-
-    private Type visitMethodCall(JmmNode node, String scope) {
-        JmmNode methodNameNode = node.getChildren().get(0);
-        JmmNode paramsNode = node.getChildren().get(1);
-
-        Symbol methodSymbol = this.symbolTable.getMethodSymbol(methodNameNode.get("VALUE"));
-
-        if (methodSymbol == null) {
             this.reports.add(
                 new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Could not find the method \"" + methodNameNode.get("VALUE") + "\", are you missing an import?"
+                    "Invalid type found. Expected \"<class>\" or \"this\", found \"" + leftType + "\""
                 )
             );
-
-            return null; // TODO: check if null always works as a return
         }
+
+        if (LENGTH.equals(rightType) && !leftType.isArray()) {
+            this.reports.add(
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(node.get("LINE")),
+                    Integer.parseInt(node.get("COLUMN")),
+                    "Invalid type found. Expected \"<any_type>[]\", found \"" + rightType + "\""
+                )
+            );
+        }
+
+        return leftType.equals(THIS) ? rightType : (leftType.isArray() && LENGTH.equals(rightType) ? INT : typeNScope.expected);
+    }
+
+    private Type visitMethodCall(JmmNode node, TypeNScope typeNScope) {
+        JmmNode methodNameNode = node.getChildren().get(0);
+        JmmNode paramsNode = node.getChildren().get(1);
+
+        String methodName = methodNameNode.get("VALUE");
+
+        // check if method isn't from class
+        if (!typeNScope.scope.equals(AnalysisTable.CLASS_SCOPE)) {
+            List<String> imports = symbolTable.getImports();
+            boolean isImportedMethod = false;
+
+            for (String importName : imports) {
+                isImportedMethod |= importName.equals(typeNScope.scope) || importName.equals(methodName);
+            }
+
+            if (!isImportedMethod)
+                this.reports.add(
+                    new Report(
+                        ReportType.ERROR,
+                        Stage.SEMANTIC,
+                        Integer.parseInt(node.get("LINE")),
+                        Integer.parseInt(node.get("COLUMN")),
+                        "Could not find the method \"" + methodName + "\", are you missing an import?"
+                    )
+                );
+
+            return typeNScope.expected;
+        }
+
+        Symbol methodSymbol = this.symbolTable.getMethodSymbol(methodName);
 
         List<Type> methodParameters = this.symbolTable.getParameters(methodSymbol.getName()).stream().map(Symbol::getType).collect(Collectors.toList());
 
-        List<Type> givenParameters = paramsNode.getChildren().stream().map(this::visit).collect(Collectors.toList());
+        TypeNScope newTypeNScope = new TypeNScope(typeNScope.scope, null);
+        List<Type> givenParameters = paramsNode.getChildren().stream().map((child) -> this.visit(child, newTypeNScope)).collect(Collectors.toList());
 
         if (methodParameters.size() != givenParameters.size()) {
             this.reports.add(
@@ -187,12 +231,12 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         return methodSymbol.getType();
     }
 
-    private Type visitArray(JmmNode node, String scope) {
+    private Type visitArray(JmmNode node, TypeNScope typeNScope) {
         JmmNode leftOperand = node.getChildren().get(0);
         JmmNode rightOperand = node.getChildren().get(1);
 
-        Type leftType = visit(leftOperand, scope);
-        Type rightType = visit(rightOperand, scope);
+        Type leftType = visit(leftOperand, typeNScope);
+        Type rightType = visit(rightOperand, typeNScope);
 
         if (!leftType.isArray()) {
             this.reports.add(
@@ -221,40 +265,44 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         return new Type(leftType.getName(), false);
     }
 
-    private Type visitIntReturnBool(JmmNode node, String scope) {
-        checkTwoTypes(node, scope, INT);
+    private Type visitIntReturnBool(JmmNode node, TypeNScope typeNScope) {
+        checkTwoTypes(node, new TypeNScope(typeNScope.scope, INT));
 
         return BOOL;
     }
 
-    private Type visitBool(JmmNode node, String scope) {
-        checkTwoTypes(node, scope, BOOL);
+    private Type visitBool(JmmNode node, TypeNScope typeNScope) {
+        checkTwoTypes(node, new TypeNScope(typeNScope.scope, BOOL));
 
         return BOOL;
     }
 
-    private Type visitSingleInt(JmmNode node, String scope) {
-        checkSingleType(node, scope, BOOL);
+    private Type visitSingleInt(JmmNode node, TypeNScope typeNScope) {
+        checkSingleType(node.getChildren().get(0), new TypeNScope(typeNScope.scope, BOOL));
 
         return INT;
     }
 
-    private Type visitSingleBool(JmmNode node, String scope) {
-        checkSingleType(node, scope, INT);
+    private Type visitSingleBool(JmmNode node, TypeNScope typeNScope) {
+        checkSingleType(node.getChildren().get(0), new TypeNScope(typeNScope.scope, BOOL));
 
         return BOOL;
     }
 
-    private Type visitInt(JmmNode node, String scope) {
-        checkTwoTypes(node, scope, INT);
+    private Type visitInt(JmmNode node, TypeNScope typeNScope) {
+        checkTwoTypes(node, new TypeNScope(typeNScope.scope, INT));
 
         return INT;
     }
 
-    private Type visitVar(JmmNode node, String scope) {
-        Symbol variable = this.symbolTable.getVariable(scope, node.get("VALUE"));
+    private Type visitVar(JmmNode node, TypeNScope typeNScope) {
+        Symbol variable = this.symbolTable.getVariable(typeNScope.scope, node.get("VALUE"));
 
-        if(variable == null) {
+        if (variable == null) {
+            if (this.symbolTable.getImports().contains(node.get("VALUE"))) {
+                return new Type(node.get("VALUE"), false);
+            }
+
             this.reports.add(
                 new Report(
                     ReportType.ERROR,
@@ -265,63 +313,67 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
                 )
             );
 
-            return null; // TODO: check if this can be null without further checks
+            return typeNScope.expected;
         }
 
         return variable.getType();
     }
 
-    private Type returnInt(JmmNode node, String scope) {
+    private Type returnInt(JmmNode node, TypeNScope typeNScope) {
         return INT;
     }
 
-    private Type returnBool(JmmNode node, String scope) {
+    private Type returnIntArray(JmmNode node, TypeNScope typeNScope) {
+        return INT_ARRAY;
+    }
+
+    private Type returnBool(JmmNode node, TypeNScope typeNScope) {
         return BOOL;
     }
 
-    private Type returnLength(JmmNode node, String scope) {
+    private Type returnLength(JmmNode node, TypeNScope typeNScope) {
         return LENGTH;
     }
 
-    private Type returnThis(JmmNode node, String scope) {
+    private Type returnThis(JmmNode node, TypeNScope typeNScope) {
         return THIS;
     }
 
-    private void checkTwoTypes(JmmNode node, String scope, Type type) {
+    private void checkTwoTypes(JmmNode node, TypeNScope typeNScope) {
         JmmNode leftOperand = node.getChildren().get(0);
         JmmNode rightOperand = node.getChildren().get(1);
 
-        Type leftType = visit(leftOperand, scope);
-        Type rightType = visit(rightOperand, scope);
+        Type leftType = visit(leftOperand, typeNScope);
+        Type rightType = visit(rightOperand, typeNScope);
 
-        if (!leftType.equals(type) || !rightType.equals(type)) {
-            Type wrongType = leftType.equals(type) ? rightType : leftType;
+        if (!leftType.equals(typeNScope.expected) || !rightType.equals(typeNScope.expected)) {
+            Type wrongType = leftType.equals(typeNScope.expected) ? rightType : leftType;
 
             this.reports.add(
-                    new Report(
-                            ReportType.ERROR,
-                            Stage.SEMANTIC,
-                            Integer.parseInt(node.get("LINE")),
-                            Integer.parseInt(node.get("COLUMN")),
-                            "Invalid type found on " + (wrongType == rightType ? "right" : "left")
-                                    + " side operand. Expected \"" + type + "\", found \"" + wrongType + "\""
-                    )
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(node.get("LINE")),
+                    Integer.parseInt(node.get("COLUMN")),
+                    "Invalid type found on " + (wrongType == rightType ? "right" : "left")
+                        + " side operand. Expected \"" + typeNScope.expected + "\", found \"" + wrongType + "\""
+                )
             );
         }
     }
 
-    private void checkSingleType(JmmNode node, String scope, Type type) {
-        Type childType = visit(node.getChildren().get(0));
+    private void checkSingleType(JmmNode node, TypeNScope typeNScope) {
+        Type childType = visit(node, typeNScope);
 
-        if (!childType.equals(INT)) {
+        if (!childType.equals(typeNScope.expected)) {
             this.reports.add(
-                    new Report(
-                            ReportType.ERROR,
-                            Stage.SEMANTIC,
-                            Integer.parseInt(node.get("LINE")),
-                            Integer.parseInt(node.get("COLUMN")),
-                            "Invalid expression type found. Expected \"" + INT + "\", found \"" + childType + "\""
-                    )
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(node.get("LINE")),
+                    Integer.parseInt(node.get("COLUMN")),
+                    "Invalid type found. Expected \"" + typeNScope.expected + "\", found \"" + childType + "\""
+                )
             );
         }
     }
@@ -334,10 +386,10 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         return new Type(node.get("VALUE"), false);
     }
 
-    private Type defaultVisit(JmmNode node, String scope) {
+    private Type defaultVisit(JmmNode node, TypeNScope typeNScope) {
         Type type = null;
         for (JmmNode child : node.getChildren()) {
-            type = visit(child, scope);
+            type = visit(child, typeNScope);
         }
 
         return type;

@@ -1,99 +1,114 @@
 import static org.junit.Assert.*;
 
+import analysis.JmmSemanticsResult;
 import org.junit.Test;
 import pt.up.fe.comp.TestUtils;
 import parser.JmmParserResult;
+import report.Report;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
 
 public class ParserTest {
-    private void test(String resource, boolean mustFail) {
+    private void test(Path resource, boolean mustFail) {
         try {
-            String content = Utils.getResourceContent(resource, resource.substring(resource.lastIndexOf("/")));
+            String content = Utils.getResourceContent(resource.toString(), resource.getFileName().toString());
             JmmParserResult result = TestUtils.parse(content);
-            Utils.saveFile(Utils.getFilename(resource), "generated/json", result.toJson());
+            Utils.saveFile(Utils.getFilename(resource.toString()), "generated/json", result.toJson());
+
+            List<Report> reports = result.getReports();
+
+            if(result.getRootNode() != null) {
+                JmmSemanticsResult semanticsResult = TestUtils.analyse(result);
+                reports = semanticsResult.getReports();
+            }
 
             if (mustFail) {
-                TestUtils.mustFail(result.getReports());
+                TestUtils.mustFail(reports);
             } else {
-                TestUtils.noErrors(result.getReports());
+                TestUtils.noErrors(reports);
             }
+            System.out.println(reports);
         } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
 
     @Test
     public void testFindMaximum() {
-        test("test/fixtures/public/FindMaximum.jmm", false);
+        test(Path.of("test/fixtures/public/FindMaximum.jmm"), false);
     }
 
     @Test
     public void testHelloWorld() {
-        test("test/fixtures/public/HelloWorld.jmm", false);
+        test(Path.of("test/fixtures/public/HelloWorld.jmm"), false);
     }
 
     @Test
     public void testLazysort() {
-        test("test/fixtures/public/Lazysort.jmm", false);
+        test(Path.of("test/fixtures/public/Lazysort.jmm"), false);
     }
 
     @Test
     public void testLife() {
-        test("test/fixtures/public/Life.jmm", false);
+        test(Path.of("test/fixtures/public/Life.jmm"), false);
     }
 
     @Test
     public void testMonteCarloPi() {
-        test("test/fixtures/public/MonteCarloPi.jmm", false);
+        test(Path.of("test/fixtures/public/MonteCarloPi.jmm"), false);
     }
 
     @Test
     public void testQuickSort() {
-        test("test/fixtures/public/QuickSort.jmm", false);
+        test(Path.of("test/fixtures/public/QuickSort.jmm"), false);
     }
 
     @Test
     public void testSimple() {
-        test("test/fixtures/public/Simple.jmm", false);
+        test(Path.of("test/fixtures/public/Simple.jmm"), false);
     }
 
     @Test
     public void testTicTacToe() {
-        test("test/fixtures/public/TicTacToe.jmm", false);
+        test(Path.of("test/fixtures/public/TicTacToe.jmm"), false);
     }
 
     @Test
     public void testWhileAndIF() {
-        test("test/fixtures/public/WhileAndIF.jmm", false);
+        test(Path.of("test/fixtures/public/WhileAndIF.jmm"), false);
     }
 
     @Test
     public void testBlowUp() {
-        test("test/fixtures/public/fail/syntactical/BlowUp.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/BlowUp.jmm"), true);
     }
 
     @Test
     public void testCompleteWhileTest() {
-        test("test/fixtures/public/fail/syntactical/CompleteWhileTest.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/CompleteWhileTest.jmm"), true);
     }
 
     @Test
     public void testLengthError() {
-        test("test/fixtures/public/fail/syntactical/LengthError.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/LengthError.jmm"), true);
     }
 
     @Test
     public void testMissingRightPar() {
-        test("test/fixtures/public/fail/syntactical/MissingRightPar.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/MissingRightPar.jmm"), true);
     }
 
     @Test
     public void testMultipleSequential() {
-        test("test/fixtures/public/fail/syntactical/MultipleSequential.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/MultipleSequential.jmm"), true);
     }
 
     @Test
     public void testNestedLoop() {
-        test("test/fixtures/public/fail/syntactical/NestedLoop.jmm", true);
+        test(Path.of("test/fixtures/public/fail/syntactical/NestedLoop.jmm"), true);
     }
 
     /**
@@ -101,16 +116,16 @@ public class ParserTest {
      */
     @Test
     public void testTuringV2() {
-        test("test/fixtures/private/TuringV2.jmm", false);
+        test(Path.of("test/fixtures/private/TuringV2.jmm"), false);
     }
 
     @Test
     public void testArrayAssign() {
-        test("test/fixtures/private/ArrayAssign.jmm", false);
+        test(Path.of("test/fixtures/private/ArrayAssign.jmm"), false);
     }
 
     @Test
     public void testArrayAssignFail() {
-        test("test/fixtures/private/fail/ArrayAssignFail.jmm", true);
+        test(Path.of("test/fixtures/private/fail/ArrayAssignFail.jmm"), true);
     }
 }

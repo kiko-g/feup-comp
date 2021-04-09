@@ -20,23 +20,23 @@ public class Main {
 
 		JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
 		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
-		OllirResult ollirResult = new OllirResult(semanticsResult, null, new ArrayList<>());
-		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
+//		OllirResult ollirResult = new OllirResult(semanticsResult, null, new ArrayList<>());
+//		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);
 			semanticsResult = Analysis.run(parserResult);
-			ollirResult = OptimizationStage.run(semanticsResult);
-			jasminResult = BackendStage.run(ollirResult);
-			jasminResult.run();
+//			ollirResult = OptimizationStage.run(semanticsResult);
+//			jasminResult = BackendStage.run(ollirResult);
+//			jasminResult.run();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) { } finally {
 			List<Report> reports = Utils.concatReports(
 				parserResult.getReports(),
-				semanticsResult.getReports(),
-				ollirResult.getReports(),
-				jasminResult.getReports()
+				semanticsResult.getReports()
+//				ollirResult.getReports(),
+//				jasminResult.getReports()
 			);
 
 			reports.forEach(System.err::println);

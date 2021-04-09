@@ -1,6 +1,7 @@
 options {
     LOOKAHEAD = 1;
     STATIC = false;
+    NODE_SCOPE_HOOK=true;
 }
 
 PARSER_BEGIN(Jmm)
@@ -64,6 +65,13 @@ public class Jmm {
     public List<Report> getReports() {
         return this.reports;
     }
+
+    void jjtreeOpenNodeScope(Node n) {
+        ((SimpleNode)n).put("LINE", Integer.toString(getToken(1).beginLine));
+        ((SimpleNode)n).put("COLUMN", Integer.toString(getToken(1).beginColumn));
+    }
+
+    void jjtreeCloseNodeScope(Node n) { }
 }
 PARSER_END(Jmm)
 
@@ -144,7 +152,7 @@ void ImportStatement() #void: {} {
 }
 
 Token Import() #void: {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ImportName {return t;}
+    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image);} #ImportName {return t;}
 }
 
 void ClassDeclaration() #void: {} {
@@ -159,15 +167,13 @@ void VarDeclaration() #void: {} {
     Type() Name() <SEMICOLON>
 }
 
-void MethodDeclaration() #void: { } {
+void MethodDeclaration() #void: {} {
     <PUBLIC> (MainDeclaration() #Main | RegularMethodDeclaration() #Method)
 }
 
 void MainDeclaration() #void: {Token t;} {
     <STATIC> <VOID> <MAIN> <LPAR> (t=<STRING> {
         jjtThis.put("VALUE",  t.image);
-        jjtThis.put("LINE",  String.valueOf(t.beginLine));
-        jjtThis.put("COLUMN", String.valueOf(t.beginColumn));
     } #ClassName <LSQRBRACKET> <RSQRBRACKET>#Array(1) Name())#MethodParam(2) <RPAR>#MethodParameters(1) <LBRACKET>
         MethodBody()
     <RBRACKET>
@@ -193,9 +199,9 @@ void MethodBody() #void: {} {
 }
 
 void Type() #void: {Token t;} {
-    t=<BOOLEAN> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Boolean
-    | t=<INT> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
-    | t=<IDENTIFIER> {jjtThis.put("VALUE",  t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ClassName
+    t=<BOOLEAN> {jjtThis.put("VALUE",  t.image);} #Boolean
+    | t=<INT> {jjtThis.put("VALUE",  t.image);} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
+    | t=<IDENTIFIER> {jjtThis.put("VALUE",  t.image);} #ClassName
 }
 
 void Statement() #void: {} {
@@ -205,9 +211,8 @@ void Statement() #void: {} {
     | AssignOrExpression() <SEMICOLON>
 }
 
-void IfStatement() #void: {Token t;} {
-    <IF> t=<LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
-    {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #If(3)
+void IfStatement() #void: {} {
+    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement() #If(3)
 }
 
 /* *
@@ -215,14 +220,14 @@ void IfStatement() #void: {Token t;} {
 * https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
 * https://www.cs.purdue.edu/homes/hosking/javacc/doc/apiroutines.html
 * */
-void WhileStatement() #void: {Token t;} {
-    t=<WHILE>
+void WhileStatement() #void: {} {
+    <WHILE>
     try {
-        t=<LPAR> Expression() <RPAR>
+        <LPAR> Expression() <RPAR>
     } catch (ParseException e) {
         processWhileError(e);
     }
-    Statement() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #While(2)
+    Statement() #While(2)
 }
 
 /* *
@@ -234,40 +239,40 @@ void Expression() #void: {} {
     LogicalAndExp()
 }
 
-void LogicalAndExp() #void: {Token t;} {
-    RelationalLessExp() (t=<AND> RelationalLessExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #LogicalAnd(2))*
+void LogicalAndExp() #void: {} {
+    RelationalLessExp() (<AND> RelationalLessExp() #LogicalAnd(2))*
 }
 
-void RelationalLessExp() #void: {Token t;} {
-    ArithmeticAdditiveExp() (t=<LESS> ArithmeticAdditiveExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Less(2))*
+void RelationalLessExp() #void: {} {
+    ArithmeticAdditiveExp() (<LESS> ArithmeticAdditiveExp() #Less(2))*
 }
 
-void ArithmeticAdditiveExp() #void: {Token t;} {
+void ArithmeticAdditiveExp() #void: {} {
     ArithmeticMultiplicativeExp()
-    (t=<PLUS> ArithmeticMultiplicativeExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Add(2)
-        | t=<MINUS> ArithmeticMultiplicativeExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Sub(2))*
+    (<PLUS> ArithmeticMultiplicativeExp() #Add(2)
+        | <MINUS> ArithmeticMultiplicativeExp() #Sub(2))*
 }
 
-void ArithmeticMultiplicativeExp() #void: {Token t;} {
+void ArithmeticMultiplicativeExp() #void: {} {
     LogicalNotExp()
-    (t=<MUL> LogicalNotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Mul(2)
-        | t=<DIV> LogicalNotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Div(2))*
+    (<MUL> LogicalNotExp() #Mul(2)
+        | <DIV> LogicalNotExp() #Div(2))*
 }
 
-void LogicalNotExp() #void: {Token t;} {
-    (t=<NOT> AccessExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Not)+ | AccessExp()
+void LogicalNotExp() #void: {} {
+    (<NOT> AccessExp() #Not)+ | AccessExp()
 }
 
-void AccessExp() #void: {Token t;} {
-    TerminalExp() (t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2) | t=<DOT> DotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Dot(2))*
+void AccessExp() #void: {} {
+    TerminalExp() (ArrayAccess() #ArrayAccess(2) | <DOT> DotExp() #Dot(2))*
 }
 
-void DotExp() #void: {Token t;} {
-    t=<LENGTH> #Length | CallWithParams() #MethodCall
+void DotExp() #void: {} {
+    <LENGTH> #Length | CallWithParams() #MethodCall
 }
 
-Token ArrayAccess() #void: {Token t;} {
-    t=<LSQRBRACKET> Expression() #Index <RSQRBRACKET> {return t;}
+void ArrayAccess() #void: {} {
+    <LSQRBRACKET> Expression() #Index <RSQRBRACKET>
 }
 
 void CallWithParams() #void: {} {
@@ -275,65 +280,65 @@ void CallWithParams() #void: {} {
 }
 
 void TerminalExp() #void: {Token t;} {
-    t=<INTEGER_LITERAL> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #IntegerVal
-    | t=<TRUE> {jjtThis.put("VALUE", "true"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Bool
-    | t=<FALSE> {jjtThis.put("VALUE", "false"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Bool
-    | t=<THIS> {jjtThis.put("VALUE", "this"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #This
+    t=<INTEGER_LITERAL> {jjtThis.put("VALUE", t.image);} #IntegerVal
+    | t=<TRUE> {jjtThis.put("VALUE", "true");} #Bool
+    | t=<FALSE> {jjtThis.put("VALUE", "false");} #Bool
+    | t=<THIS> {jjtThis.put("VALUE", "this");} #This
     | Var()
     | <NEW> NewInstance() #New
     | <LPAR> Expression() #Important <RPAR>
 }
 
 void AssignOrExpression() #void: {Token t;} {
-    t=<INTEGER_LITERAL> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #IntegerVal Operations()
-    | t=<TRUE> {jjtThis.put("VALUE", "true"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Bool Operations()
-    | t=<FALSE> {jjtThis.put("VALUE", "false"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Bool Operations()
-    | t=<THIS> {jjtThis.put("VALUE", "this"); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #This Operations()
+    t=<INTEGER_LITERAL> {jjtThis.put("VALUE", t.image);} #IntegerVal Operations()
+    | t=<TRUE> {jjtThis.put("VALUE", "true");} #Bool Operations()
+    | t=<FALSE> {jjtThis.put("VALUE", "false");} #Bool Operations()
+    | t=<THIS> {jjtThis.put("VALUE", "this");} #This Operations()
     | Var()  ArrayAccessExpressionOrAssign()
     | <NEW> NewInstance() #New
     | <LPAR> Expression() #Important <RPAR>
-    | t=<NOT> LogicalNotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Not
+    | <NOT> LogicalNotExp() #Not
 }
 
-void ArrayAccessExpressionOrAssign() #void: {Token t;} {
+void ArrayAccessExpressionOrAssign() #void: {} {
     //Ignore warning, match with first ArrayAccess
-    [LOOKAHEAD(1) t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2)]
+    [LOOKAHEAD(1) ArrayAccess() #ArrayAccess(2)]
     (
-        t=<EQUALS> Expression() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Assign(2)
-            | Operations() (t=ArrayAccess() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #ArrayAccess(2))*
+        <EQUALS> Expression() #Assign(2)
+            | Operations() (ArrayAccess() #ArrayAccess(2))*
     )
 }
 
-void Operations() #void: {Token t;} {
-    RelationalLessOp() (t=<AND> RelationalLessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #LogicalAnd(2))*
+void Operations() #void: {} {
+    RelationalLessOp() (<AND> RelationalLessOp() #LogicalAnd(2))*
 }
 
-void RelationalLessOp() #void: {Token t;} {
-    ArithmeticAdditiveOp() (t=<LESS> ArithmeticAdditiveOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Less(2))*
+void RelationalLessOp() #void: {} {
+    ArithmeticAdditiveOp() (<LESS> ArithmeticAdditiveOp() #Less(2))*
 }
 
-void ArithmeticAdditiveOp() #void: {Token t;} {
+void ArithmeticAdditiveOp() #void: {} {
     ArithmeticMultiplicativeOp()
-        (t=<PLUS> ArithmeticMultiplicativeOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Add(2))*
-        (t=<MINUS> ArithmeticMultiplicativeOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Sub(2))*
+        (<PLUS> ArithmeticMultiplicativeOp() #Add(2))*
+        (<MINUS> ArithmeticMultiplicativeOp() #Sub(2))*
 }
 
-void ArithmeticMultiplicativeOp() #void: {Token t;} {
+void ArithmeticMultiplicativeOp() #void: {} {
     AccessOp()
-    (t=<MUL> AccessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Mul(2))*
-    (t=<DIV> AccessOp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}  #Div(2))*
+    (<MUL> AccessOp() #Mul(2))*
+    (<DIV> AccessOp() #Div(2))*
 }
 
-void AccessOp() #void: {Token t;} {
-    (t=<DOT> DotExp() {jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));} #Dot(2))*
+void AccessOp() #void: {} {
+    (<DOT> DotExp() #Dot(2))*
 }
 
 void Var(): {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}
+    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image);}
 }
 
 void Name(): {Token t;} {
-    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image); jjtThis.put("LINE",  String.valueOf(t.beginLine)); jjtThis.put("COLUMN", String.valueOf(t.beginColumn));}
+    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image);}
 }
 
 void NewInstance() #void: {} {

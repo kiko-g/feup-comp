@@ -40,7 +40,7 @@ public class BackendStage implements JasminBackend {
             // More reports from this stage
             List<Report> reports = ollirResult.getReports();
 
-            return new JasminResult(ollirResult, jasminCode, reports);
+            return new JasminResult(ollirResult, jasminCode.toString(), reports);
 
         } catch (OllirErrorException e) {
             return new JasminResult(ollirClass.getClassName(), null,

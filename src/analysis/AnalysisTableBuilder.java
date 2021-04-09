@@ -19,6 +19,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         this.reports = reports;
 
         addVisit("Import", this::visitImport);
+        addVisit("ImportName", this::visitValue);
         addVisit("Class", this::visitClass);
         addVisit("VarDecl", this::visitVarDecl);
         addVisit("Method", this::visitMethod);
@@ -28,15 +29,13 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     }
 
     public String visitImport(JmmNode node, String scope) {
-        StringBuilder importStmt = new StringBuilder();
+        String importClass = "";
 
         for (JmmNode child : node.getChildren()) {
-            importStmt.append(child.get("VALUE")).append('.');
+            importClass = visit(child);
         }
 
-        importStmt.deleteCharAt(importStmt.length() - 1);
-
-        if (!this.symbolTable.addImport(importStmt.toString())) {
+        if (!this.symbolTable.addImport(importClass)) {
             JmmNode lastChild = node.getChildren().get(node.getNumChildren() - 1);
 
             this.reports.add(
@@ -45,7 +44,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
                     Stage.SEMANTIC,
                     Integer.parseInt(lastChild.get("LINE")),
                     Integer.parseInt(lastChild.get("COLUMN")),
-                    "Duplicated import " + importStmt + "\""
+                    "Duplicated import " + importClass + "\""
                 )
             );
         }
@@ -95,7 +94,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
             );
         }
 
-        if(node.getChildren().size() >= 3) {
+        if(node.getChildren().size() >= 3 && node.getChildren().get(2).getKind().equals("MethodParameters")) {
             this.fillMethodParameters(node.getChildren().get(2), method);
         }
         
@@ -121,6 +120,10 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
         this.fillMethodParameters(params, method);
 
         return defaultVisit(node, method.getName());
+    }
+
+    public String visitValue(JmmNode node, String scope) {
+        return node.get("VALUE");
     }
 
     private void fillMethodParameters(JmmNode node, Symbol method) {
