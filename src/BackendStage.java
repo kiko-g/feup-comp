@@ -1,19 +1,20 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import analysis.JmmSemanticsResult;
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.OllirErrorException;
-
 import jasmin.JasminBackend;
 import jasmin.JasminResult;
 import ollir.OllirResult;
+import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.TestUtils;
 import report.Report;
 import report.Stage;
 
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 
+/**
+ * JASMIN Instructions
+ * http://jasmin.sourceforge.net/instructions.html
+ */
 public class BackendStage implements JasminBackend {
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
@@ -34,17 +35,16 @@ public class BackendStage implements JasminBackend {
             ollirClass.buildVarTables(); // build the table of variables for each method
             ollirClass.show(); // print to console main information about the input OLLIR
 
-            // Convert the OLLIR to a String containing the equivalent Jasmin code
-            String jasminCode = ""; // Convert node ...
+            StringBuilder jasminCode = new StringBuilder();
 
             // More reports from this stage
-            List<Report> reports = new ArrayList<>();
+            List<Report> reports = ollirResult.getReports();
 
             return new JasminResult(ollirResult, jasminCode, reports);
 
         } catch (OllirErrorException e) {
             return new JasminResult(ollirClass.getClassName(), null,
-                Arrays.asList(Report.newError(Stage.GENERATION, -1, -1, "Exception during Jasmin generation", e)));
+                Arrays.asList(Report.newError(Stage.GENERATION, "Exception during Jasmin generation", e)));
         }
     }
 }

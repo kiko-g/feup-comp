@@ -1,5 +1,8 @@
-package analysis.table;
+package analysis;
 
+import analysis.table.AnalysisTable;
+import analysis.table.Symbol;
+import analysis.table.Type;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import report.Report;
@@ -338,5 +341,9 @@ public class TypeAnalysis extends AJmmVisitor<String, Type> {
         }
 
         return type;
+    }
+
+    public List<Report> getReports() {
+        return this.reports;
     }
 }

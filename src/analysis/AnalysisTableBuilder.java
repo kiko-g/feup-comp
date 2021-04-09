@@ -1,7 +1,10 @@
-package analysis.table;
+package analysis;
 
 import java.util.List;
 
+import analysis.table.AnalysisTable;
+import analysis.table.Symbol;
+import analysis.table.Type;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import report.Report;

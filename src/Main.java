@@ -28,6 +28,7 @@ public class Main {
 			semanticsResult = Analysis.run(parserResult);
 			ollirResult = OptimizationStage.run(semanticsResult);
 			jasminResult = BackendStage.run(ollirResult);
+			jasminResult.run();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) { } finally {

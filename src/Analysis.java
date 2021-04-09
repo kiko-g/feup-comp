@@ -1,5 +1,5 @@
-import analysis.table.AnalysisTable;
-import analysis.table.AnalysisTableBuilder;
+import analysis.AnalysisTableBuilder;
+import analysis.TypeAnalysis;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import parser.JmmParserResult;
@@ -27,6 +27,19 @@ public class Analysis implements JmmAnalysis {
         AnalysisTableBuilder tableBuilder = new AnalysisTableBuilder(reports);
         tableBuilder.visit(root, "");
 
+        if(TestUtils.getNumErrors(tableBuilder.getReports()) != 0) {
+            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
+            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
+        }
+
+        TypeAnalysis typeAnalysis = new TypeAnalysis(tableBuilder.getSymbolTable(), reports);
+        typeAnalysis.visit(root, "");
+
+        if(TestUtils.getNumErrors(typeAnalysis.getReports()) != 0) {
+            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
+            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
+        }
+
         /*System.out.println("Dump tree with Visitor where you control tree traversal");
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
         System.out.println(visitor.visit(node, ""));
@@ -47,20 +60,6 @@ public class Analysis implements JmmAnalysis {
         var varPrinter = new ExamplePrintVariables("Variable", "name", "line");
         varPrinter.visit(node, null);*/
 
-        if(TestUtils.getNumErrors(tableBuilder.getReports()) != 0) {
-            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Symbol Table is null!"));
-            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
-        }
-
-        if(!Analysis.isSemanticallyCorrect(tableBuilder.getSymbolTable())) {
-            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program"));
-            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
-        }
-
         return new JmmSemanticsResult(parserResult, tableBuilder.getSymbolTable(), tableBuilder.getReports());
-    }
-
-    public static boolean isSemanticallyCorrect(AnalysisTable table) {
-        return false;
     }
 }

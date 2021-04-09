@@ -30,7 +30,7 @@ public class Report {
         this.message = message;
     }
 
-    public static Report newError(Stage stage, int line, int column, String message, Exception e) {
+    public static Report newError(Stage stage, String message, Exception e) {
         var report = new Report(ReportType.ERROR, stage, message);
         report.setException(e);
         return report;
@@ -66,8 +66,8 @@ public class Report {
 
     public String toJson() {
         Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+            .setPrettyPrinting()
+            .create();
         return gson.toJson(this, Report.class);
     }
 

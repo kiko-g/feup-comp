@@ -75,16 +75,16 @@ public class JasminResult {
     public String run(List<String> classpath) {
         var classFile = compile();
 
-        var classpathArg = classFile.getParentFile().getAbsolutePath();
+        StringBuilder classpathArg = new StringBuilder(classFile.getParentFile().getAbsolutePath());
         if (!classpath.isEmpty()) {
             var sep = System.getProperty("path.separator");
             for (var classpathElement : classpath) {
-                classpathArg += sep + classpathElement;
+                classpathArg.append(sep).append(classpathElement);
             }
         }
 
         var classname = SpecsIo.removeExtension(classFile.getName());
-        var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg, classname), true, true);
+        var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg.toString(), classname), true, true);
         return output.getOutput();
     }
 
