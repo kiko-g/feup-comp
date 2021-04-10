@@ -110,7 +110,6 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         JmmNode rightOperand = node.getChildren().get(1);
 
         Type leftType = visit(leftOperand, typeNScope);
-
         checkSingleType(rightOperand, new TypeNScope(typeNScope.scope, leftType));
 
         return leftType;
