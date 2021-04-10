@@ -15,12 +15,13 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     private final AnalysisTable symbolTable = new AnalysisTable();
     private final List<Report> reports;
 
-    public AnalysisTableBuilder(List<Report> reports) { ;
+    public AnalysisTableBuilder(List<Report> reports) {
         this.reports = reports;
 
         addVisit("Import", this::visitImport);
         addVisit("ImportName", this::visitValue);
         addVisit("Class", this::visitClass);
+        addVisit("Extension", this::visitExtension);
         addVisit("VarDecl", this::visitVarDecl);
         addVisit("Method", this::visitMethod);
         addVisit("Main", this::visitMain);
@@ -55,6 +56,11 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     public String visitClass(JmmNode node, String scope) {
         this.symbolTable.setClassName(node.getChildren().get(0).get("VALUE"));
         return defaultVisit(node, AnalysisTable.CLASS_SCOPE);
+    }
+
+    private String visitExtension(JmmNode node, String scope) {
+        this.symbolTable.setSuper(node.get("VALUE"));
+        return scope;
     }
 
     public String visitVarDecl(JmmNode node, String scope) {

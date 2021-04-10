@@ -160,7 +160,7 @@ void ClassDeclaration() #void: {} {
 }
 
 void ClassBody() #void: {} {
-    Name() [<EXTENDS> Name()]
+    Name() [<EXTENDS> Extension()]
 }
 
 void VarDeclaration() #void: {} {
@@ -200,7 +200,7 @@ void MethodBody() #void: {} {
 
 void Type() #void: {Token t;} {
     t=<BOOLEAN> {jjtThis.put("VALUE",  t.image);} #Boolean
-    | t=<INT> {jjtThis.put("VALUE",  t.image);} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1) ]
+    | t=<INT> {jjtThis.put("VALUE",  t.image);} #Int [<LSQRBRACKET> <RSQRBRACKET> #Array(1)]
     | t=<IDENTIFIER> {jjtThis.put("VALUE",  t.image);} #ClassName
 }
 
@@ -338,6 +338,10 @@ void Var(): {Token t;} {
 }
 
 void Name(): {Token t;} {
+    t=<IDENTIFIER> {jjtThis.put("VALUE", t.image);}
+}
+
+void Extension(): {Token t;} {
     t=<IDENTIFIER> {jjtThis.put("VALUE", t.image);}
 }
 

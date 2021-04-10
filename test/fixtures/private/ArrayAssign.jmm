@@ -2,8 +2,10 @@ import ioPlus;
 
 class Array {
 	public static void main(String[] args) {
+	    int[] i;
+	    int a;
         i[0] = i[0];
-        i[0][0];
-        i = i[0][0];
+        i[0];
+        a = i[0];
 	}
 }
