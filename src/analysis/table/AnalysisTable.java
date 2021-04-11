@@ -79,7 +79,7 @@ public class AnalysisTable implements SymbolTable {
 
     @Override
     public List<Symbol> getFields() {
-        return new ArrayList<>(this.symbolTable.get(this.className));
+        return new ArrayList<>(this.symbolTable.get(this.classMethod));
     }
 
     @Override
