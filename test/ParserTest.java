@@ -28,9 +28,7 @@ public class ParserTest {
             } else {
                 TestUtils.noErrors(reports);
             }
-            System.out.println(reports);
         } catch (Exception e) {
-            e.printStackTrace();
             fail(e.getMessage());
         }
     }
