@@ -1,8 +1,6 @@
-import jasmin.JasminResult;
-import ollir.OllirResult;
-import pt.up.fe.comp.jmm.JmmNode;
-import parser.JmmParserResult;
 import analysis.JmmSemanticsResult;
+import parser.JmmParserResult;
+import pt.up.fe.comp.jmm.JmmNode;
 import report.Report;
 
 import java.io.IOException;

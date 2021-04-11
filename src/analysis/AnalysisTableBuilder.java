@@ -11,9 +11,7 @@ import report.ReportType;
 import report.Stage;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
@@ -143,6 +141,11 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
             );
 
             method = this.symbolTable.getMethod(AnalysisTable.MAIN_SCOPE, parametersType);
+        }
+
+        for (Symbol parameter : parameters) {
+            this.symbolTable.addParameter(method, parameter);
+            this.symbolTable.addLocalVariable(method, parameter);
         }
 
         return defaultVisit(node, method);

@@ -191,8 +191,6 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
 
         TypeNScope newTypeNScope = new TypeNScope(typeNScope.previousScope, null, null);
         List<Type> givenParameters = paramsNode.getChildren().stream().map((child) -> this.visit(child, newTypeNScope)).collect(Collectors.toList());
-        if(methodName.equals("quicksort"))
-            System.out.println(givenParameters.stream().map(Type::toString).collect(Collectors.joining(", ")));
 
         Method method = this.symbolTable.getMethod(methodName, givenParameters);
 
