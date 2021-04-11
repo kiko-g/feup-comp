@@ -25,7 +25,7 @@ public class Analysis implements JmmAnalysis {
         List<Report> reports = parserResult.getReports();
 
         AnalysisTableBuilder tableBuilder = new AnalysisTableBuilder(reports);
-        tableBuilder.visit(root, "");
+        tableBuilder.visit(root);
 
         if(TestUtils.getNumErrors(tableBuilder.getReports()) != 0) {
             tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
@@ -33,7 +33,7 @@ public class Analysis implements JmmAnalysis {
         }
 
         TypeAnalysis typeAnalysis = new TypeAnalysis(tableBuilder.getSymbolTable(), reports);
-        typeAnalysis.visit(root, null);
+        typeAnalysis.visit(root);
 
         if(TestUtils.getNumErrors(typeAnalysis.getReports()) != 0) {
             tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));

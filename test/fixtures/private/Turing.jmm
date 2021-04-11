@@ -1,5 +1,4 @@
-import static io.println(int) void;
-import static io.println() void;
+import io;
 class Turing {
 
     int NUM_SYMBOLS;

@@ -1,5 +1,4 @@
-import io.println;
-import io.print;
+import io;
 
 class Turing {
 

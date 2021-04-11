@@ -1,14 +1,13 @@
-import static org.junit.Assert.*;
-
 import analysis.JmmSemanticsResult;
 import org.junit.Test;
-import pt.up.fe.comp.TestUtils;
 import parser.JmmParserResult;
+import pt.up.fe.comp.TestUtils;
 import report.Report;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
+import static org.junit.Assert.fail;
 
 public class ParserTest {
     private void test(Path resource, boolean mustFail) {
@@ -114,6 +113,11 @@ public class ParserTest {
     /**
      * Private Tests
      */
+    @Test
+    public void testTuring() {
+        test(Path.of("test/fixtures/private/Turing.jmm"), false);
+    }
+
     @Test
     public void testTuringV2() {
         test(Path.of("test/fixtures/private/TuringV2.jmm"), false);

@@ -347,7 +347,11 @@ void Extension(): {Token t;} {
 
 void NewInstance() #void: {} {
     <INT> <LSQRBRACKET> Expression() #Size <RSQRBRACKET> #IntArray(1)
-        | CallWithParams() #Object // new int[] | new Identifier(Param1, Param2, ...)
+        | NewObject() #Object // new int[] | new Identifier()
+}
+
+void NewObject() #void: {} {
+    Name() <LPAR><RPAR>
 }
 
 void Params() #void: {} {

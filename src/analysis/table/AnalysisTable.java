@@ -1,21 +1,21 @@
 package analysis.table;
 
-import analysis.table.Symbol;
-import analysis.table.SymbolTable;
-import analysis.table.Type;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AnalysisTable implements SymbolTable {
     public final static String CLASS_SCOPE = "";
     public final static String MAIN_SCOPE = "main";
 
-    private final Map<String, Set<Symbol>> symbolTable = new HashMap<>();
-    private final Map<Symbol, Set<Symbol>> methods = new HashMap<>();
+    private final Map<Method, Set<Symbol>> symbolTable = new HashMap<>();
+    private final Map<Method, Set<Symbol>> methods = new HashMap<>();
     private final Set<String> imports = new HashSet<>();
     private String className;
     private String extension;
+    private Method classMethod;
+
+    public Method getClassMethod() {
+        return classMethod;
+    }
 
     @Override
     public List<String> getImports() {
@@ -33,7 +33,8 @@ public class AnalysisTable implements SymbolTable {
 
     public void setClassName(String className) {
         this.className = className;
-        this.symbolTable.put(CLASS_SCOPE, new HashSet<>());
+        this.classMethod = new Method(new Symbol(new Type(className, false), CLASS_SCOPE), new ArrayList<>());
+        this.symbolTable.put(classMethod, new HashSet<>());
     }
 
     @Override
@@ -46,26 +47,33 @@ public class AnalysisTable implements SymbolTable {
     }
 
     @Override
-    public List<String> getMethods() {
-        return this.methods.keySet().stream().map(Symbol::getName).collect(Collectors.toList());
+    public List<Method> getMethods() {
+        return new ArrayList<>(this.methods.keySet());
     }
 
-    public Symbol getMethodSymbol(String method) {
-        for (Symbol methodSymbol : methods.keySet()) {
-            if (methodSymbol.getName().equals(method)) {
-                return methodSymbol;
+    public Method getMethod(String methodName, List<Type> parameters) {
+        for (Method method : methods.keySet()) {
+            if (method.getMethodSymbol().getName().equals(methodName) && parameters.size() == method.getParameters().size()) {
+                boolean isEqual = true;
+                for (int i = 0; i < parameters.size(); i++) {
+                    isEqual &= parameters.get(i).equals(method.getParameters().get(i));
+                }
+
+                if (isEqual) {
+                    return method;
+                }
             }
         }
 
         return null;
     }
 
-    public boolean addMethod(Symbol method) {
+    public boolean addMethod(Method method) {
         if (this.methods.put(method, new HashSet<>()) != null) {
             return false;
         }
 
-        return this.symbolTable.put(method.getName(), new HashSet<>()) == null;
+        return this.symbolTable.put(method, new HashSet<>()) == null;
     }
 
     @Override
@@ -74,36 +82,32 @@ public class AnalysisTable implements SymbolTable {
     }
 
     @Override
-    public Type getReturnType(String methodName) {
-        for(Symbol symbol: this.methods.keySet()) {
-            if(symbol.getName().equals(methodName)) {
-                return symbol.getType();
+    public Type getReturnType(String methodName, List<Type> parameters) {
+        for(Method method : this.methods.keySet()) {
+            if(method.getMethodSymbol().getName().equals(methodName)) {
+                return method.getMethodSymbol().getType();
             }
         }
         return null;
     }
 
     @Override
-    public List<Symbol> getParameters(String methodName) {
-        for(Symbol symbol: this.methods.keySet()) {
-            if(symbol.getName().equals(methodName)) {
-                return new ArrayList<>(this.methods.get(symbol));
-            }
-        }
-        return null;
+    public List<Symbol> getParameters(Method method) {
+        Set<Symbol> parameters = this.methods.get(method);
+        return parameters == null ? null : new ArrayList<>(parameters);
     }
 
-    public boolean addParameter(Symbol method, Symbol param) {
+    public boolean addParameter(Method method, Symbol param) {
         return this.methods.get(method).add(param);
     }
 
     @Override
-    public List<Symbol> getLocalVariables(String methodName) {
-        return new ArrayList<>(this.symbolTable.get(methodName));
+    public List<Symbol> getLocalVariables(Method method) {
+        return new ArrayList<>(this.symbolTable.get(method));
     }
 
-    public Symbol getVariable(String scope, String name) {
-        for (Symbol variable : this.symbolTable.get(scope)) {
+    public Symbol getVariable(Method scope, String name) {
+        for (Symbol variable : this.symbolTable.getOrDefault(scope, new HashSet<>())) {
             if (variable.getName().equals(name)) {
                 return variable;
             }
@@ -112,7 +116,8 @@ public class AnalysisTable implements SymbolTable {
         return null;
     }
 
-    public boolean addLocalVariable(String scope, Symbol symbol) {
-        return this.symbolTable.get(scope).add(symbol);
+    public boolean addLocalVariable(Method scope, Symbol symbol) {
+        Set<Symbol> variables = this.symbolTable.get(scope);
+        return variables != null && variables.add(symbol);
     }
 }
