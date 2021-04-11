@@ -18,5 +18,4 @@ public interface JasminBackend {
      * @return
      */
     JasminResult toJasmin(OllirResult ollirResult);
-
 }

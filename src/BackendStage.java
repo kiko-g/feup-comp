@@ -7,14 +7,12 @@ import pt.up.fe.comp.TestUtils;
 import report.Report;
 import report.Stage;
 
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
 import org.specs.comp.ollir.ElementType;
 
 import report.ReportType;
-import report.Stage;
 
 /**
  * JASMIN Instructions
@@ -29,6 +27,7 @@ import report.Stage;
  */
 public class BackendStage implements JasminBackend {
     private String className;
+    private int labelNo = 0;
 
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
@@ -53,11 +52,10 @@ public class BackendStage implements JasminBackend {
             List<Report> reports = ollirResult.getReports();
 
             StringBuilder jasminCode = new StringBuilder();
-            jasminCode.append(BackendStage.generateClass(ollirClass, ollirResult.getSymbolTable(), reports));
+            jasminCode.append(BackendStage.generateClassDecl(ollirClass, ollirResult.getSymbolTable(), reports));
             jasminCode.append(BackendStage.generateClassFields(ollirClass, ollirResult.getSymbolTable(), reports));
             jasminCode.append(BackendStage.generateClassMethods(ollirClass, ollirResult.getSymbolTable(), reports));
 
-            // TODO: duvidas -> Porque precisamos da symbol table na parte de geracao de cofigo? A unico coisa que tem que o OllirClass n tem é o Super
             // TODO: duvidas -> Temos de ver stack limits etc?
             // TODO: duvidas -> Perceber o L data type
 
@@ -70,7 +68,7 @@ public class BackendStage implements JasminBackend {
         }
     }
 
-    private static String generateClass(ClassUnit ollirClass, SymbolTable table, List<Report> reports) {
+    private static String generateClassDecl(ClassUnit ollirClass, SymbolTable table, List<Report> reports) {
         StringBuilder classCode = new StringBuilder();
 
         // Class: Error Checking
@@ -115,8 +113,7 @@ public class BackendStage implements JasminBackend {
             classFieldsCode.append("\n");
         }
 
-        classFieldsCode.append("\n");
-        return classFieldsCode.toString();
+        return classFieldsCode.append("\n").toString();
     }
 
     public static String generateClassMethods(ClassUnit ollirClass, SymbolTable table, List<Report> reports) {
@@ -138,7 +135,7 @@ public class BackendStage implements JasminBackend {
                     reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Main needs to have a body!"));
                 }
 
-                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions())));
+                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions(), table)));
                 classMethodsCode.append(String.format("%s\n", BackendStage.generateReturn(method.getReturnType())));
             }
 
@@ -151,7 +148,7 @@ public class BackendStage implements JasminBackend {
                 }
                 classMethodsCode.append(String.format(")%s\n",
                     BackendStage.getType(method.getReturnType(), ollirClass.getClassName())));
-                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions())));
+                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions(), table)));
             }
 
             classMethodsCode.append(".end method\n\n");
@@ -160,8 +157,26 @@ public class BackendStage implements JasminBackend {
         return classMethodsCode.toString();
     }
 
-    private static String generateClassMethodBody(List<Instruction> instructions) {
-        return "\n";
+    private static String generateClassMethodBody(List<Instruction> instructions, SymbolTable table) {
+        StringBuilder methodInstCode = new StringBuilder();
+
+
+        for(Instruction instr: instructions) {
+            switch (instr.getInstType()) {
+                case ASSIGN: break;
+                case BINARYOPER: break;
+                case BRANCH: break;
+                case CALL: break;
+                case GETFIELD: break;
+                case GOTO: break;
+                case NOPER: break;
+                case PUTFIELD: break;
+                case RETURN: methodInstCode.append(""); break;
+                case UNARYOPER: break;
+            }
+        }
+
+        return methodInstCode.append("\n").toString();
     }
 
     private static String generateReturn(Type type) {
