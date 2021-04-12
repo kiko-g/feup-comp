@@ -1,6 +1,7 @@
-import analysis.JmmSemanticsResult;
-import parser.JmmParserResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.specs.util.SpecsCollections;
 import report.Report;
 
 import java.io.IOException;
@@ -30,12 +31,7 @@ public class Main {
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) { } finally {
-			List<Report> reports = Utils.concatReports(
-				parserResult.getReports(),
-				semanticsResult.getReports()
-//				ollirResult.getReports(),
-//				jasminResult.getReports()
-			);
+			List<Report> reports = SpecsCollections.concat(parserResult.getReports(), semanticsResult.getReports());
 
 			reports.forEach(System.err::println);
 		}

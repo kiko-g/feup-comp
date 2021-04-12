@@ -1,18 +1,15 @@
-import analysis.table.SymbolTable;
-import jasmin.JasminBackend;
-import jasmin.JasminResult;
-import ollir.OllirResult;
+import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
+import pt.up.fe.comp.jmm.jasmin.JasminBackend;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import org.specs.comp.ollir.*;
 import pt.up.fe.comp.TestUtils;
 import report.Report;
-import report.Stage;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.specs.comp.ollir.ElementType;
-
-import report.ReportType;
 
 /**
  * JASMIN Instructions

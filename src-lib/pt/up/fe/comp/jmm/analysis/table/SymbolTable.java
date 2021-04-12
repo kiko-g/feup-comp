@@ -1,4 +1,4 @@
-package analysis.table;
+package pt.up.fe.comp.jmm.analysis.table;
 
 import java.util.List;
 
@@ -24,30 +24,30 @@ public interface SymbolTable {
      */
     List<Symbol> getFields();
     /**
-     * 
+     *
      * @return a list with the names of the methods of the class
      */
-    List<Method> getMethods();
+    List<String> getMethods();
 
     /**
      * 
-     * @return the return type of the given method 
+     * @return the return type of the given method
      */
-    Type getReturnType(String methodName, List<Type> parameters);
+    Type getReturnType(String methodName);
 
     /**
      * 
-     * @param method
+     * @param methodName
      * @return a list of parameters of the given method
      */
-    List<Symbol> getParameters(Method method);
+    List<Symbol> getParameters(String methodName);
 
     /**
      * 
-     * @param method
+     * @param methodName
      * @return a list of local variables declared in the given method
      */
-    List<Symbol> getLocalVariables(Method method);
+    List<Symbol> getLocalVariables(String methodName);
 
 }
 

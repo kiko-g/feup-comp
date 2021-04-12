@@ -2,6 +2,8 @@ package report;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.Optional;
 

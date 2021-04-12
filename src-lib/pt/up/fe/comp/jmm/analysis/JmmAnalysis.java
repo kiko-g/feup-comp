@@ -1,6 +1,6 @@
-package analysis;
+package pt.up.fe.comp.jmm.analysis;
 
-import parser.JmmParserResult;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 
 /**
  * This stage deals with analysis performed at the AST level, essentially semantic analysis and symbol table generation. 

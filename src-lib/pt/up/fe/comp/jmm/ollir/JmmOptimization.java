@@ -1,6 +1,6 @@
-package ollir;
+package pt.up.fe.comp.jmm.ollir;
 
-import analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 
 /**
  * This Stage deals with optimizations performed at the AST level and at the OLLIR level.

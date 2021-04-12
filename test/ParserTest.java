@@ -1,6 +1,6 @@
-import analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import org.junit.Test;
-import parser.JmmParserResult;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.TestUtils;
 import report.Report;
 

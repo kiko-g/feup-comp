@@ -1,14 +1,15 @@
 import analysis.AnalysisTableBuilder;
 import analysis.TypeAnalysis;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
-import parser.JmmParserResult;
-import analysis.JmmAnalysis;
-import analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import report.Report;
-import report.ReportType;
-import report.Stage;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Analysis implements JmmAnalysis {
@@ -22,44 +23,24 @@ public class Analysis implements JmmAnalysis {
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
         JmmNode root = parserResult.getRootNode();
-        List<Report> reports = parserResult.getReports();
+        List<Report> reports = new ArrayList<>();
 
         AnalysisTableBuilder tableBuilder = new AnalysisTableBuilder(reports);
         tableBuilder.visit(root);
 
         if(TestUtils.getNumErrors(tableBuilder.getReports()) != 0) {
-            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
-            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
+            return new JmmSemanticsResult(parserResult, null, reports);
         }
 
         TypeAnalysis typeAnalysis = new TypeAnalysis(tableBuilder.getSymbolTable(), reports);
         typeAnalysis.visit(root);
 
         if(TestUtils.getNumErrors(typeAnalysis.getReports()) != 0) {
-            tableBuilder.getReports().add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
-            return new JmmSemanticsResult(parserResult, null, tableBuilder.getReports());
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
+            return new JmmSemanticsResult(parserResult, null, reports);
         }
 
-        /*System.out.println("Dump tree with Visitor where you control tree traversal");
-        ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
-        System.out.println(visitor.visit(node, ""));
-
-        System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
-        var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
-        System.out.println(preOrderVisitor.visit(node, ""));
-
-        System.out.println(
-                "Create histogram of node kinds with Visitor that automatically performs postorder tree traversal");
-        var postOrderVisitor = new ExamplePostorderVisitor();
-        var kindCount = new HashMap<String, Integer>();
-        postOrderVisitor.visit(node, kindCount);
-        System.out.println("Kinds count: " + kindCount + "\n");
-
-        System.out.println(
-                "Print variables name and line, and their corresponding parent with Visitor that automatically performs preorder tree traversal");
-        var varPrinter = new ExamplePrintVariables("Variable", "name", "line");
-        varPrinter.visit(node, null);*/
-
-        return new JmmSemanticsResult(parserResult, tableBuilder.getSymbolTable(), tableBuilder.getReports());
+        return new JmmSemanticsResult(parserResult, tableBuilder.getSymbolTable(), reports);
     }
 }

@@ -1,4 +1,4 @@
-package report;
+package pt.up.fe.comp.jmm.report;
 
 public enum Stage {
     LEXICAL,

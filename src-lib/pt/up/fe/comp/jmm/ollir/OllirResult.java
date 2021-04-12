@@ -1,13 +1,12 @@
-package ollir;
+package pt.up.fe.comp.jmm.ollir;
+
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import org.specs.comp.ollir.ClassUnit;
+import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
+import pt.up.fe.specs.util.SpecsCollections;
+import report.Report;
 
 import java.util.List;
-
-import org.specs.comp.ollir.ClassUnit;
-
-import analysis.JmmSemanticsResult;
-import analysis.table.SymbolTable;
-import report.Report;
-import pt.up.fe.specs.util.SpecsCollections;
 
 /**
  * An OLLIR result returns the parsed OLLIR code and the corresponding symbol table.

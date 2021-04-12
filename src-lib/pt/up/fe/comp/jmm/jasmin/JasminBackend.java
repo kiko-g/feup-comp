@@ -1,6 +1,6 @@
-package jasmin;
+package pt.up.fe.comp.jmm.jasmin;
 
-import ollir.OllirResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 
 /**
  * This Stage converts the OLLIR to Jasmin Bytecodes with optimizations performed at the AST level and at the OLLIR

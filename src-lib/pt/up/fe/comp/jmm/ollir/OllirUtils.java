@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License. under the License.
  */
 
-package ollir;
+package pt.up.fe.comp.jmm.ollir;
 
 import org.specs.comp.ollir.ClassUnit;
 import org.specs.comp.ollir.parser.OllirParser;

@@ -1,17 +1,17 @@
 package pt.up.fe.comp;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.JmmNode;
-import parser.JmmParserResult;
-import analysis.JmmAnalysis;
-import analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ast.examples.ExamplePostorderVisitor;
 import pt.up.fe.comp.jmm.ast.examples.ExamplePreorderVisitor;
 import pt.up.fe.comp.jmm.ast.examples.ExampleVisitor;
-import report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
+import pt.up.fe.comp.jmm.report.ReportType;
+
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class MainAnalysis implements JmmAnalysis { // }, JmmOptimization, JasminBackend {
 

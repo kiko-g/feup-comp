@@ -1,11 +1,10 @@
-import java.util.ArrayList;
 import java.util.List;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
-import analysis.JmmSemanticsResult;
-import ollir.JmmOptimization;
-import ollir.OllirResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.ollir.JmmOptimization;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import report.Report;
 
 public class OptimizationStage implements JmmOptimization {

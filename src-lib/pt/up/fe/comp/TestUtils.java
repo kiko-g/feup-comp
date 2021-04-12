@@ -1,21 +1,21 @@
 package pt.up.fe.comp;
 
+import pt.up.fe.comp.jmm.jasmin.JasminBackend;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.JmmOptimization;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.parser.JmmParser;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.specs.util.SpecsIo;
+import report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Properties;
-
-import parser.JmmParser;
-import parser.JmmParserResult;
-import analysis.JmmAnalysis;
-import analysis.JmmSemanticsResult;
-import jasmin.JasminBackend;
-import jasmin.JasminResult;
-import ollir.JmmOptimization;
-import ollir.OllirResult;
-import report.Report;
-import report.ReportType;
-import pt.up.fe.specs.util.SpecsIo;
 
 public class TestUtils {
     private static final Properties PARSER_CONFIG = TestUtils.loadProperties("parser.properties");

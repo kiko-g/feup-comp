@@ -1,15 +1,15 @@
-package analysis;
-
-import java.util.List;
+package pt.up.fe.comp.jmm.analysis;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.JmmNode;
-import parser.JmmParserResult;
-import analysis.table.SymbolTable;
+import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.ast.JmmSerializer;
-import report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
+import report.Report;
+
+import java.util.List;
 
 /**
  * A semantic analysis returns the analysed tree and the generated symbol table.

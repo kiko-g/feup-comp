@@ -1,20 +1,19 @@
 package analysis;
 
 import analysis.table.AnalysisTable;
-import analysis.table.Method;
-import analysis.table.Symbol;
-import analysis.table.Type;
 import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
+import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import report.Report;
-import report.ReportType;
-import report.Stage;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
+public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     private final AnalysisTable symbolTable = new AnalysisTable();
     private final List<Report> reports;
 
@@ -32,7 +31,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
         setDefaultVisit(this::defaultVisit);
     }
 
-    public String visitImport(JmmNode node, Method scope) {
+    public String visitImport(JmmNode node, String scope) {
         String importClass = "";
 
         for (JmmNode child : node.getChildren()) {
@@ -56,17 +55,17 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
         return "";
     }
 
-    public String visitClass(JmmNode node, Method scope) {
+    public String visitClass(JmmNode node, String scope) {
         this.symbolTable.setClassName(node.getChildren().get(0).get("VALUE"));
-        return defaultVisit(node, this.symbolTable.getClassMethod());
+        return defaultVisit(node, AnalysisTable.CLASS_SCOPE);
     }
 
-    private String visitExtension(JmmNode node, Method scope) {
+    private String visitExtension(JmmNode node, String scope) {
         this.symbolTable.setSuper(node.get("VALUE"));
         return "";
     }
 
-    public String visitVarDecl(JmmNode node, Method scope) {
+    public String visitVarDecl(JmmNode node, String scope) {
         JmmNode firstChild = node.getChildren().get(0);
         JmmNode secondChild = node.getChildren().get(1);
 
@@ -85,20 +84,20 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
         return "";
     }
 
-    public String visitMethod(JmmNode node, Method scope) {
+    public String visitMethod(JmmNode node, String scope) {
         JmmNode returnType = node.getChildren().get(0);
         JmmNode name = node.getChildren().get(1);
 
         List<Symbol> parameters = new ArrayList<>();
-        Symbol methodSymbol = new Symbol(getType(returnType), name.get("VALUE"));
 
         if(node.getChildren().size() >= 3 && node.getChildren().get(2).getKind().equals("MethodParameters")) {
-            this.fillMethodParameters(node.getChildren().get(2), methodSymbol, parameters);
+            this.fillMethodParameters(node.getChildren().get(2), name.get("VALUE"), parameters);
         }
 
-        List<Type> parametersType = parameters.stream().map(Symbol::getType).collect(Collectors.toList());
-
-        Method method = new Method(methodSymbol, parametersType);
+        Symbol method = new Symbol(
+            getType(returnType),
+            AnalysisTable.getMethodString(name.get("VALUE"), parameters.stream().map(Symbol::getType).collect(Collectors.toList()))
+        );
 
         if (!this.symbolTable.addMethod(method)) {
             this.reports.add(
@@ -113,23 +112,24 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
         }
 
         for (Symbol parameter : parameters) {
-            this.symbolTable.addParameter(method, parameter);
-            this.symbolTable.addLocalVariable(method, parameter);
+            this.symbolTable.addParameter(method.getName(), parameter);
+            this.symbolTable.addLocalVariable(method.getName(), parameter);
         }
 
-        return defaultVisit(node, method);
+        return defaultVisit(node, method.getName());
     }
 
-    public String visitMain(JmmNode node, Method scope) {
+    public String visitMain(JmmNode node, String scope) {
         JmmNode params = node.getChildren().get(0);
-        Symbol methodSymbol = new Symbol(new Type("void", false), AnalysisTable.MAIN_SCOPE);
 
         List<Symbol> parameters = new ArrayList<>();
 
-        this.fillMethodParameters(params, methodSymbol, parameters);
+        this.fillMethodParameters(params, AnalysisTable.MAIN_SCOPE, parameters);
 
-        List<Type> parametersType = parameters.stream().map(Symbol::getType).collect(Collectors.toList());
-        Method method = new Method(methodSymbol, parametersType);
+        Symbol method = new Symbol(
+            new Type("void", false),
+            AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, parameters.stream().map(Symbol::getType).collect(Collectors.toList()))
+        );
 
         if (!this.symbolTable.addMethod(method)) {
             this.reports.add(
@@ -139,23 +139,21 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
                     "Redeclaration of method \"main\""
                 )
             );
-
-            method = this.symbolTable.getMethod(AnalysisTable.MAIN_SCOPE, parametersType);
         }
 
         for (Symbol parameter : parameters) {
-            this.symbolTable.addParameter(method, parameter);
-            this.symbolTable.addLocalVariable(method, parameter);
+            this.symbolTable.addParameter(method.getName(), parameter);
+            this.symbolTable.addLocalVariable(method.getName(), parameter);
         }
 
-        return defaultVisit(node, method);
+        return defaultVisit(node, method.getName());
     }
 
-    public String visitValue(JmmNode node, Method scope) {
+    public String visitValue(JmmNode node, String scope) {
         return node.get("VALUE");
     }
 
-    private void fillMethodParameters(JmmNode node, Symbol method, List<Symbol> parameters) {
+    private void fillMethodParameters(JmmNode node, String method, List<Symbol> parameters) {
         for(JmmNode child: node.getChildren()) {
             JmmNode firstChild = child.getChildren().get(0);
             JmmNode secondChild = child.getChildren().get(1);
@@ -169,7 +167,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
                         Stage.SEMANTIC,
                         Integer.parseInt(secondChild.get("LINE")),
                         Integer.parseInt(secondChild.get("COLUMN")),
-                        "Redeclaration of parameter \"" + secondChild.get("VALUE") + "\" in function: \"" + method.getName() + "\""
+                        "Redeclaration of parameter \"" + secondChild.get("VALUE") + "\" in function: \"" + method + "\""
                     )
                 );
             } else {
@@ -186,7 +184,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<Method, String> {
         return new Type(node.get("VALUE"), false);
     }
 
-    private String defaultVisit(JmmNode node, Method scope) {
+    private String defaultVisit(JmmNode node, String scope) {
         for (JmmNode child : node.getChildren()) {
            visit(child, scope);
         }
