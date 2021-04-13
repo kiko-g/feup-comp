@@ -50,7 +50,7 @@ public class JmmNodeImpl implements JmmNode {
     public String get(String attribute) {
         var value = this.attributes.get(attribute);
 
-        SpecsCheck.checkNotNull(value, () -> "Node " + getKind() + " does not contain attribute '" + attribute + "'");
+        SpecsCheck.checkNotNull(value, () -> "Node " + toString() + " does not contain attribute '" + attribute + "'");
 
         return value;
     }

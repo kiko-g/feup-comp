@@ -13,7 +13,10 @@
 
 package pt.up.fe.comp.jmm.ollir;
 
+import org.specs.comp.ollir.CallInstruction;
+import org.specs.comp.ollir.CallType;
 import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.OllirAccesser;
 import org.specs.comp.ollir.parser.OllirParser;
 import org.specs.comp.ollir.parser.ParseException;
 
@@ -41,5 +44,9 @@ public class OllirUtils {
             throw new RuntimeException("Exception while parsing OLLIR code", e);
         }
 
+    }
+
+    public static CallType getCallInvocationType(CallInstruction callInstruction) {
+        return OllirAccesser.getCallInvocation(callInstruction);
     }
 }

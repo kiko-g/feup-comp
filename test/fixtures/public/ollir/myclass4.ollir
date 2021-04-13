@@ -1,0 +1,27 @@
+myClass {
+	.construct myClass().V {
+		invokespecial(this, "<init>").V;
+	}
+	
+	.method public check(A.array.i32, N.i32, T.i32).bool {
+		i.i32 :=.i32 0.i32;
+		all.bool :=.bool 0.bool;
+		
+		Loop:
+			t1.bool :=.bool i.i32 <.i32 $2.N.i32;
+			t2.i32 :=.i32 $1.A[i.i32].i32;
+			t3.bool :=.bool t2.i32 <.i32 $3.T.i32;
+			if (t1.bool &&.bool t3.bool) goto Body;
+			goto EndLoop;
+		Body:
+			i.i32 :=.i32 i.i32 +.i32 1.i32;
+			goto Loop;
+		EndLoop:
+			if(i.i32 ==.i32 $2.N.i32) goto Then;
+			goto End;
+		Then:all.bool :=.bool 1.bool;
+		
+		End:
+			ret.bool all.bool;
+	}
+}

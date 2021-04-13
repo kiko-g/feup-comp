@@ -1,5 +1,5 @@
 /*  REASON:
-    Variable assignments to literals must have the literal be the variable's type.
+    Types of arguments of calls must be compatible with the parameters of the method (only for methods of the class being compiled).
 */
 
 class T {
