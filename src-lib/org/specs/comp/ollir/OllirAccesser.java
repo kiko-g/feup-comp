@@ -13,9 +13,20 @@
 
 package org.specs.comp.ollir;
 
+import java.util.HashMap;
+
 public class OllirAccesser {
 
     public static CallType getCallInvocation(CallInstruction callInstruction) {
         return callInstruction.invocationType;
     }
+
+    public static boolean isParameter(Operand operand) {
+        return operand.isParameter;
+    }
+
+    public static HashMap<String, Descriptor> getVarTable(Method method) {
+        return method.varTable;
+    }
+
 }
