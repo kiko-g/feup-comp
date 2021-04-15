@@ -26,6 +26,8 @@ public class BackendStage implements JasminBackend {
     private String className;
     private int labelNo = 0;
 
+    private int ltLabel = 0;
+
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
         TestUtils.noErrors(ollirResult.getReports());
@@ -37,29 +39,33 @@ public class BackendStage implements JasminBackend {
     public JasminResult toJasmin(OllirResult ollirResult) {
         ClassUnit ollirClass = ollirResult.getOllirClass();
         this.className = ollirClass.getClassName();
+        StringBuilder jasminCode = new StringBuilder();
 
         try {
             // Example of what you can do with the OLLIR class
             ollirClass.checkMethodLabels(); // check the use of labels in the OLLIR loaded
             ollirClass.buildCFGs(); // build the CFG of each method
-            ollirClass.outputCFGs(); // output to .dot files the CFGs, one per method
+            //ollirClass.outputCFGs(); // output to .dot files the CFGs, one per method
             ollirClass.buildVarTables(); // build the table of variables for each method
-            ollirClass.show(); // print to console main information about the input OLLIR
+            //ollirClass.show(); // print to console main information about the input OLLIR
             // More reports from this stage
             List<Report> reports = ollirResult.getReports();
 
-            StringBuilder jasminCode = new StringBuilder();
+
             jasminCode.append(BackendStage.generateClassDecl(ollirClass, ollirResult.getSymbolTable(), reports));
             jasminCode.append(BackendStage.generateClassFields(ollirClass, ollirResult.getSymbolTable(), reports));
-            jasminCode.append(BackendStage.generateClassMethods(ollirClass, ollirResult.getSymbolTable(), reports));
+            System.out.println(jasminCode);
+
+            jasminCode.append(this.generateClassMethods(ollirClass, ollirResult.getSymbolTable(), reports));
 
             // TODO: duvidas -> Temos de ver stack limits etc?
             // TODO: duvidas -> Perceber o L data type
+            // TODO: add initial constructor
 
 
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
 
-        } catch (OllirErrorException e) {
+        } catch (Exception e) {
             return new JasminResult(ollirClass.getClassName(), null,
                 Arrays.asList(Report.newError(Stage.GENERATION, "Exception during Jasmin generation", e)));
         }
@@ -69,7 +75,7 @@ public class BackendStage implements JasminBackend {
         StringBuilder classCode = new StringBuilder();
 
         // Class: Error Checking
-        if(!ollirClass.getClassAccessModifier().equals(AccessModifiers.PUBLIC)) {
+        if(!ollirClass.getClassAccessModifier().equals(AccessModifiers.DEFAULT)) {
             reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Only public classes can exist!"));
         }
 
@@ -102,7 +108,7 @@ public class BackendStage implements JasminBackend {
 
             // Class Fields: Assembling
             classFieldsCode.append(String.format(".field private %s %s", field.getFieldName(),
-                    BackendStage.getType(field.getFieldType(), ollirClass.getClassName())));
+                    BackendStage.getType(field.getFieldType())));
             if(field.isInitialized()) {
                 classFieldsCode.append(String.format(" = %s", field.getInitialValue()));
             }
@@ -113,7 +119,7 @@ public class BackendStage implements JasminBackend {
         return classFieldsCode.append("\n").toString();
     }
 
-    public static String generateClassMethods(ClassUnit ollirClass, SymbolTable table, List<Report> reports) {
+    public String generateClassMethods(ClassUnit ollirClass, SymbolTable table, List<Report> reports) {
         StringBuilder classMethodsCode = new StringBuilder();
 
         for(Method method: ollirClass.getMethods()) {
@@ -132,7 +138,7 @@ public class BackendStage implements JasminBackend {
                     reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Main needs to have a body!"));
                 }
 
-                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions(), table)));
+                classMethodsCode.append(String.format("%s\n", this.generateClassMethodBody(method.getInstructions(), table)));
                 classMethodsCode.append(String.format("%s\n", BackendStage.generateReturn(method.getReturnType())));
             }
 
@@ -140,12 +146,12 @@ public class BackendStage implements JasminBackend {
             else {
                 classMethodsCode.append(String.format(".method public %s(", method.getMethodName()));
                 for(Element param:  method.getParams()) {
-                    classMethodsCode.append(BackendStage.getType(method.getReturnType(), ollirClass.getClassName()));
+                    classMethodsCode.append(BackendStage.getType(method.getReturnType()));
                     param.isLiteral(); // TODO: What should we do with this ?
                 }
                 classMethodsCode.append(String.format(")%s\n",
-                    BackendStage.getType(method.getReturnType(), ollirClass.getClassName())));
-                classMethodsCode.append(String.format("%s\n", BackendStage.generateClassMethodBody(method.getInstructions(), table)));
+                    BackendStage.getType(method.getReturnType())));
+                classMethodsCode.append(String.format("%s\n", this.generateClassMethodBody(method.getInstructions(), table)));
             }
 
             classMethodsCode.append(".end method\n\n");
@@ -154,26 +160,213 @@ public class BackendStage implements JasminBackend {
         return classMethodsCode.toString();
     }
 
-    private static String generateClassMethodBody(List<Instruction> instructions, SymbolTable table) {
+    private String generateClassMethodBody(List<Instruction> instructions, SymbolTable table) {
         StringBuilder methodInstCode = new StringBuilder();
 
-
         for(Instruction instr: instructions) {
-            switch (instr.getInstType()) {
-                case ASSIGN: break;
-                case BINARYOPER: break;
-                case BRANCH: break;
-                case CALL: break;
-                case GETFIELD: break;
-                case GOTO: break;
-                case NOPER: break;
-                case PUTFIELD: break;
-                case RETURN: methodInstCode.append(""); break;
-                case UNARYOPER: break;
-            }
+            methodInstCode.append(this.generateOperation(instr));
         }
 
-        return methodInstCode.append("\n").toString();
+        return methodInstCode.append("\n\n").toString();
+    }
+
+    private String generateOperation(Instruction instr) {
+        if(instr.getInstType().equals(InstructionType.NOPER)) {
+            return "";
+        }
+
+        switch (instr.getInstType()) {
+            case ASSIGN: {
+                AssignInstruction assign = (AssignInstruction) instr;
+                Element elem = assign.getDest();
+                
+                ElementType elemType = elem.getType().getTypeOfElement();
+                String identifier = ((LiteralElement) elem).getLiteral();
+
+                StringBuilder builder = new StringBuilder();
+                switch (elemType) {
+                    case ARRAYREF: {
+
+
+
+                        builder.append("iastore\n");
+                    }
+
+                    case BOOLEAN: {
+
+                    }
+
+                    case INT32: {
+
+                    }
+
+                    default: {
+
+                        builder.append("aload_0\n");
+                    }
+                }
+
+
+                break;
+            }
+
+            case BINARYOPER: {
+                return generateBinaryOp((BinaryOpInstruction) instr);
+            }
+
+            case BRANCH: {
+                CondBranchInstruction condBranch = (CondBranchInstruction) instr;
+                Element left = condBranch.getLeftOperand();
+                Element right = condBranch.getRightOperand();
+                String label = condBranch.getLabel();
+                Operation operation = condBranch.getCondOperation();
+                break;
+            }
+
+            case CALL: {
+                CallInstruction call = (CallInstruction) instr;
+                Element first = call.getFirstArg();
+                Element second = call.getSecondArg();
+                Type returnType = call.getReturnType();
+                List<Element> operands = call.getListOfOperands();
+                break;
+            }
+
+            case GETFIELD: {
+                GetFieldInstruction getField = (GetFieldInstruction) instr;
+                Element first = getField.getFirstOperand();
+                Element second = getField.getSecondOperand();
+                break;
+            }
+
+            case GOTO: {
+                return generateGotoOp((GotoInstruction) instr);
+            }
+
+            case PUTFIELD: {
+                return generatePutFieldOp((PutFieldInstruction) instr);
+            }
+
+            case UNARYOPER: {
+                UnaryOpInstruction unaryOp = (UnaryOpInstruction) instr;
+                Element right = unaryOp.getRightOperand();
+                OperationType op = unaryOp.getUnaryOperation().getOpType();
+                break;
+            }
+
+            //case RETURN: methodInstCode.append(""); break;
+        }
+
+        return "";
+    }
+
+    private String generateGotoOp(GotoInstruction instr) {
+        return "goto " + instr.getLabel() + "\n";
+    }
+
+    private String generatePutFieldOp(PutFieldInstruction instr) {
+        Element fieldElem = instr.getFirstOperand();
+        String field = ((Operand) fieldElem).getName();
+        Element second = instr.getSecondOperand();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("aload_0\n")
+            .append("putfield ")
+            .append(this.className)
+            .append("/")
+            .append(field)
+            .append(" ")
+            .append(getType(second.getType()))
+            .append("\n");
+
+        return builder.toString();
+    }
+
+    private String generateBinaryOp(BinaryOpInstruction instr) {
+        Element leftElem = instr.getLeftOperand();
+        Element rightElem = instr.getRightOperand();
+
+        String left = generateElement(leftElem);
+        String right = generateElement(rightElem);
+
+        OperationType op = instr.getUnaryOperation().getOpType();
+
+        switch (op) {
+            case ANDI32 -> {
+                return left + right + "iand\n";
+            }
+
+            case LTHI32 -> {
+                StringBuilder builder = new StringBuilder();
+                String labelTrue = "LABEL " + this.ltLabel++;
+                String labelContinue = "LABEL " + this.ltLabel++;
+
+                builder.append("if_icmplt ").append(labelTrue).append("\n");
+                builder.append("iconst_0\n");
+                builder.append("goto ").append(labelContinue).append("\n");
+                builder.append(labelTrue).append(":\n");
+                builder.append("iconst_1\n");
+                builder.append(labelContinue).append(":\n");
+                return builder.toString();
+            }
+
+            case ADDI32 -> {
+                return left + right + "iadd\n";
+            }
+
+            case SUBI32 -> {
+                return left + right + "isub\n";
+            }
+
+            case MULI32 -> {
+                return left + right + "imul\n";
+            }
+
+            case DIVI32 -> {
+                return left + right + "idiv\n";
+            }
+        }
+        return left;
+    }
+
+    private static String generateElement(Element elem) {
+        if (elem instanceof LiteralElement) {
+            LiteralElement literal =(LiteralElement) elem;
+
+            int value = Integer.parseInt(literal.getLiteral());
+
+            if(value == -1) {
+                return "iconst_m1";
+            }
+
+            if(value >= 0 && value <= 5) {
+                return "iconst_" + literal.getLiteral();
+            }
+
+            if(value >= -128 && value <= 127) {
+                return "bipush" + literal.getLiteral();
+            }
+
+            if(value >= -32768 && value <= 32767) {
+                return "sipush" + literal.getLiteral();
+            }
+
+            return "ldc" + literal.getLiteral();
+        }
+
+        // TODO: check if array is only for unary operation
+        /*if (elem instanceof ArrayOperand) {
+            ArrayOperand arrayOperand = (ArrayOperand) elem;
+            String type = arrayOperand.
+        }*/
+
+        if(elem instanceof Operand) {
+            Operand operand = (Operand) elem;
+            var pos = 3;
+            return "iload_" + pos;
+        }
+
+        return "";
     }
 
     private static String generateReturn(Type type) {
@@ -189,13 +382,13 @@ public class BackendStage implements JasminBackend {
     }
 
     // TODO: Review this
-    private static String getType(Type type, String className) {
+    private static String getType(Type type) {
         return switch (type.getTypeOfElement()) {
             case ARRAYREF -> "[I";
             case INT32 -> "I";
             case BOOLEAN -> "Z";
             case VOID -> "V";
-            case CLASS -> String.format("L  %s", className); // TODO: understand better this value, where can it be used?
+            //case CLASS -> String.format("L  %s", className); // TODO: understand better this value, where can it be used?
             default -> throw new IllegalStateException("Unexpected value: " + type.getTypeOfElement());
         };
     }
