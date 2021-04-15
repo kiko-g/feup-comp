@@ -1,11 +1,14 @@
-import java.util.List;
-
+import ollir.SethiUllmanLabeler;
+import ollir.SethiUllmanGenerator;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import report.Report;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OptimizationStage implements JmmOptimization {
     public static OllirResult run(JmmSemanticsResult semanticsResult) {
@@ -17,11 +20,16 @@ public class OptimizationStage implements JmmOptimization {
 
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
-        JmmNode node = semanticsResult.getRootNode();
-        // Convert the AST to a String containing the equivalent OLLIR code
-        String ollirCode = ""; // Convert node ...
+        JmmNode root = semanticsResult.getRootNode();
         // More reports from this stage
-        List<Report> reports = semanticsResult.getReports();
+        List<Report> reports = new ArrayList<>();
+
+        SethiUllmanLabeler labeler = new SethiUllmanLabeler();
+        labeler.visit(root);
+
+        // Convert the AST to a String containing the equivalent OLLIR code
+        SethiUllmanGenerator generator = new SethiUllmanGenerator();
+        String ollirCode = generator.visit(root);
 
         return new OllirResult(semanticsResult, ollirCode, reports);
     }
