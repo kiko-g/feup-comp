@@ -5,12 +5,13 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
-import report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
+import report.Report;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
@@ -207,7 +208,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                 return typeNScope.expected;
             }
 
-            List<String> imports = this.symbolTable.getImports();
+            List<String> imports = this.symbolTable.getImports().stream().map(this::getImportName).collect(Collectors.toList());
             boolean isImportedMethod = false;
 
             for (String importName : imports) {
@@ -361,7 +362,9 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                 return variable.getType();
             }
 
-            if (this.symbolTable.getImports().contains(node.get("VALUE"))) {
+            Set<String> imports = this.symbolTable.getImports().stream().map(this::getImportName).collect(Collectors.toSet());
+
+            if (imports.contains(node.get("VALUE"))) {
                 return new Type(node.get("VALUE"), false);
             }
 
@@ -446,6 +449,16 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         }
 
         return new Type(node.get("VALUE"), false);
+    }
+
+    private String getImportName(String importStatement) {
+        int delimiterIndex = importStatement.lastIndexOf(AnalysisTableBuilder.DELIMITER);
+
+        if (delimiterIndex == -1) {
+            return importStatement;
+        }
+
+        return importStatement.substring(delimiterIndex + 1);
     }
 
     private void fillMethodParameters(JmmNode node, List<Symbol> parameters) {

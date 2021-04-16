@@ -7,7 +7,7 @@ public class SethiUllmanLabeler extends PostorderJmmVisitor<Integer, Integer> {
     public static final String LABEL = "LABEL";
 
     public SethiUllmanLabeler() {
-        addVisit("Params",      this::visitSumChildren);
+        addVisit("Params",      this::visitAllChildren);
 
         addVisit("Assign",      this::visitTwoChildren);
         addVisit("Dot",         this::visitTwoChildren);
@@ -21,6 +21,7 @@ public class SethiUllmanLabeler extends PostorderJmmVisitor<Integer, Integer> {
 
         addVisit("MethodCall",  this::visitSecondChildren);
 
+        addVisit("Return",      this::visitFirstChildren);
         addVisit("If",          this::visitFirstChildren);
         addVisit("While",       this::visitFirstChildren);
         addVisit("Not",         this::visitFirstChildren);
@@ -47,12 +48,15 @@ public class SethiUllmanLabeler extends PostorderJmmVisitor<Integer, Integer> {
         return 0;
     }
 
-    private Integer visitSumChildren(JmmNode node, Integer _int) {
-        int needed = 0;
+    private Integer visitAllChildren(JmmNode node, Integer _int) {
+        int numChildren = node.getNumChildren();
+        int needed = numChildren;
 
         for (JmmNode child : node.getChildren()) {
-            needed += this.getLabel(child);
+            needed = Math.max(needed, numChildren + this.getLabel(child) - 1);
         }
+
+        this.setLabel(node, needed);
 
         return needed;
     }

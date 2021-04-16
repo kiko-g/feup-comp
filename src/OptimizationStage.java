@@ -28,7 +28,7 @@ public class OptimizationStage implements JmmOptimization {
         labeler.visit(root);
 
         // Convert the AST to a String containing the equivalent OLLIR code
-        SethiUllmanGenerator generator = new SethiUllmanGenerator();
+        SethiUllmanGenerator generator = new SethiUllmanGenerator(semanticsResult.getSymbolTable());
         String ollirCode = generator.visit(root);
 
         return new OllirResult(semanticsResult, ollirCode, reports);

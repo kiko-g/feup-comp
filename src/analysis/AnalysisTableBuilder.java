@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
+    public static final String DELIMITER = "/";
     private final AnalysisTable symbolTable = new AnalysisTable();
     private final List<Report> reports;
 
@@ -32,12 +33,13 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
     }
 
     public String visitImport(JmmNode node, String scope) {
-        String importClass = "";
+        List<String> imports = new ArrayList<>();
 
         for (JmmNode child : node.getChildren()) {
-            importClass = visit(child);
+            imports.add(visit(child));
         }
 
+        String importClass = String.join(DELIMITER, imports);
         if (!this.symbolTable.addImport(importClass)) {
             JmmNode lastChild = node.getChildren().get(node.getNumChildren() - 1);
 
