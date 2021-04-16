@@ -40,7 +40,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("If",          this::visitIf);
         addVisit("While",       this::visitWhile);
 
-        addVisit("Add",         this::visitAdd);
+        addVisit("Add",         (node, sns) -> this.generateTwoChildren(node, sns, "+.i32", "i32"));
 /*
         addVisit("Params",      this::visitAllChildren);
 
@@ -74,24 +74,25 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
 
     }
 
-    private List<String> visitAdd(JmmNode node, ScopeNSpacing scopeNSpacing) {
+    private List<String> generateTwoChildren(JmmNode node, ScopeNSpacing scopeNSpacing, String expressionSign, String paramType) {
         List<String> instructions = new ArrayList<>();
         List<String> instructionsLeft = this.visit(node.getChildren().get(0), scopeNSpacing);
         List<String> instructionsRight = this.visit(node.getChildren().get(1), scopeNSpacing);
 
         String leftVar, rightVar;
 
-        if (instructionsRight.size() == 0) {
-            rightVar = getTerminalVar(node.getChildren().get(1), scopeNSpacing.scope, scopeNSpacing.previousScope);
-        } else {
-            rightVar = "t" + this.stackCounter + ".i32";
-            this.stackCounter--;
-        }
         if (instructionsLeft.size() == 0) {
             leftVar = getTerminalVar(node.getChildren().get(0), scopeNSpacing.scope, scopeNSpacing.previousScope);
         } else {
-            leftVar = "t" + this.stackCounter + ".i32";
-            this.stackCounter--;
+            // TODO: t0.paramType :=.paramType lastExp;
+            this.stackCounter++;
+        }
+
+        if (instructionsRight.size() == 0) {
+            rightVar = getTerminalVar(node.getChildren().get(1), scopeNSpacing.scope, scopeNSpacing.previousScope);
+        } else {
+            // TODO: t1.paramType :=.paramType lastExp;
+            this.stackCounter++;
         }
 
         instructions.addAll(instructionsLeft);
@@ -99,7 +100,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
 
         this.stackCounter++;
 
-        instructions.add(scopeNSpacing.spacing + "t" + this.stackCounter + ".i32 := " + leftVar + " +.i32 " + rightVar + ";\n");
+        instructions.add(scopeNSpacing.spacing + leftVar + " " + expressionSign + " " + rightVar + ";\n");
 
         return instructions;
     }
@@ -225,6 +226,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         String conditionInstruction = conditionInstructions.remove(conditionInstructions.size() - 1);
         conditionInstruction = conditionInstruction.replace("\t", "");
         conditionInstruction = conditionInstruction.replace("\n", "");
+        conditionInstruction = conditionInstruction.replace(";", "");
 
         instructions.add(scopeNSpacing.spacing + "if (" + conditionInstruction + ") goto True" + ifCounter + ";\n");
         instructions.addAll(conditionFalseInstructions);
@@ -252,6 +254,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         String conditionInstruction = conditionInstructions.remove(conditionInstructions.size() - 1);
         conditionInstruction = conditionInstruction.replace("\t", "");
         conditionInstruction = conditionInstruction.replace("\n", "");
+        conditionInstruction = conditionInstruction.replace(";", "");
 
         instructions.add(scopeNSpacing.spacing + "While" + loopCounter + ":");
         instructions.addAll(conditionInstructions);
