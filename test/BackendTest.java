@@ -1,12 +1,10 @@
 import analysis.table.AnalysisTable;
 import org.junit.Test;
 import pt.up.fe.comp.TestUtils;
-import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.specs.util.SpecsIo;
-import report.Report;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ public class BackendTest {
     public void test(Path resource, boolean mustFail) {
         BackendStage stage = new BackendStage();
         AnalysisTable table = new AnalysisTable();
-        table.setSuper("a");
+        table.setSuper("SuperClass");
         OllirResult ollirRes = new OllirResult(
             OllirUtils.parse(SpecsIo.getResource(resource.toString())), table, new ArrayList<>()
         );
