@@ -9,6 +9,7 @@ import report.Report;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OptimizationStage implements JmmOptimization {
     public static OllirResult run(JmmSemanticsResult semanticsResult) {
@@ -29,7 +30,7 @@ public class OptimizationStage implements JmmOptimization {
 
         // Convert the AST to a String containing the equivalent OLLIR code
         SethiUllmanGenerator generator = new SethiUllmanGenerator(semanticsResult.getSymbolTable());
-        String ollirCode = generator.visit(root);
+        String ollirCode = String.join("", generator.visit(root));
 
         return new OllirResult(semanticsResult, ollirCode, reports);
     }

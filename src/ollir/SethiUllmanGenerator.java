@@ -41,17 +41,18 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("While",       this::visitWhile);
 
         addVisit("Add",         (node, sns) -> this.generateTwoChildren(node, sns, "+.i32", "i32"));
+        addVisit("Sub",         (node, sns) -> this.generateTwoChildren(node, sns, "-.i32", "i32"));
+        addVisit("Mul",         (node, sns) -> this.generateTwoChildren(node, sns, "*.i32", "i32"));
+        addVisit("Div",         (node, sns) -> this.generateTwoChildren(node, sns, "/.i32", "i32"));
+        addVisit("LogicalAnd",  (node, sns) -> this.generateTwoChildren(node, sns, "&&.bool", "bool"));
+        addVisit("Less",        (node, sns) -> this.generateTwoChildren(node, sns, "<.bool", "i32"));
+        addVisit("Assign",      this::visitAssign);
+        addVisit("ArrayAccess", this::visitArrayAccess);
+        addVisit("Object",      this::visitObject);
 /*
         addVisit("Params",      this::visitAllChildren);
 
-        addVisit("Assign",      this::visitTwoChildren);
         addVisit("Dot",         this::visitTwoChildren);
-        addVisit("Sub",         this::visitTwoChildren);
-        addVisit("Mul",         this::visitTwoChildren);
-        addVisit("Div",         this::visitTwoChildren);
-        addVisit("LogicalAnd",  this::visitTwoChildren);
-        addVisit("Less",        this::visitTwoChildren);
-        addVisit("ArrayAccess", this::visitTwoChildren);
 
         addVisit("MethodCall",  this::visitMethodCall);
 
@@ -61,49 +62,100 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("Size",        this::visitFirstChildren);
         addVisit("Param",       this::visitFirstChildren);
         addVisit("Important",   this::visitFirstChildren);
-        addVisit("New",         this::visitFirstChildren);
         addVisit("IntArray",    this::visitFirstChildren);
 
-        addVisit("Object",      this::visitTerminal);
         addVisit("Var",         this::visitTerminal);
         addVisit("IntegerVal",  this::visitTerminal);
-        addVisit("Bool",        this::visitTerminal);
         addVisit("Length",      this::visitTerminal);
-        addVisit("This",        this::visitTerminal);
 */
+        addVisit("Bool",        this::visitBool);
+        addVisit("This",        this::visitThis);
 
     }
+
+    private List<String> visitThis(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        List<String> instructions = new ArrayList<>();
+        instructions.add(scopeNSpacing.spacing + "this." + symbolTable.getClassName() + ";\n");
+
+        return instructions;
+    }
+
+    private List<String> visitBool(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        List<String> instructions = new ArrayList<>();
+        instructions.add(scopeNSpacing.spacing + "this." + symbolTable.getClassName() + ";\n");
+
+        return instructions;
+    }
+
+    private List<String> visitObject(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        //TODO:
+        // t0.myClass :=.myClass new(myClass).myClass;
+        // invokespecial(t0.myClass,"<init>").V;
+        // t0.myClass
+        List<String> instructions = new ArrayList<>();
+        String ollirParamType = typeToOllirString(new Type(node.getChildren().get(0).get("VALUE"), false));
+        instructions.add(scopeNSpacing.spacing + "t" + this.stackCounter + "." + ollirParamType + " :=." + ollirParamType + "new(" + ollirParamType + ")." + ollirParamType + ";\n");
+        instructions.add(scopeNSpacing.spacing + "invokespecial(t" + this.stackCounter + "." + ollirParamType + ",\"<init>\").V;\n");
+        instructions.add(scopeNSpacing.spacing + "t" + this.stackCounter + "." + ollirParamType + ";\n");
+
+        return instructions;
+    }
+
+    private List<String> visitArrayAccess(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        //TODO: $1.A[i.i32].i32;
+        List<String> instructions = new ArrayList<>();
+        List<String> instructionsRight = this.visit(node.getChildren().get(1), scopeNSpacing);
+
+        int originalStackCounter = this.stackCounter;
+        String leftVar = getTerminalVar(node.getChildren().get(0), scopeNSpacing.scope, scopeNSpacing.previousScope).split("\\.array")[0];
+        String rightVar = getInstruction(node.getChildren().get(1), scopeNSpacing, "", instructions, instructionsRight);
+        this.stackCounter = originalStackCounter;
+
+        instructions.addAll(instructionsRight);
+        instructions.add(scopeNSpacing.spacing + leftVar + "[" + rightVar + ".i32].i32;\n");
+
+        return instructions;
+    }
+
+    private List<String> visitAssign(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        Type paramType = getVarType(node.getChildren().get(0), scopeNSpacing);
+        String ollirParamType = typeToOllirString(paramType);
+
+        return generateTwoChildren(node, scopeNSpacing, "=."+ollirParamType, ollirParamType);
+    }
+
 
     private List<String> generateTwoChildren(JmmNode node, ScopeNSpacing scopeNSpacing, String expressionSign, String paramType) {
         List<String> instructions = new ArrayList<>();
         List<String> instructionsLeft = this.visit(node.getChildren().get(0), scopeNSpacing);
         List<String> instructionsRight = this.visit(node.getChildren().get(1), scopeNSpacing);
 
-        String leftVar, rightVar;
-
-        if (instructionsLeft.size() == 0) {
-            leftVar = getTerminalVar(node.getChildren().get(0), scopeNSpacing.scope, scopeNSpacing.previousScope);
-        } else {
-            // TODO: t0.paramType :=.paramType lastExp;
-            this.stackCounter++;
-        }
-
-        if (instructionsRight.size() == 0) {
-            rightVar = getTerminalVar(node.getChildren().get(1), scopeNSpacing.scope, scopeNSpacing.previousScope);
-        } else {
-            // TODO: t1.paramType :=.paramType lastExp;
-            this.stackCounter++;
-        }
+        int originalStackCounter = this.stackCounter;
+        String leftVar = getInstruction(node.getChildren().get(0), scopeNSpacing, paramType, instructions, instructionsLeft);
+        String rightVar = getInstruction(node.getChildren().get(1), scopeNSpacing, paramType, instructions, instructionsRight);
+        this.stackCounter = originalStackCounter;
 
         instructions.addAll(instructionsLeft);
         instructions.addAll(instructionsRight);
-
-        this.stackCounter++;
-
         instructions.add(scopeNSpacing.spacing + leftVar + " " + expressionSign + " " + rightVar + ";\n");
 
         return instructions;
     }
+
+    private String getInstruction(JmmNode node, ScopeNSpacing scopeNSpacing, String paramType, List<String> instructions, List<String> instructionsRight) {
+        if(instructionsRight.size() == 0) {
+            return getTerminalVar(node, scopeNSpacing.scope, scopeNSpacing.previousScope);
+        }
+
+        String instr = cleanStringEnding(instructionsRight.remove(instructionsRight.size() - 1));
+
+        String var = "t" + this.stackCounter;
+        instructions.add(var + "." + paramType + " :=." + paramType + " " + instr);
+        this.stackCounter++;
+
+        return var;
+    }
+
 
     private String getTerminalVar(JmmNode node, String scope, String previousScope) {
 
@@ -117,7 +169,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         instructions.add(this.symbolTable.getClassName() + " {\n\n");
 
         for (Symbol field : this.symbolTable.getFields()) {
-            instructions.add("\t.field private " + field.getName() + "." + typeToString(field.getType()) + ";\n\n");
+            instructions.add("\t.field private " + field.getName() + "." + typeToOllirString(field.getType()) + ";\n\n");
         }
 
         instructions.add("\t.construct " + this.symbolTable.getClassName() + "().V {\n" + "\t\tinvokespecial(this, \"<init>\").V;\n" + "\t}\n\n");
@@ -151,11 +203,11 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         for (Symbol param : parameters) {
             methodBuilder.append(param.getName())
                 .append(".")
-                .append(typeToString(param.getType()));
+                .append(typeToOllirString(param.getType()));
         }
 
         methodBuilder.append(".")
-            .append(typeToString(getType(returnType)))
+            .append(typeToOllirString(getParamType(returnType)))
             .append("{\n");
 
         instructions.add(methodBuilder.toString());
@@ -190,7 +242,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         for (Symbol param : parameters) {
             methodBuilder.append(param.getName())
                 .append(".")
-                .append(typeToString(param.getType()));
+                .append(typeToOllirString(param.getType()));
         }
 
         methodBuilder.append(").V{\n");
@@ -223,10 +275,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         List<String> conditionTrueInstructions = visit(conditionTrue, conditionsScopeNSpacing);
         List<String> conditionFalseInstructions = visit(conditionFalse, conditionsScopeNSpacing);
 
-        String conditionInstruction = conditionInstructions.remove(conditionInstructions.size() - 1);
-        conditionInstruction = conditionInstruction.replace("\t", "");
-        conditionInstruction = conditionInstruction.replace("\n", "");
-        conditionInstruction = conditionInstruction.replace(";", "");
+        String conditionInstruction = cleanStringEnding(conditionInstructions.remove(conditionInstructions.size() - 1));
 
         instructions.add(scopeNSpacing.spacing + "if (" + conditionInstruction + ") goto True" + ifCounter + ";\n");
         instructions.addAll(conditionFalseInstructions);
@@ -251,10 +300,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         ScopeNSpacing conditionsScopeNSpacing = new ScopeNSpacing(scopeNSpacing.scope, scopeNSpacing.spacing + "\t", scopeNSpacing.previousScope);
         List<String> loopInstructions = visit(loop, conditionsScopeNSpacing);
 
-        String conditionInstruction = conditionInstructions.remove(conditionInstructions.size() - 1);
-        conditionInstruction = conditionInstruction.replace("\t", "");
-        conditionInstruction = conditionInstruction.replace("\n", "");
-        conditionInstruction = conditionInstruction.replace(";", "");
+        String conditionInstruction = cleanStringEnding(conditionInstructions.remove(conditionInstructions.size() - 1));
 
         instructions.add(scopeNSpacing.spacing + "While" + loopCounter + ":");
         instructions.addAll(conditionInstructions);
@@ -268,7 +314,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return instructions;
     }
 
-    private String typeToString(Type type) {
+    private String typeToOllirString(Type type) {
         StringBuilder builder = new StringBuilder();
 
         if (type.isArray()) {
@@ -277,7 +323,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
 
         switch (type.getName()) {
             case "int" -> builder.append("i32");
-            case "boolean" -> builder.append("boolean");
+            case "boolean" -> builder.append("bool");
             default -> {
                 if (type.getName().equals(this.symbolTable.getClassName())) {
                     builder.append(this.symbolTable.getClassName());
@@ -317,16 +363,45 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
             JmmNode firstChild = child.getChildren().get(0);
             JmmNode secondChild = child.getChildren().get(1);
 
-            parameters.add(new Symbol(getType(firstChild), secondChild.get("VALUE")));
+            parameters.add(new Symbol(getParamType(firstChild), secondChild.get("VALUE")));
         }
     }
 
-    private Type getType(JmmNode node) {
+    private Type getParamType(JmmNode node) {
         if (node.getKind().equals("Array")) {
             return new Type(node.getChildren().get(0).get("VALUE"), true);
         }
 
         return new Type(node.get("VALUE"), false);
+    }
+
+    private Type getVarType(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        JmmNode name = node;
+
+        if(node.getNumChildren() > 0) {
+            name = node.getChildren().get(0);
+        }
+
+        String varName = name.get("VALUE");
+
+        Type varType = findTypeOfVar(this.symbolTable.getLocalVariables(scopeNSpacing.scope), varName);
+        if(varType != null) return varType;
+
+        varType = findTypeOfVar(this.symbolTable.getParameters(scopeNSpacing.scope), varName);
+        if(varType != null) return varType;
+
+        varType = findTypeOfVar(this.symbolTable.getFields(), varName);
+        return varType;
+    }
+
+    private Type findTypeOfVar(List<Symbol> symbols, String varName) {
+        for(Symbol symbol : symbols) {
+            if(symbol.getName().equals(varName)) {
+                return symbol.getType();
+            }
+        }
+
+        return null;
     }
 
     private List<String> defaultVisit(JmmNode node, ScopeNSpacing scope) {
@@ -339,4 +414,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return instructions;
     }
 
+    private String cleanStringEnding(String instr) {
+        return instr.replace("\t", "").replace("\n", "").replace(";", "");
+    }
 }
