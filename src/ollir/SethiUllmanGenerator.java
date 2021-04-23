@@ -51,7 +51,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("Object",      this::visitObject);
 
         addVisit("Params",      this::visitAllChildren);
-        addVisit("Dot",         this::visitTwoChildren);
+        addVisit("Dot",         this::visitDot);
 /*
         addVisit("MethodCall",  this::visitMethodCall);
 
@@ -63,17 +63,15 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("Important",   this::visitFirstChildren);
         addVisit("IntArray",    this::visitFirstChildren);
 */
-        // TODO ?? addVisit("VarDeclaration",         this::visitVarDeclaration);
-        addVisit("Var",         this::visitTerminal);
-        addVisit("Length",      this::visitLength);
-
+        addVisit("Var",         this::visitVar);
         addVisit("IntegerVal",  this::visitIntegerVal);
         addVisit("Bool",        this::visitBool);
         addVisit("This",        this::visitThis);
     }
 
-    private List<String> visitTwoChildren(JmmNode node, ScopeNSpacing scopeNSpacing) {
-        //TODO invokevirtual(this, "compFac", aux1.i32).i32;
+    private List<String> visitDot(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        //TODO: invokevirtual(this, "compFac", aux1.i32).i32;
+        //TODO: arraylength($1.A.array.i32).i32;
         List<String> instructions = new ArrayList<>();
 
         return instructions;
@@ -101,8 +99,9 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return instructions;
     }
 
-    private List<String> visitTerminal(JmmNode node, ScopeNSpacing scopeNSpacing) {
+    private List<String> visitVar(JmmNode node, ScopeNSpacing scopeNSpacing) {
         List<String> instructions = new ArrayList<>();
+        //TODO
         instructions.add(scopeNSpacing.spacing + node.getChildren() + ";\n");
 
         return instructions;
@@ -128,15 +127,6 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
     private List<String> visitThis(JmmNode node, ScopeNSpacing scopeNSpacing) {
         List<String> instructions = new ArrayList<>();
         instructions.add(scopeNSpacing.spacing + "this." + symbolTable.getClassName() + ";\n");
-
-        return instructions;
-    }
-
-    private List<String> visitLength(JmmNode node, ScopeNSpacing scopeNSpacing) {
-        //TODO: arraylength($1.A.array.i32).i32;
-        List<String> instructions = new ArrayList<>();
-        String var = getTerminalVar(node.getChildren().get(0), scopeNSpacing.scope, scopeNSpacing.previousScope).split("\\.array")[0]; //TODO ??
-        instructions.add(scopeNSpacing.spacing + "arraylength(" + var + ".array.i32).i32;\n");
 
         return instructions;
     }
