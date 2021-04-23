@@ -51,8 +51,8 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("Object",      this::visitObject);
 
         addVisit("Params",      this::visitAllChildren);
-/*
         addVisit("Dot",         this::visitTwoChildren);
+/*
         addVisit("MethodCall",  this::visitMethodCall);
 
         addVisit("Return",      this::visitReturn);
@@ -70,6 +70,13 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("IntegerVal",  this::visitIntegerVal);
         addVisit("Bool",        this::visitBool);
         addVisit("This",        this::visitThis);
+    }
+
+    private List<String> visitTwoChildren(JmmNode node, ScopeNSpacing scopeNSpacing) {
+        //TODO invokevirtual(this, "compFac", aux1.i32).i32;
+        List<String> instructions = new ArrayList<>();
+
+        return instructions;
     }
 
     private List<String> visitAllChildren(JmmNode node, ScopeNSpacing scopeNSpacing) {
