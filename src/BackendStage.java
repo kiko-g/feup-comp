@@ -1,11 +1,9 @@
-import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import org.specs.comp.ollir.*;
 import pt.up.fe.comp.TestUtils;
 import report.Report;
-import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.ArrayList;
@@ -26,9 +24,10 @@ import java.util.List;
 public class BackendStage implements JasminBackend {
     private String className;
     private String extendsDef;
+    private Method currMethod;
     private List<Report> reports = new ArrayList<>();
 
-    private int ltLabel = 0;
+    private int opLabel = 0;
 
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
@@ -59,9 +58,6 @@ public class BackendStage implements JasminBackend {
             jasminCode.append(this.generateClassFields(ollirClass));
             jasminCode.append(this.generateClassMethods(ollirClass));
 
-            // TODO: duvidas -> Temos de ver stack limits etc?
-            // TODO: duvidas -> Perceber o L data type
-
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
 
         } catch (Exception e) {
@@ -84,12 +80,13 @@ public class BackendStage implements JasminBackend {
             .append("\n");
 
         // Class: Used to initialize a new instance of the class
-        classCode.append(".method public <init>()V\n");
-        classCode.append("\taload_0\n");
-        classCode.append("\tinvokenonvirtual ")
-            .append(BackendStage.getSuper(this.extendsDef));
-        classCode.append("\treturn\n");
-        classCode.append(".end method\n\n");
+        classCode.append(".method public <init>()V\n")
+            .append("\taload_0\n")
+            .append("\tinvokenonvirtual ")
+            .append(BackendStage.getSuper(this.extendsDef))
+            .append("/<init>()V\n")
+            .append("\treturn\n")
+            .append(".end method\n\n");
 
         return classCode.toString();
     }
@@ -112,13 +109,15 @@ public class BackendStage implements JasminBackend {
         StringBuilder classMethodsCode = new StringBuilder();
 
         for(Method method: ollirClass.getMethods()) {
+            this.currMethod = method;
+
             // Main Declaration
             if(method.isStaticMethod() && method.getReturnType().getTypeOfElement() == ElementType.VOID) {
-                classMethodsCode.append(".method public static main([Ljava/lang/String;)V\n");
-
-                classMethodsCode.append(this.generateClassMethodBody(method.getInstructions(), method.getMethodName()))
-                    .append("\n")
-                    .append("return\n");
+                classMethodsCode.append(".method public static main([Ljava/lang/String;)V\n")
+                    .append("\n.limit stack 99\n")
+                    .append(".limit locals 99\n")
+                    .append(this.generateClassMethodBody(method.getInstructions(), method.getMethodName()))
+                    .append("\nreturn\n");
             }
 
             // Regular Method Declaration
@@ -214,9 +213,11 @@ public class BackendStage implements JasminBackend {
 
                 break;
             }
+
             case BINARYOPER -> {
                 return generateBinaryOp((BinaryOpInstruction) instr);
             }
+
             case BRANCH -> {
                 CondBranchInstruction condBranch = (CondBranchInstruction) instr;
                 Element left = condBranch.getLeftOperand();
@@ -225,26 +226,46 @@ public class BackendStage implements JasminBackend {
                 Operation operation = condBranch.getCondOperation();
                 break;
             }
+
             case CALL -> {
                 return generateCallOp((CallInstruction) instr, methodName);
             }
+
             case GETFIELD -> {
-                GetFieldInstruction getField = (GetFieldInstruction) instr;
-                Element first = getField.getFirstOperand();
-                Element second = getField.getSecondOperand();
-                break;
+                return generateGetFieldOp((GetFieldInstruction) instr);
             }
+
             case GOTO -> {
                 return generateGotoOp((GotoInstruction) instr);
             }
+
             case PUTFIELD -> {
                 return generatePutFieldOp((PutFieldInstruction) instr);
             }
+
             case UNARYOPER -> {
-                UnaryOpInstruction unaryOp = (UnaryOpInstruction) instr;
-                Element right = unaryOp.getRightOperand();
-                OperationType op = unaryOp.getUnaryOperation().getOpType();
-                break;
+                return generateUnaryOp((UnaryOpInstruction) instr);
+            }
+
+            case RETURN -> {
+                ReturnInstruction returnInstr = (ReturnInstruction) instr;
+
+                if(returnInstr.hasReturnValue()) {
+                    Element operand = returnInstr.getOperand();
+                    if(operand.isLiteral()) {
+                        LiteralElement ret = (LiteralElement) operand;
+                    } else {
+                        Operand ret = (Operand) operand;
+                    }
+
+                }
+
+                return switch (returnInstr.getElementType()) {
+                    case INT32 -> "ireturn";
+                    case BOOLEAN -> "ireturn";
+                    default -> "areturn";
+                };
+
             }
         }
 
@@ -267,8 +288,8 @@ public class BackendStage implements JasminBackend {
 
             case LTHI32 -> {
                 StringBuilder builder = new StringBuilder();
-                String labelTrue = "LABEL " + this.ltLabel++;
-                String labelContinue = "LABEL " + this.ltLabel++;
+                String labelTrue = "LABEL " + this.opLabel++;
+                String labelContinue = "LABEL " + this.opLabel++;
 
                 builder.append("if_icmplt ").append(labelTrue).append("\n");
                 builder.append("iconst_0\n");
@@ -301,27 +322,25 @@ public class BackendStage implements JasminBackend {
     private String generateCallOp(CallInstruction instr, String methodName) {
         Element first = instr.getFirstArg();
         Element second = instr.getSecondArg();
-        Type returnType = instr.getReturnType();
         List<Element> operands = instr.getListOfOperands();
-
         CallType invocationType = OllirAccesser.getCallInvocation(instr);
+
         switch (invocationType) {
             //case ldc -> break;
             case NEW -> {
                 StringBuilder builder = new StringBuilder();
-                builder.append("");
-
-                for(Element param: instr.getListOfOperands()) {
-                   if(param.isLiteral()) {
-                       String aux = ((LiteralElement)param).getLiteral();
-                       builder.append(((LiteralElement)param).getLiteral());
-                   }
-                }
 
                 if(first.getType().getTypeOfElement() == ElementType.OBJECTREF) {
-                    builder.append("bipush ?").append("\nnewarray int");
-                } else if(first.getType().getTypeOfElement() == ElementType.CLASS) {
-                    builder.append("new <class>");
+                    builder.append("new ")
+                        .append(((Operand)first).getName())
+                        .append("\ndup\n");
+                } else if(first.getType().getTypeOfElement() == ElementType.ARRAYREF) {
+                    if(operands.size() > 0) {
+                        Element elem = operands.get(0);
+                        builder.append(generateElement(elem)).append("\n");
+                        builder.append("\nnewarray int\n");
+                        return builder.toString();
+                    }
                 }
 
                 return "";
@@ -333,16 +352,23 @@ public class BackendStage implements JasminBackend {
 
             case invokespecial -> {
                 StringBuilder builder = new StringBuilder();
+
                 builder.append(invocationType.toString())
-                    .append(" ")
-                    .append(this.className)
-                    .append("/<init>(");
+                    .append(" ");
+
+                if(first.getType().getTypeOfElement() == ElementType.THIS) {
+                    builder.append(this.className).append("/");
+                }
+
+                builder.append("<init>(");
 
                 for(Element param: instr.getListOfOperands()) {
                     builder.append(BackendStage.getType(param.getType()));
                 }
 
-                builder.append(BackendStage.generateReturn(instr.getReturnType()));
+                builder.append(")")
+                    .append(BackendStage.getType(instr.getReturnType()));
+
                 return builder.toString();
             }
 
@@ -354,16 +380,19 @@ public class BackendStage implements JasminBackend {
                     .append(" ");
 
                 if(first.getType().getTypeOfElement() == ElementType.THIS) {
-                    builder.append(this.className).append("/");
+                    builder.append(this.className);
+                } else if(first.getType().getTypeOfElement() == ElementType.CLASS) {
+                    builder.append(((Operand)first).getName());
                 } else {
-                    builder.append(((Operand)first).getName())
-                        .append("/");
+                    return "";
                 }
 
-                builder.append(((LiteralElement)second).getLiteral().replace("\"", ""))
+                builder.append(".")
+                    .append(((LiteralElement)second).getLiteral().replace("\"", ""))
                     .append("(");
 
                 for(Element param: instr.getListOfOperands()) {
+                    var a = OllirAccesser.getVarTable(this.currMethod);
                     builder.append(BackendStage.getType(param.getType()));
                 }
 
@@ -378,14 +407,53 @@ public class BackendStage implements JasminBackend {
         return "";
     }
 
+    private String generateGetFieldOp(GetFieldInstruction instr) {
+        Element fieldElem = instr.getFirstOperand();
+        String field = ((Operand) fieldElem).getName();
+        Element second = instr.getSecondOperand();
+
+        StringBuilder builder = new StringBuilder();
+        Descriptor descriptor = OllirAccesser.getVarTable(this.currMethod).get(field);
+
+        switch (descriptor.getScope()) {
+            case FIELD -> {
+                builder.append("aload_0\n")
+                    .append("getfield ")
+                    .append(this.className)
+                    .append("/")
+                    .append(field)
+                    .append(" ")
+                    .append(getType(second.getType()))
+                    .append("\n");
+            }
+
+            case PARAMETER, LOCAL -> {
+                builder.append("aload_\n")
+                    .append(descriptor.getVirtualReg())
+                    .append("getfield ")
+                    .append(this.className)
+                    .append("/")
+                    .append(field)
+                    .append(" ")
+                    .append(getType(second.getType()))
+                    .append("\n");
+            }
+        }
+
+        return builder.toString();
+    }
+
     private String generateGotoOp(GotoInstruction instr) {
         return "goto " + instr.getLabel() + "\n";
     }
 
     private String generatePutFieldOp(PutFieldInstruction instr) {
-        Element fieldElem = instr.getFirstOperand();
+        /*Element fieldElem = instr.getSecondOperand();
         String field = ((Operand) fieldElem).getName();
-        Element second = instr.getSecondOperand();
+        Element first = instr.getFirstOperand();
+        Element third = instr.getThirdOperand();
+
+        if(true < false)
 
         StringBuilder builder = new StringBuilder();
         builder.append("aload_0\n")
@@ -394,10 +462,31 @@ public class BackendStage implements JasminBackend {
             .append("/")
             .append(field)
             .append(" ")
-            .append(getType(second.getType()))
+            .append(getType(third.getType()))
             .append("\n");
 
-        return builder.toString();
+        return builder.toString();*/
+        return "";
+    }
+
+    private String generateUnaryOp(UnaryOpInstruction instr) { ;
+        OperationType op = instr.getUnaryOperation().getOpType();
+
+        if (op == OperationType.NOTB) {
+            StringBuilder builder = new StringBuilder();
+            String labelTrue = "LABEL " + this.opLabel++;
+            String labelContinue = "LABEL " + this.opLabel++;
+
+            builder.append("ifeq  ").append(labelTrue).append("\n");
+            builder.append("iconst_0\n");
+            builder.append("goto ").append(labelContinue).append("\n");
+            builder.append(labelTrue).append(":\n");
+            builder.append("iconst_1\n");
+            builder.append(labelContinue).append(":\n");
+            return builder.toString();
+        }
+
+        return "";
     }
 
     private static String generateElement(Element elem) {
@@ -415,14 +504,14 @@ public class BackendStage implements JasminBackend {
             }
 
             if(value >= -128 && value <= 127) {
-                return "bipush" + literal.getLiteral();
+                return "bipush " + literal.getLiteral();
             }
 
             if(value >= -32768 && value <= 32767) {
-                return "sipush" + literal.getLiteral();
+                return "sipush " + literal.getLiteral();
             }
 
-            return "ldc" + literal.getLiteral();
+            return "ldc " + literal.getLiteral();
         }
 
         // TODO: check if array is only for unary operation
@@ -448,18 +537,20 @@ public class BackendStage implements JasminBackend {
         };
     }
 
+    /*private String getVar(String var) {
+        Descriptor descriptor = OllirAccesser.getVarTable(this.currMethod).get(var);
+    }*/
+
     private static String getSuper(String extendsDef) {
         return extendsDef == null ? "java/lang/Object" : extendsDef;
     }
 
-    // TODO: Review this
     private static String getType(Type type) {
         return switch (type.getTypeOfElement()) {
             case ARRAYREF -> "[I";
             case INT32 -> "I";
             case BOOLEAN -> "Z";
             case VOID -> "V";
-            //case CLASS -> String.format("L  %s", className); // TODO: understand better this value, where can it be used?
             default -> throw new IllegalStateException("Unexpected value: " + type.getTypeOfElement());
         };
     }
