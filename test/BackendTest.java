@@ -14,7 +14,7 @@ public class BackendTest {
     public void test(Path resource, boolean mustFail) {
         BackendStage stage = new BackendStage();
         AnalysisTable table = new AnalysisTable();
-        table.setSuper("SuperClass");
+        //table.setSuper("SuperClass");
         OllirResult ollirRes = new OllirResult(
             OllirUtils.parse(SpecsIo.getResource(resource.toString())), table, new ArrayList<>()
         );
