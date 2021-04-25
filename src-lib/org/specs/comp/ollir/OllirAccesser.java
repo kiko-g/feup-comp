@@ -29,4 +29,8 @@ public class OllirAccesser {
         return method.varTable;
     }
 
+    public static HashMap<String, Instruction> getLabels(Method method) {
+        return method.methodLabels;
+    }
+
 }
