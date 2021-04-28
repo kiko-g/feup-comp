@@ -1,10 +1,16 @@
-package ollir.instruction;
+package ollir.instruction.complex.binary;
 
+import ollir.instruction.JmmInstruction;
+import ollir.instruction.Operation;
+import ollir.instruction.OperationType;
+import ollir.instruction.TerminalInstruction;
+import ollir.instruction.complex.ComplexInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 
 public class BinaryOperationInstruction extends ComplexInstruction {
     protected JmmInstruction rhs, lhs;
     protected Operation operation;
+    protected boolean hasVariable = false;
 
     public BinaryOperationInstruction(JmmInstruction lhs, JmmInstruction rhs, Operation operation) {
         this.lhs = lhs;
@@ -23,6 +29,8 @@ public class BinaryOperationInstruction extends ComplexInstruction {
         if (operation.getOperationType() == OperationType.EQUALS) {
             return lhs;
         }
+
+        hasVariable = true;
 
         TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), "t" + ComplexInstruction.stackCounter++));
         BinaryOperationInstruction newOperation = new BinaryOperationInstruction(this);

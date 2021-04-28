@@ -3,6 +3,8 @@ package ollir;
 import ollir.instruction.*;
 import analysis.AnalysisTableBuilder;
 import analysis.table.AnalysisTable;
+import ollir.instruction.complex.*;
+import ollir.instruction.complex.binary.*;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
@@ -13,21 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope, List<JmmInstruction>> {
+public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstruction>> {
     private final SymbolTable symbolTable;
-    private int stackCounter;
-    private int ifElseCounter = 0;
-    private int loopCounter = 0;
-
-    protected static class Scope {
-        private final String scope;
-        private final String previousScope;
-
-        public Scope(String scope, String previousScope) {
-            this.scope = scope;
-            this.previousScope = previousScope;
-        }
-    }
 
     public SethiUllmanGenerator(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
@@ -39,15 +28,17 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("If",          this::visitIf);
         addVisit("While",       this::visitWhile);
 
-        addVisit("Add",         (node, sns) -> this.generateTwoChildren(node, sns, "+.i32", "i32"));
-        addVisit("Sub",         (node, sns) -> this.generateTwoChildren(node, sns, "-.i32", "i32"));
-        addVisit("Mul",         (node, sns) -> this.generateTwoChildren(node, sns, "*.i32", "i32"));
-        addVisit("Div",         (node, sns) -> this.generateTwoChildren(node, sns, "/.i32", "i32"));
-        addVisit("LogicalAnd",  (node, sns) -> this.generateTwoChildren(node, sns, "&&.bool", "bool"));
-        addVisit("Less",        (node, sns) -> this.generateTwoChildren(node, sns, "<.bool", "i32"));
+        addVisit("Add",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.ADD, new Type("int", false))));
+        addVisit("Sub",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.SUB, new Type("int", false))));
+        addVisit("Mul",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.MUL, new Type("int", false))));
+        addVisit("Div",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.DIV, new Type("int", false))));
+        addVisit("LogicalAnd",  (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.AND, new Type("bool", false))));
+        addVisit("Less",        (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.LESS_THAN, new Type("int", false))));
         addVisit("Assign",      this::visitAssign);
         addVisit("ArrayAccess", this::visitArrayAccess);
         addVisit("Object",      this::visitObject);
+        addVisit("IntArray",    this::visitIntArray);
+        addVisit("Not",         this::visitNot);
 
         addVisit("Params",      this::visitAllChildren);
         addVisit("Dot",         this::visitDot);
@@ -56,29 +47,63 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         addVisit("IntegerVal",  this::visitIntegerVal);
         addVisit("Bool",        this::visitBool);
         addVisit("This",        this::visitThis);
-/*
-        addVisit("MethodCall",  this::visitMethodCall);
-        addVisit("Not",         this::visitFirstChildren);
-        addVisit("Size",        this::visitFirstChildren);
-        addVisit("Index",       this::visitFirstChildren);
         addVisit("Return",      this::visitReturn);
-
-        //TODO addVisit("Param",       this::visitFirstChildren);
-        //TODO addVisit("Important",   this::visitFirstChildren);
-        //TODO addVisit("IntArray",    this::visitFirstChildren);
-*/
     }
 
-    private List<JmmInstruction> visitDot(JmmNode node, Scope scope) {
-        //TODO: invokevirtual(this, "compFac", aux1.i32).i32;
-        //TODO: arraylength($1.A.array.i32).i32;
-        List<JmmInstruction> instructions = new ArrayList<>();
-        //DotMethodInstruction dotMethodInstruction = new DotMethodInstruction(node);
+    private List<JmmInstruction> visitIntArray(JmmNode node, String scope) {
+        List<JmmInstruction> sizeInstructions = this.visit(node.getChildren().get(0), scope);
+
+        JmmInstruction sizeVar = getTerminalInstruction(sizeInstructions, sizeInstructions.get(sizeInstructions.size() - 1));
+
+        List<JmmInstruction> instructions = new ArrayList<>(sizeInstructions);
+        instructions.add(new NewArrayInstruction(sizeVar));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitAllChildren(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitNot(JmmNode node, String scope) {
+        List<JmmInstruction> notInstructions = this.visit(node.getChildren().get(0), scope);
+
+        JmmInstruction notVar = getTerminalInstruction(notInstructions, notInstructions.get(notInstructions.size() - 1));
+
+        List<JmmInstruction> instructions = new ArrayList<>(notInstructions);
+        instructions.add(new NotInstruction(notVar));
+
+        return instructions;
+    }
+
+    private List<JmmInstruction> visitReturn(JmmNode node, String scope) {
+        List<JmmInstruction> instructions = new ArrayList<>(visit(node.getChildren().get(0)));
+        JmmInstruction terminalVar = getTerminalInstruction(instructions, instructions.get(instructions.size() - 1));
+
+        instructions.add(new ReturnInstruction(terminalVar, OllirUtils.ollirToType(node.get("RETURN"))));
+
+        return instructions;
+    }
+
+    private List<JmmInstruction> visitDot(JmmNode node, String scope) {
+        List<JmmInstruction> leftInstructions = visit(node.getChildren().get(0), scope);
+        JmmInstruction leftOperand = getTerminalInstruction(leftInstructions, leftInstructions.get(leftInstructions.size() - 1));
+
+        JmmNode rightOperand = node.getChildren().get(1);
+
+        List<JmmInstruction> instructions = new ArrayList<>(leftInstructions);
+
+        if (rightOperand.getKind().equals("Length")) {
+            instructions.add(new DotLengthInstruction(leftOperand));
+            return instructions;
+        }
+
+        String methodName = rightOperand.getChildren().get(0).get("VALUE");
+        Type returnType = OllirUtils.ollirToType(rightOperand.getChildren().get(0).get("RETURN"));
+        List<JmmInstruction> params = visit(rightOperand.getChildren().get(1));
+
+        instructions.add(new DotMethodInstruction(leftOperand, methodName, params, returnType));
+
+        return instructions;
+    }
+
+    private List<JmmInstruction> visitAllChildren(JmmNode node, String scope) {
         List<JmmNode> children = node.getChildren();
         List<JmmInstruction> instructions = new ArrayList<>();
 
@@ -89,272 +114,191 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return instructions;
     }
 
-    private List<JmmInstruction> visitVar(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitVar(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        instructions.add(node.getChildren() + ";\n");
+
+        List<Symbol> parameters = this.symbolTable.getParameters(scope);
+        for (int i = 0; i < parameters.size(); i++) {
+            if (parameters.get(i).getName().equals(node.get("VALUE"))) {
+                Symbol param = new Symbol(parameters.get(i).getType(), "$" + i + "." + parameters.get(i).getName());
+                instructions.add(new TerminalInstruction(param));
+                return instructions;
+            }
+        }
+
+        for (Symbol symbol : symbolTable.getLocalVariables(scope)) {
+            if (symbol.getName().equals(node.get("VALUE"))) {
+                instructions.add(new TerminalInstruction(symbol));
+                return instructions;
+            }
+        }
+
+        for (Symbol symbol : symbolTable.getFields()) {
+            if (symbol.getName().equals(node.get("VALUE"))) {
+                instructions.add(new FieldInstruction(symbol));
+                return instructions;
+            }
+        }
 
         return instructions;
     }
 
-    private List<JmmInstruction> generateTwoChildren(JmmNode node, Scope scope, String expressionSign, String paramType) {
+    private List<JmmInstruction> generateTwoChildren(JmmNode node, String scope, Operation operation) {
         List<JmmInstruction> instructions = new ArrayList<>();
         List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
         List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        int originalStackCounter = this.stackCounter;
-        String leftVar = node.getChildren().get(0), scope, paramType, instructions, instructionsLeft;
-        String rightVar = getInstruction(node.getChildren().get(1), scope, paramType, instructions, instructionsRight);
-        this.stackCounter = originalStackCounter;
+        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1));
+        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
 
         instructions.addAll(instructionsLeft);
         instructions.addAll(instructionsRight);
-        instructions.add(leftVar + " " + expressionSign + " " + rightVar + ";\n");
+        instructions.add(new BinaryOperationInstruction(leftVar, rightVar, operation));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitThis(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitThis(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        instructions.add("this." + symbolTable.getClassName() + ";\n");
+        instructions.add(new TerminalInstruction(new Symbol(new Type("", false), "this")));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitBool(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitBool(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        instructions.add(node.get("VALUE") + ".i32;\n");
+        instructions.add(new TerminalInstruction(new Symbol(new Type("bool", false), node.get("VALUE"))));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitIntegerVal(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitIntegerVal(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        String ollirBool = "0.bool";
-        if(node.get("VALUE").equals("true")) ollirBool = "1.bool";
-        instructions.add(ollirBool + ";\n");
+        instructions.add(new TerminalInstruction(new Symbol(new Type("int", false), node.get("VALUE"))));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitObject(JmmNode node, Scope scope) {
-        //TODO:
-        // t0.myClass :=.myClass new(myClass).myClass;
-        // invokespecial(t0.myClass,"<init>").V;
-        // t0.myClass
+    private List<JmmInstruction> visitObject(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        String ollirParamType = typeToOllirString(new Type(node.getChildren().get(0).get("VALUE"), false));
-        instructions.add("t" + this.stackCounter + "." + ollirParamType + " :=." + ollirParamType + "new(" + ollirParamType + ")." + ollirParamType + ";\n");
-        instructions.add("invokespecial(t" + this.stackCounter + "." + ollirParamType + ",\"<init>\").V;\n");
-        instructions.add("t" + this.stackCounter + "." + ollirParamType + ";\n");
+        String className = node.getChildren().get(0).get("VALUE");
 
-        return instructions;
-    }
-
-    private List<JmmInstruction> visitArrayAccess(JmmNode node, Scope scope) {
-        //TODO: $1.A[i.i32].i32;
-        List<JmmInstruction> instructions = new ArrayList<>();
-        List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
-
-        int originalStackCounter = this.stackCounter;
-        String leftVar = getTerminalVar(node.getChildren().get(0), scope.scope, scope.previousScope).split("\\.array")[0];
-        String rightVar = getInstruction(node.getChildren().get(1), scope, "", instructions, instructionsRight);
-        this.stackCounter = originalStackCounter;
-
-        instructions.addAll(instructionsRight);
-        instructions.add(leftVar + "[" + rightVar + ".i32].i32;\n");
-
-        return instructions;
-    }
-
-    private List<JmmInstruction> visitAssign(JmmNode node, Scope scope) {
-        Type paramType = getVarType(node.getChildren().get(0), scope);
-        String ollirParamType = typeToOllirString(paramType);
-
-        return generateTwoChildren(node, scope, "=."+ollirParamType, ollirParamType);
-    }
-
-    private List<JmmInstruction> visitClass(JmmNode node, Scope _s) {
-        List<JmmInstruction> instructions = new ArrayList<>();
-
-        instructions.add(this.symbolTable.getClassName() + " {\n\n");
-
-        for (Symbol field : this.symbolTable.getFields()) {
-            instructions.add("\t.field private " + field.getName() + "." + typeToOllirString(field.getType()) + ";\n\n");
+        if (className.equals(symbolTable.getClassName())) {
+            instructions.add(new NewObjectInstruction(className));
+        } else {
+            instructions.add(new NewObjectInstruction(getImport(className)));
         }
 
-        instructions.add("\t.construct " + this.symbolTable.getClassName() + "().V {\n" + "\t\tinvokespecial(this, \"<init>\").V;\n" + "\t}\n\n");
+        return instructions;
+    }
 
-        instructions.addAll(this.defaultVisit(node, new Scope(AnalysisTable.CLASS_SCOPE, "\t", null)));
+    private List<JmmInstruction> visitArrayAccess(JmmNode node, String scope) {
+        List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
+        List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        instructions.add("}");
+        JmmInstruction leftVar = instructionsLeft.get(instructionsLeft.size() - 1);
+        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+
+        List<JmmInstruction> instructions = new ArrayList<>(instructionsRight);
+        instructions.add(new ArrayAccessInstruction(leftVar, rightVar));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitMethod(JmmNode node, Scope scopeNSpacing) {
-        List<JmmInstruction> instructions = new ArrayList<>();
-        this.stackCounter = 0;
+    private List<JmmInstruction> visitAssign(JmmNode node, String scope) {
+        Type paramType = getVarType(node.getChildren().get(0), scope);
 
+        return generateTwoChildren(node, scope, new Operation(OperationType.EQUALS, paramType));
+    }
+
+    private List<JmmInstruction> visitClass(JmmNode node, String _s) {
+        List<JmmInstruction> instructions = new ArrayList<>();
+
+        instructions.add(new ClassInstruction(
+                this.symbolTable.getClassName(),
+                this.symbolTable.getFields(),
+                this.defaultVisit(node, AnalysisTable.CLASS_SCOPE)
+        ));
+
+        return instructions;
+    }
+
+    private List<JmmInstruction> visitMethod(JmmNode node, String scope) {
         JmmNode returnType = node.getChildren().get(0);
         JmmNode name = node.getChildren().get(1);
 
         List<Symbol> parameters = new ArrayList<>();
-
         if(node.getChildren().size() >= 3 && node.getChildren().get(2).getKind().equals("MethodParameters")) {
             this.fillMethodParameters(node.getChildren().get(2), parameters);
         }
 
-        StringBuilder methodBuilder = new StringBuilder();
-        methodBuilder.append(scopeNSpacing.spacing)
-            .append(".method public ")
-            .append(name.get("VALUE"))
-            .append("(");
+        String methodScope = AnalysisTable.getMethodString(name.get("VALUE"), parameters.stream().map(Symbol::getType).collect(Collectors.toList()));
 
-        for (Symbol param : parameters) {
-            methodBuilder.append(param.getName())
-                .append(".")
-                .append(typeToOllirString(param.getType()));
-        }
+        List<JmmInstruction> methodInstructions = getInstructions(node, methodScope);
 
-        methodBuilder.append(".")
-            .append(typeToOllirString(getParamType(returnType)))
-            .append("{\n");
-
-        instructions.add(methodBuilder.toString());
-
-        String scope = AnalysisTable.getMethodString(name.get("VALUE"), parameters.stream().map(Symbol::getType).collect(Collectors.toList()));
-
-        for (JmmNode child : node.getChildren()) {
-            instructions.addAll(visit(child, new Scope(scope, scopeNSpacing + "\t", scopeNSpacing.scope)));
-        }
-
-        instructions.add(scopeNSpacing.spacing + "}\n\n");
+        List<JmmInstruction> instructions = new ArrayList<>();
+        instructions.add(new MethodInstruction(name.get("VALUE"), parameters, methodInstructions, getParamType(returnType)));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitMain(JmmNode node, Scope scopeNSpacing) {
-        List<JmmInstruction> instructions = new ArrayList<>();
-        this.stackCounter = 0;
+    private List<JmmInstruction> getInstructions(JmmNode node, String scope) {
+        List<JmmInstruction> methodInstructions = new ArrayList<>();
+        for (JmmNode child : node.getChildren()) {
+            methodInstructions.addAll(visit(child, scope));
+        }
 
+        return methodInstructions;
+    }
+
+    private List<JmmInstruction> visitMain(JmmNode node, String scope) {
         JmmNode params = node.getChildren().get(0);
 
         List<Symbol> parameters = new ArrayList<>();
 
         this.fillMethodParameters(params, parameters);
 
-        StringBuilder methodBuilder = new StringBuilder();
-        methodBuilder.append(scopeNSpacing.spacing)
-            .append(".method public static ")
-            .append(AnalysisTable.MAIN_SCOPE)
-            .append("(");
+        String mainScope = AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, parameters.stream().map(Symbol::getType).collect(Collectors.toList()));
 
-        for (Symbol param : parameters) {
-            methodBuilder.append(param.getName())
-                .append(".")
-                .append(typeToOllirString(param.getType()));
-        }
+        List<JmmInstruction> methodInstructions = getInstructions(node, mainScope);
 
-        methodBuilder.append(").V{\n");
-
-        instructions.add(methodBuilder.toString());
-
-        String scope = AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, parameters.stream().map(Symbol::getType).collect(Collectors.toList()));
-
-        for (JmmNode child : node.getChildren()) {
-            instructions.addAll(visit(child, new Scope(scope, scopeNSpacing.spacing + "\t", scopeNSpacing.scope)));
-        }
-
-        instructions.add(scopeNSpacing.spacing + "}\n\n");
+        List<JmmInstruction> instructions = new ArrayList<>();
+        instructions.add(new MainInstruction(parameters, methodInstructions));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitIf(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitIf(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
         JmmNode condition = node.getChildren().get(0);
         JmmNode conditionTrue = node.getChildren().get(1);
         JmmNode conditionFalse = node.getChildren().get(2);
 
-        int ifCounter = this.ifElseCounter;
-        this.ifElseCounter++;
-
         List<JmmInstruction> conditionInstructions = visit(condition, scope);
 
-        Scope conditionsScopeNSpacing = new Scope(scope.scope, "\t", scope.previousScope);
-        List<JmmInstruction> conditionTrueInstructions = visit(conditionTrue, conditionsScopeNSpacing);
-        List<JmmInstruction> conditionFalseInstructions = visit(conditionFalse, conditionsScopeNSpacing);
+        List<JmmInstruction> conditionTrueInstructions = visit(conditionTrue, scope);
+        List<JmmInstruction> conditionFalseInstructions = visit(conditionFalse, scope);
 
-        String conditionInstruction = cleanStringEnding(conditionInstructions.remove(conditionInstructions.size() - 1));
-
-        instructions.add("if (" + conditionInstruction + ") goto True" + ifCounter + ";\n");
-        instructions.addAll(conditionFalseInstructions);
-        instructions.add("goto Endif" + ifCounter + ";\n");
-        instructions.add("True" + ifCounter + ":\n");
-        instructions.addAll(conditionTrueInstructions);
-        instructions.add("Endif" + ifCounter + ":\n");
+        instructions.add(new IfInstruction(conditionInstructions, conditionTrueInstructions, conditionFalseInstructions));
 
         return instructions;
     }
 
-    private List<JmmInstruction> visitWhile(JmmNode node, Scope scope) {
+    private List<JmmInstruction> visitWhile(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
         JmmNode condition = node.getChildren().get(0);
         JmmNode loop = node.getChildren().get(1);
 
-        int loopCounter = this.loopCounter;
-        this.loopCounter++;
-
         List<JmmInstruction> conditionInstructions = visit(condition, scope);
+        List<JmmInstruction> loopInstructions = visit(loop, scope);
 
-        Scope conditionsScopeNSpacing = new Scope(scope.scope, "\t", scope.previousScope);
-        List<JmmInstruction> loopInstructions = visit(loop, conditionsScopeNSpacing);
-
-        String conditionInstruction = cleanStringEnding(conditionInstructions.remove(conditionInstructions.size() - 1));
-
-        instructions.add("While" + loopCounter + ":");
-        instructions.addAll(conditionInstructions);
-        instructions.add("if (" + conditionInstruction + ") goto Loop" + loopCounter + ";\n");
-        instructions.add("goto EndWhile" + loopCounter + ":\n");
-        instructions.add("Loop" + loopCounter + ":\n");
-        instructions.addAll(loopInstructions);
-        instructions.add("goto While" + loopCounter + ";\n");
-        instructions.add("EndWhile" + loopCounter + ":\n");
+        instructions.add(new WhileInstruction(conditionInstructions, loopInstructions));
 
         return instructions;
     }
 
-    private String typeToOllirString(Type type) {
-        StringBuilder builder = new StringBuilder();
-
-        if (type.isArray()) {
-            builder.append("array.");
-        }
-
-        switch (type.getName()) {
-            case "int" -> builder.append("i32");
-            case "boolean" -> builder.append("bool");
-            default -> {
-                if (type.getName().equals(this.symbolTable.getClassName())) {
-                    builder.append(this.symbolTable.getClassName());
-                } else {
-                    builder.append(this.getImport(type.getName()));
-                }
-            }
-        }
-
-        return builder.toString();
-    }
-
-
-    private String getTerminalVar(JmmNode node, String scope, String previousScope) {
-
-
-        return "";
-    }
-
     private String getImport(String className) {
-        List<JmmInstruction> imports = this.symbolTable.getImports();
+        List<String> imports = this.symbolTable.getImports();
 
         for (String importStatement : imports) {
             if(this.getImportName(importStatement).equals(className)) {
@@ -362,7 +306,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
             }
         }
 
-        return null;
+        return "";
     }
 
     private String getImportName(String importStatement) {
@@ -373,6 +317,15 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         }
 
         return importStatement.substring(delimiterIndex + 1);
+    }
+
+    private JmmInstruction getTerminalInstruction(List<JmmInstruction> instructions, JmmInstruction var) {
+        if (var instanceof TerminalInstruction) {
+            instructions.remove(var);
+            return var;
+        }
+
+        return var.getVariable();
     }
 
     private void fillMethodParameters(JmmNode node, List<Symbol> parameters) {
@@ -392,7 +345,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return new Type(node.get("VALUE"), false);
     }
 
-    private Type getVarType(JmmNode node, Scope scope) {
+    private Type getVarType(JmmNode node, String scope) {
         JmmNode name = node;
 
         if(node.getNumChildren() > 0) {
@@ -401,10 +354,10 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
 
         String varName = name.get("VALUE");
 
-        Type varType = findTypeOfVar(this.symbolTable.getLocalVariables(scope.scope), varName);
+        Type varType = findTypeOfVar(this.symbolTable.getLocalVariables(scope), varName);
         if(varType != null) return varType;
 
-        varType = findTypeOfVar(this.symbolTable.getParameters(scope.scope), varName);
+        varType = findTypeOfVar(this.symbolTable.getParameters(scope), varName);
         if(varType != null) return varType;
 
         varType = findTypeOfVar(this.symbolTable.getFields(), varName);
@@ -421,7 +374,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         return null;
     }
 
-    private List<JmmInstruction> defaultVisit(JmmNode node, Scope scope) {
+    private List<JmmInstruction> defaultVisit(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
 
         for (JmmNode child : node.getChildren()) {
@@ -429,9 +382,5 @@ public class SethiUllmanGenerator extends AJmmVisitor<SethiUllmanGenerator.Scope
         }
 
         return instructions;
-    }
-
-    private String cleanStringEnding(String instr) {
-        return instr.replace("\t", "").replace("\n", "").replace(";", "");
     }
 }

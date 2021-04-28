@@ -19,4 +19,26 @@ public class OllirUtils {
 
         return builder.toString();
     }
+
+    public static Type ollirToType(String returnType) {
+        String[] types = returnType.split("\\.");
+
+        switch (types[0]) {
+            case "array" -> {
+                return new Type("int", true);
+            }
+            case "i32" -> {
+                return new Type("int", false);
+            }
+            case "bool" -> {
+                return new Type("bool", false);
+            }
+            case "V" -> {
+                return new Type("void", false);
+            }
+            default -> {
+                return new Type(types[0], false);
+            }
+        }
+    }
 }

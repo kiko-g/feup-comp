@@ -1,5 +1,8 @@
-package ollir.instruction;
+package ollir.instruction.complex.binary;
 
+import ollir.instruction.JmmInstruction;
+import ollir.instruction.Operation;
+import ollir.instruction.OperationType;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 public class ArrayAccessInstruction extends BinaryOperationInstruction {
@@ -9,6 +12,6 @@ public class ArrayAccessInstruction extends BinaryOperationInstruction {
 
     @Override
     public String toString() {
-        return lhs + "[" + rhs + "].i32";
+        return hasVariable ? super.toString() : lhs + "[" + rhs + "].i32";
     }
 }

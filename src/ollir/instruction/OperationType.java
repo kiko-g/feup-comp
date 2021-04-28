@@ -10,5 +10,6 @@ public enum OperationType {
     AND,
     NOT,
     ARRAY_ACCESS,
-    DOT
+    DOT,
+    NONE
 }
