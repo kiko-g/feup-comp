@@ -1,0 +1,6 @@
+class Fac {
+    public static void main(String[]args){
+        int[] array;
+        array[true];
+    }
+}

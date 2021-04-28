@@ -1,0 +1,15 @@
+class Fac {
+    public int getInt(){
+        return 1;
+    }
+
+    public static void main(String[]args){
+        int var1;
+        Fac fac1;
+        var1=a.getInt();
+
+        var1=fac1.getInt();
+
+        var1=this.getInt();
+    }
+}

@@ -1,0 +1,12 @@
+import Class.Fac2;
+
+class Fac {
+
+    public static void main(String[]args){
+        int var;
+        Fac facTest;
+
+        var=Fac2.getInt(1,2,true);
+        facTest=Fac2.getObj();
+    }
+}

@@ -1,0 +1,13 @@
+class Fac {
+    public static void main(String[]args){
+        int int1;
+        int int2;
+        boolean bool1;
+        Fac fac1;
+        1+1;
+        1+true;
+        int1+int2;
+        fac1+int1;
+        bool1+3;
+    }
+}

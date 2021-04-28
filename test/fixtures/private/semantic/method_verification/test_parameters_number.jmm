@@ -1,0 +1,11 @@
+class Fac {
+    public int[] returnArray(int var1, boolean var2){
+        return new int[3];
+    }
+
+    public static void main(String[]args){
+        Fac fac;
+        fac.returnArray(this,true);
+        this.returnArray(true,1);
+    }
+}

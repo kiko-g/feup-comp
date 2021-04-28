@@ -1,0 +1,32 @@
+class Fac {
+    public int[] returnInt(){
+        return 1;
+    }
+    public int returnArray(){
+        return new int[3];
+    }
+
+
+    public static void main(String[]args){
+        int var1;
+        boolean var2;
+        int[] array;
+        Fac facTest;
+        Fac2 fac2Test;
+
+        var1=1+2+5+8*8/true;
+        var2=true;
+        var2=false;
+        var1=var2;
+        array=new int[true];
+
+        array=this.returnArray();
+
+        factTest=this;
+        fac2Test=Fac2.create();
+
+
+
+
+    }
+}

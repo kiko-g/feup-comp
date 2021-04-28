@@ -130,4 +130,62 @@ public class ParserTest {
     public void testArrayAssignFail() {
         test(Path.of("test/fixtures/private/fail/ArrayAssignFail.jmm"), true);
     }
+
+    /***
+     * Custom Tests
+     */
+    @Test
+    public void testDifferentOperandTypes() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_op_same_type.jmm"), true);
+    }
+
+    @Test
+    public void testDirectArrayOperations() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_direct_array_ops.jmm"), true);
+    }
+
+    @Test
+    public void testDirectIntegerArrayAccess() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access.jmm"), true);
+    }
+
+    @Test
+    public void testArrayIndex1() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access_index.jmm"), true);
+    }
+
+    @Test
+    public void testAssigmentOk() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_ok.jmm"), true);
+    }
+
+    @Test
+    public void testAssigmentFail() {
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_fail.jmm"), true);
+    }
+
+    @Test
+    public void testTarget1() {
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target.jmm"), true);
+    }
+
+    @Test
+    public void testTarget2() {
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target_with_super.jmm"), false);
+    }
+
+    @Test
+    public void testTargetWithImport() {
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_import.jmm"), false);
+    }
+
+    @Test
+    public void testMethodParameters() {
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_parameters_number.jmm"), true);
+    }
+
+    @Test
+    public void testNumberParameters() {
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_number_parameters.jmm"), true);
+    }
 }
