@@ -17,11 +17,12 @@ public class TerminalInstruction implements JmmInstruction {
 
     @Override
     public String toString(String backspace) {
-        return backspace + toString() + ";\n";
+        return backspace + this + ";\n";
     }
 
     @Override
     public String toString() {
+        if(rhs.getName().equals("this")) return "this";
         return rhs.getName() + "." + OllirUtils.typeToOllir(rhs.getType());
     }
 }

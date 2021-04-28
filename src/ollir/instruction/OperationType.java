@@ -9,5 +9,6 @@ public enum OperationType {
     LESS_THAN,
     AND,
     NOT,
-    ARRAY_ACCESS
+    ARRAY_ACCESS,
+    DOT
 }

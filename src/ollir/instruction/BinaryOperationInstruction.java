@@ -36,11 +36,11 @@ public class BinaryOperationInstruction extends ComplexInstruction {
 
     @Override
     public String toString(String backspace) {
-        return backspace + toString() + ";\n";
+        return backspace + this + ";\n";
     }
 
     @Override
     public String toString() {
-        return lhs.toString() + operation.toString() + rhs.toString();
+        return lhs.toString() + " " + operation.toString() + " " + rhs.toString();
     }
 }

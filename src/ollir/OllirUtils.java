@@ -13,6 +13,7 @@ public class OllirUtils {
         switch (type.getName()) {
             case "int" -> builder.append("i32");
             case "boolean" -> builder.append("bool");
+            case "void" -> builder.append("V");
             default -> builder.append(type.getName());
         }
 
