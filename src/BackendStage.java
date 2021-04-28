@@ -94,7 +94,7 @@ public class BackendStage implements JasminBackend {
         StringBuilder classFieldsCode = new StringBuilder();
 
         for(Field field: ollirClass.getFields()) {
-            classFieldsCode.append(".field private ")
+            classFieldsCode.append("\t.field private ")
                 .append(field.getFieldName())
                 .append(" ")
                 .append(BackendStage.getType(field.getFieldType()))
@@ -111,15 +111,15 @@ public class BackendStage implements JasminBackend {
             this.currMethod = method;
 
             if(method.getMethodName().equals("main")) {
-                classMethodsCode.append(".method public static main([Ljava/lang/String;)V\n")
-                    .append(".limit stack 99\n")
-                    .append(".limit locals 99\n")
+                classMethodsCode.append("\t.method public static main([Ljava/lang/String;)V\n")
+                    .append("\t\t.limit stack 99\n")
+                    .append("\t\t.limit locals 99\n")
                     .append(this.generateClassMethodBody(method.getInstructions()))
-                    .append("\nreturn\n");
+                    .append("\n\t\treturn\n");
             }
 
             else {
-                classMethodsCode.append(String.format(".method public %s(", method.getMethodName()));
+                classMethodsCode.append(String.format("\t.method public %s(", method.getMethodName()));
 
                 for(Element param:  method.getParams()) {
                     classMethodsCode.append(BackendStage.getType(param.getType()));
@@ -127,17 +127,17 @@ public class BackendStage implements JasminBackend {
 
                 classMethodsCode.append(")")
                     .append(BackendStage.getType(method.getReturnType()))
-                    .append("\n.limit stack 99\n")
-                    .append(".limit locals 99\n")
+                    .append("\n\t\t.limit stack 99\n")
+                    .append("\t\t.limit locals 99\n")
                     .append(this.generateClassMethodBody(method.getInstructions()))
                     .append("\n");
 
                 if(method.getReturnType().getTypeOfElement() == ElementType.VOID) {
-                    classMethodsCode.append("return\n");
+                    classMethodsCode.append("\t\treturn\n");
                 }
             }
 
-            classMethodsCode.append(".end method\n\n");
+            classMethodsCode.append("\t.end method\n\n");
         }
 
         return classMethodsCode.toString();
@@ -153,46 +153,9 @@ public class BackendStage implements JasminBackend {
         return methodInstCode.toString();
     }
 
-    private String generateLoad(Element elem) {
-        if(!elem.isLiteral()) {
-            Descriptor descriptor = OllirAccesser.getVarTable(this.currMethod).get(((Operand) elem).getName());
-
-            if(descriptor.getScope() == VarScope.FIELD) {
-                Instruction getfield = new GetFieldInstruction(
-                    new Element(new Type(ElementType.THIS)),
-                    new Element(descriptor.getVarType()),
-                    descriptor.getVarType()
-                );
-                return generateOperation(getfield);
-            } else {
-                return switch (descriptor.getVarType().getTypeOfElement()) {
-                    case INT32, BOOLEAN -> "iload_" + descriptor.getVirtualReg();
-                    case THIS -> "aload_0";
-                    case ARRAYREF, CLASS, OBJECTREF -> "aload_" + descriptor.getVirtualReg();
-                    default -> "";
-                };
-            }
-        } else {
-            String literal = ((LiteralElement) elem).getLiteral();
-
-            try {
-                int value = Integer.parseInt(literal);
-                if(value == -1) return "iconst_m1";
-                if(value >= 0 && value <= 5) return "iconst_" + value;
-                if(value >= -128 && value <= 127) return "bipush " + value;
-                if(value >= -32768 && value <= 32767) return "sipush " + value;
-                return "ldc " + value;
-            } catch (NumberFormatException ignored) {
-                this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
-            }
-        }
-
-        return "";
-    }
-
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
-            case NOPER -> generateNoOperation((SingleOpInstruction) instr);
+            case NOPER -> "\t\t" + generateLoad(((SingleOpInstruction) instr).getSingleOperand());
             //case ASSIGN -> generateAssign((AssignInstruction) instr);
             case BINARYOPER -> generateBinaryOp((BinaryOpInstruction) instr);
             case UNARYOPER -> generateUnaryOp((UnaryOpInstruction) instr);
@@ -216,17 +179,38 @@ public class BackendStage implements JasminBackend {
         };
     }
 
-    // TODO: when is this used?
-    private String generateNoOperation(SingleOpInstruction instr) {
-        Element elem = instr.getSingleOperand();
+    private String generateLoad(Element elem) {
+        if(!elem.isLiteral()) {
+            Descriptor descriptor = OllirAccesser.getVarTable(this.currMethod).get(((Operand) elem).getName());
 
-        String destName;
-        if(elem.isLiteral()) {
-            LiteralElement literal = (LiteralElement) elem;
-            destName = literal.getLiteral();
+            if(descriptor.getScope() == VarScope.FIELD) {
+                Instruction getfield = new GetFieldInstruction(
+                        new Element(new Type(ElementType.THIS)),
+                        new Element(descriptor.getVarType()),
+                        descriptor.getVarType()
+                );
+                return generateOperation(getfield);
+            } else {
+                return switch (descriptor.getVarType().getTypeOfElement()) {
+                    case INT32, BOOLEAN -> "iload_" + descriptor.getVirtualReg();
+                    case THIS -> "aload_0";
+                    case ARRAYREF, CLASS, OBJECTREF -> "aload_" + descriptor.getVirtualReg();
+                    default -> "";
+                };
+            }
         } else {
-            Operand operand = (Operand) elem;
-            destName = operand.getName();
+            String literal = ((LiteralElement) elem).getLiteral();
+
+            try {
+                int value = Integer.parseInt(literal);
+                if(value == -1) return "iconst_m1";
+                if(value >= 0 && value <= 5) return "iconst_" + value;
+                if(value >= -128 && value <= 127) return "bipush " + value;
+                if(value >= -32768 && value <= 32767) return "sipush " + value;
+                return "ldc " + value;
+            } catch (NumberFormatException ignored) {
+                this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
+            }
         }
 
         return "";
@@ -292,7 +276,7 @@ public class BackendStage implements JasminBackend {
 
         switch (op) {
             case ANDI32 -> {
-                return left + right + "iand\n";
+                return "\t\t" + left + right + "iand\n";
             }
 
             case LTHI32 -> {
@@ -306,26 +290,26 @@ public class BackendStage implements JasminBackend {
                 builder.append(labelTrue).append(":\n");
                 builder.append("iconst_1\n");
                 builder.append(labelContinue).append(":\n");
-                return builder.toString();
+                return "\t\t" + builder.toString();
             }
 
             case ADDI32 -> {
-                return left + right + "iadd\n";
+                return "\t\t" + left + right + "iadd\n";
             }
 
             case SUBI32 -> {
-                return left + right + "isub\n";
+                return "\t\t" + left + right + "isub\n";
             }
 
             case MULI32 -> {
-                return left + right + "imul\n";
+                return "\t\t" + left + right + "imul\n";
             }
 
             case DIVI32 -> {
-                return left + right + "idiv\n";
+                return "\t\t" + left + right + "idiv\n";
             }
         }
-        return left;
+        return "\t\t" + left;
     }
 
     private String generateUnaryOp(UnaryOpInstruction instr) { ;
@@ -485,9 +469,9 @@ public class BackendStage implements JasminBackend {
         }
 
         Element elem = instr.getOperand();
-        return this.generateLoad(elem) + switch (elem.getType().getTypeOfElement()) {
-            case INT32, BOOLEAN -> "ireturn";
-            default -> "return";
+        return "\t\t" + this.generateLoad(elem) + switch (elem.getType().getTypeOfElement()) {
+            case INT32, BOOLEAN -> "\n\t\tireturn";
+            default -> "\n\t\tareturn";
         };
     }
 
