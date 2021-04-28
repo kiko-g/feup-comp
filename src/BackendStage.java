@@ -150,6 +150,15 @@ public class BackendStage implements JasminBackend {
         return methodInstCode.toString();
     }
 
+    private String generateReturnOp(ReturnInstruction instr) {
+        if(!instr.hasReturnValue()) {
+            return "return";
+        }
+        return "";
+
+    }
+
+
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
             case NOPER -> generateNoOperation((SingleOpInstruction) instr);
@@ -160,13 +169,11 @@ public class BackendStage implements JasminBackend {
             //case GETFIELD -> generateGetFieldOp((GetFieldInstruction) instr);
             //case PUTFIELD -> generatePutFieldOp((PutFieldInstruction) instr);
             case GOTO -> generateGotoOp((GotoInstruction) instr);
-            default -> "";
+            case RETURN -> generateReturnOp((ReturnInstruction) instr);
 
 
 
-            /*
-
-            case BRANCH -> {
+            /*case BRANCH -> {
                 CondBranchInstruction condBranch = (CondBranchInstruction) instr;
                 Element left = condBranch.getLeftOperand();
                 Element right = condBranch.getRightOperand();
@@ -175,12 +182,12 @@ public class BackendStage implements JasminBackend {
                 break;
             }
 
-
-
             case RETURN -> {
+                return "";
                 ReturnInstruction returnInstr = (ReturnInstruction) instr;
+                return "";
 
-                if(returnInstr.hasReturnValue()) {
+                /*if(returnInstr.hasReturnValue()) {
                     Element operand = returnInstr.getOperand();
                     if(operand.isLiteral()) {
                         LiteralElement ret = (LiteralElement) operand;
@@ -195,11 +202,12 @@ public class BackendStage implements JasminBackend {
                     case BOOLEAN -> "ireturn";
                     default -> "areturn";
                 };
-
             }*/
+            default -> "";
         };
     }
 
+    // TODO: when is this used?
     private String generateNoOperation(SingleOpInstruction instr) {
         Element elem = instr.getSingleOperand();
 
@@ -528,10 +536,6 @@ public class BackendStage implements JasminBackend {
             default -> "areturn";
         };
     }
-
-    /*private String getVar(String var) {
-        Descriptor descriptor = OllirAccesser.getVarTable(this.currMethod).get(var);
-    }*/
 
     private static String getSuper(String extendsDef) {
         return extendsDef == null ? "java/lang/Object" : extendsDef;
