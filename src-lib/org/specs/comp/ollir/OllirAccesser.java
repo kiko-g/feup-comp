@@ -17,18 +17,42 @@ import java.util.HashMap;
 
 public class OllirAccesser {
 
+    /**
+     * @deprecated Use {@link org.specs.comp.ollir.CallInstruction#getInvocationType()} instead.
+     * @param callInstruction
+     * @return
+     */
+    @Deprecated
     public static CallType getCallInvocation(CallInstruction callInstruction) {
         return callInstruction.invocationType;
     }
 
+    /**
+     * @deprecated Use {@link org.specs.comp.ollir.Operand#isParameter()} instead.
+     * @param operand
+     * @return
+     */
+    @Deprecated
     public static boolean isParameter(Operand operand) {
         return operand.isParameter;
     }
 
+    /**
+     * @deprecated Use {@link org.specs.comp.ollir.Method#getVarTable()} instead.
+     * @param method
+     * @return
+     */
+    @Deprecated
     public static HashMap<String, Descriptor> getVarTable(Method method) {
         return method.varTable;
     }
 
+    /**
+     * @deprecated Use {@link org.specs.comp.ollir.Method#getLabels()} instead.
+     * @param method
+     * @return
+     */
+    @Deprecated
     public static HashMap<String, Instruction> getLabels(Method method) {
         return method.methodLabels;
     }
