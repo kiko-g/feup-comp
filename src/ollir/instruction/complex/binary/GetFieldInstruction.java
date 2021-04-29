@@ -6,13 +6,17 @@ import ollir.instruction.complex.ComplexInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-public class FieldInstruction extends BinaryOperationInstruction {
+public class GetFieldInstruction extends BinaryOperationInstruction {
     private final Symbol field;
 
-    public FieldInstruction(Symbol field) {
+    public GetFieldInstruction(Symbol field) {
         super(new NullInstruction(), new NullInstruction(), new Operation(OperationType.NONE, new Type("", false)));
 
         this.field = field;
+    }
+
+    public Symbol getField() {
+        return field;
     }
 
     @Override
@@ -24,7 +28,7 @@ public class FieldInstruction extends BinaryOperationInstruction {
         hasVariable = true;
 
         TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(field.getType(), "t" + ComplexInstruction.stackCounter++));
-        BinaryOperationInstruction newOperation = new FieldInstruction(this.field);
+        BinaryOperationInstruction newOperation = new GetFieldInstruction(this.field);
 
         lhs = saveVariable;
         rhs = newOperation;

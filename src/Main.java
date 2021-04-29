@@ -24,11 +24,10 @@ public class Main {
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);
-            System.out.println("ok1");
             semanticsResult = Analysis.run(parserResult);
-            System.out.println("ok");
+//			ollirResult = new OptimizationStage().toOllir(semanticsResult);
 			String ollirResult = new OptimizationStage().toCode(semanticsResult);
-            System.out.println(ollirResult);
+//            System.out.println(ollirResult);
 //			jasminResult = BackendStage.run(ollirResult);
 //			jasminResult.run();
 		} catch (IOException e) {

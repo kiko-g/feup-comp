@@ -26,11 +26,11 @@ public class IfInstruction implements JmmInstruction {
     @Override
     public String toString(String backspace) {
         return condition.stream().map(instruction -> instruction.toString(backspace)).collect(Collectors.joining()) +
-            backspace + "if (" + conditionInstruction + ") goto True" + ifCounter + ";\n" +
+            backspace + "if (" + conditionInstruction + ") goto True" + ifNum + ";\n" +
             elseBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
-            backspace + "\tgoto Endif" + ifCounter + ";\n" +
-            backspace + "True" + ifCounter + ":\n" +
+            backspace + "\tgoto Endif" + ifNum + ";\n" +
+            backspace + "True" + ifNum + ":\n" +
             ifBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
-            backspace + "Endif" + ifCounter + ":\n";
+            backspace + "Endif" + ifNum + ":\n";
     }
 }

@@ -163,7 +163,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
         for (Symbol symbol : symbolTable.getFields()) {
             if (symbol.getName().equals(node.get("VALUE"))) {
-                instructions.add(new FieldInstruction(symbol));
+                instructions.add(new GetFieldInstruction(symbol));
                 return instructions;
             }
         }
@@ -224,11 +224,12 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
         List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
         List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        JmmInstruction leftVar = instructionsLeft.get(instructionsLeft.size() - 1);
+        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1));
         JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
 
-        List<JmmInstruction> instructions = new ArrayList<>(instructionsRight);
-        instructions.add(new ArrayAccessInstruction(leftVar, rightVar));
+        List<JmmInstruction> instructions = new ArrayList<>(instructionsLeft);
+        instructions.addAll(instructionsRight);
+        instructions.add(new ArrayAccessInstruction(((TerminalInstruction) leftVar).getTerminal(), rightVar));
 
         return instructions;
     }
@@ -236,7 +237,28 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
     private List<JmmInstruction> visitAssign(JmmNode node, String scope) {
         Type paramType = getVarType(node.getChildren().get(0), scope);
 
-        return generateTwoChildren(node, scope, new Operation(OperationType.EQUALS, paramType));
+        List<JmmInstruction> instructions = new ArrayList<>();
+        List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
+        List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
+
+        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+
+        JmmInstruction leftVar = instructionsLeft.get(instructionsLeft.size() - 1);
+
+        if (leftVar instanceof GetFieldInstruction) {
+            instructionsLeft.remove(leftVar);
+            instructions.addAll(instructionsRight);
+            instructions.add(new PutFieldInstruction(((GetFieldInstruction) leftVar).getField(), rightVar));
+            return instructions;
+        }
+
+        leftVar = getTerminalInstruction(instructionsLeft, leftVar);
+
+        instructions.addAll(instructionsLeft);
+        instructions.addAll(instructionsRight);
+        instructions.add(new BinaryOperationInstruction(leftVar, rightVar, new Operation(OperationType.EQUALS, paramType)));
+
+        return instructions;
     }
 
     private List<JmmInstruction> visitClass(JmmNode node, String _s) {
@@ -348,7 +370,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
     }
 
     private JmmInstruction getTerminalInstruction(List<JmmInstruction> instructions, JmmInstruction var) {
-        if (var instanceof TerminalInstruction) {
+        if (var instanceof TerminalInstruction || var instanceof ArrayAccessInstruction) {
             instructions.remove(var);
             return var;
         }
@@ -375,6 +397,10 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
     private Type getVarType(JmmNode node, String scope) {
         JmmNode name = node;
+
+        if(node.getKind().equals("ArrayAccess")) {
+            return new Type("int", false);
+        }
 
         if(node.getNumChildren() > 0) {
             name = node.getChildren().get(0);

@@ -4,10 +4,14 @@ import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 
 public class TerminalInstruction implements JmmInstruction {
-    private final Symbol rhs;
+    private final Symbol terminal;
 
-    public TerminalInstruction(Symbol rhs) {
-        this.rhs = rhs;
+    public TerminalInstruction(Symbol terminal) {
+        this.terminal = terminal;
+    }
+
+    public Symbol getTerminal() {
+        return terminal;
     }
 
     @Override
@@ -22,7 +26,7 @@ public class TerminalInstruction implements JmmInstruction {
 
     @Override
     public String toString() {
-        if(rhs.getName().equals("this")) return "this";
-        return rhs.getName() + "." + OllirUtils.typeToOllir(rhs.getType());
+        if(terminal.getName().equals("this")) return "this";
+        return terminal.getName() + "." + OllirUtils.typeToOllir(terminal.getType());
     }
 }
