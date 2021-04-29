@@ -159,9 +159,9 @@ public class BackendStage implements JasminBackend {
 
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
-            case NOPER -> "\t\t" + generateLoad(((SingleOpInstruction) instr).getSingleOperand());
-            //case ASSIGN -> generateAssign((AssignInstruction) instr);
-            //case BINARYOPER -> generateBinaryOp((BinaryOpInstruction) instr);
+            case NOPER -> generateLoad(((SingleOpInstruction) instr).getSingleOperand());
+            case ASSIGN -> generateAssign((AssignInstruction) instr);
+            case BINARYOPER -> generateBinaryOp((BinaryOpInstruction) instr);
             case UNARYOPER -> generateUnaryOp((UnaryOpInstruction) instr);
             //case CALL -> generateCallOp((CallInstruction) instr);
             case GETFIELD -> generateGetFieldOp((GetFieldInstruction) instr);
@@ -182,11 +182,16 @@ public class BackendStage implements JasminBackend {
     }
 
     private Descriptor getDescriptor(Element elem) {
+        if(elem.isLiteral()) {
+            this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Tried to get a descriptor of a literal"));
+            return null;
+        }
+
         if(elem.getType().getTypeOfElement() == ElementType.THIS) {
             return OllirAccesser.getVarTable(this.currMethod).get("this");
-        } else {
-            return OllirAccesser.getVarTable(this.currMethod).get(((Operand) elem).getName());
         }
+
+        return OllirAccesser.getVarTable(this.currMethod).get(((Operand) elem).getName());
     }
 
     private String generateLoad(Element elem) {
@@ -195,11 +200,11 @@ public class BackendStage implements JasminBackend {
 
             try {
                 int value = Integer.parseInt(literal);
-                if(value == -1) return "\t\ticonst_m1";
-                if(value >= 0 && value <= 5) return "\t\ticonst_" + value;
-                if(value >= -128 && value <= 127) return "\t\tbipush " + value;
-                if(value >= -32768 && value <= 32767) return "\t\tsipush " + value;
-                return "\t\tldc " + value;
+                if(value == -1) return "\t\ticonst_m1\n";
+                if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
+                if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
+                if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
+                return "\t\tldc " + value + "\n";
             } catch (NumberFormatException ignored) {
                 this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
             }
@@ -214,112 +219,94 @@ public class BackendStage implements JasminBackend {
             );
             return generateOperation(getfield);
         } else {
-            return switch (descriptor.getVarType().getTypeOfElement()) {
-                case INT32, BOOLEAN -> "\t\tiload_" + descriptor.getVirtualReg();
-                case THIS -> "\t\taload_0";
-                case ARRAYREF, CLASS, OBJECTREF -> "\t\taload_" + descriptor.getVirtualReg();
+            return "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
+                case INT32, BOOLEAN -> "iload_" + descriptor.getVirtualReg() + "\n";
+                case THIS -> "aload_0" + "\n";
+                case ARRAYREF, CLASS, OBJECTREF -> "aload_" + descriptor.getVirtualReg() + "\n";
                 default -> "";
             };
         }
     }
 
-    /*private String generateAssign(AssignInstruction instr) {
-        Element dest = instr.getDest();
+    private String generateAssign(AssignInstruction instr) {
+        Descriptor descriptor = this.getDescriptor(instr.getDest());
         String instruction = this.generateOperation(instr.getRhs());
 
-        Descriptor descriptor = this.getDescriptor(dest);
-        StringBuilder builder = new StringBuilder();
-
-        if(descriptor.getScope() == VarScope.FIELD) {
-            return builder.append("aload_0\n")
-                .append(instruction)
-                .append("putfield ")
-                .append(this.className)
-                .append("/")
-                .append(destName)
-                .append(" ")
-                .append(generateType(elem.getType()))
-                .append("\n")
-                .toString();
-        } else {
-            if(descriptor.getVarType().getTypeOfElement() == ElementType.INT32 ||
-                    descriptor.getVarType().getTypeOfElement() == ElementType.BOOLEAN) {
-                return builder.append("\t\tistore_")
-                        .append(descriptor.getVirtualReg())
-                        .toString();
-            }
-
-            return builder.append("astore_\n")
-                    .append(descriptor.getVirtualReg())
-                    .append("\n")
-                    .toString();
-        }
-
-        return "";
+        return instruction + "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
+            case INT32, BOOLEAN -> "istore_" + descriptor.getVirtualReg() + "\n";
+            case THIS -> "astore_0" + "\n";
+            case ARRAYREF, CLASS, OBJECTREF -> "astore_" + descriptor.getVirtualReg() + "\n";
+            default -> "";
+        } + "\n";
     }
 
     private String generateBinaryOp(BinaryOpInstruction instr) {
         Element leftElem = instr.getLeftOperand();
         Element rightElem = instr.getRightOperand();
 
-        String left = generateElement(leftElem);
-        String right = generateElement(rightElem);
+        String left = this.generateLoad(leftElem);
+        String right = this.generateLoad(rightElem);
 
         OperationType op = instr.getUnaryOperation().getOpType();
 
         switch (op) {
             case ANDI32 -> {
-                return "\t\t" + left + right + "iand\n";
+                return left + right + "\n\t\tiand\n";
             }
 
             case LTHI32 -> {
                 StringBuilder builder = new StringBuilder();
-                String labelTrue = "LABEL " + this.opLabel++;
-                String labelContinue = "LABEL " + this.opLabel++;
+                String labelTrue = "\t\tLABEL " + this.opLabel++;
+                String labelContinue = "\t\tLABEL " + this.opLabel++;
 
-                builder.append("if_icmplt ").append(labelTrue).append("\n");
-                builder.append("iconst_0\n");
-                builder.append("goto ").append(labelContinue).append("\n");
-                builder.append(labelTrue).append(":\n");
-                builder.append("iconst_1\n");
-                builder.append(labelContinue).append(":\n");
-                return "\t\t" + builder.toString();
+                return builder.append("\t\t\tif_icmplt ")
+                    .append(labelTrue)
+                    .append("\n\t\t\ticonst_0\n")
+                    .append("\t\t\tgoto ").append(labelContinue).append("\n\t\t\t")
+                    .append(labelTrue)
+                    .append(":\n\t\t\ticonst_1\n")
+                    .append(labelContinue).append(":\n")
+                    .toString();
             }
 
             case ADDI32 -> {
-                return "\t\t" + left + right + "iadd\n";
+                return left + right + "iadd\n";
             }
 
             case SUBI32 -> {
-                return "\t\t" + left + right + "isub\n";
+                return left + right + "isub\n";
             }
 
             case MULI32 -> {
-                return "\t\t" + left + right + "imul\n";
+                return left + right + "imul\n";
             }
 
             case DIVI32 -> {
-                return "\t\t" + left + right + "idiv\n";
+                return left + right + "idiv\n";
             }
         }
-        return "\t\t" + left;
-    }*/
+        return left;
+    }
 
     private String generateUnaryOp(UnaryOpInstruction instr) { ;
         OperationType op = instr.getUnaryOperation().getOpType();
 
         if (op == OperationType.NOTB) {
             StringBuilder builder = new StringBuilder();
-            String labelTrue = "LABEL " + this.opLabel++;
-            String labelContinue = "LABEL " + this.opLabel++;
+            String labelTrue = "\t\tLABEL " + this.opLabel++;
+            String labelContinue = "\t\tLABEL " + this.opLabel++;
 
-            builder.append("ifeq ").append(labelTrue).append("\n");
-            builder.append("iconst_0\n");
-            builder.append("goto ").append(labelContinue).append("\n");
-            builder.append(labelTrue).append(":\n");
-            builder.append("iconst_1\n");
-            builder.append(labelContinue).append(":\n");
-            return builder.toString();
+            return builder.append("\t\t\tifeq ")
+                .append(labelTrue)
+                .append("\n")
+                .append("\t\t\ticonst_0\n")
+                .append("\t\t\tgoto ").append(labelContinue)
+                .append("\n\t\t\t")
+                .append(labelTrue)
+                .append(":\n\t\ticonst_1\n")
+                .append(labelContinue)
+                .append(":\n")
+                .toString();
         }
 
         return "";
@@ -446,7 +433,7 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateGotoOp(GotoInstruction instr) {
-        return "goto " + instr.getLabel() + "\n";
+        return "\t\tgoto " + instr.getLabel() + "\n";
     }
 
     private String generateReturnOp(ReturnInstruction instr) {
