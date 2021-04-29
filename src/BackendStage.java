@@ -159,26 +159,26 @@ public class BackendStage implements JasminBackend {
 
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
-            case NOPER -> generateLoad(((SingleOpInstruction) instr).getSingleOperand());
-            case ASSIGN -> generateAssign((AssignInstruction) instr);
-            case BINARYOPER -> generateBinaryOp((BinaryOpInstruction) instr);
-            case UNARYOPER -> generateUnaryOp((UnaryOpInstruction) instr);
-            //case CALL -> generateCallOp((CallInstruction) instr);
-            case GETFIELD -> generateGetFieldOp((GetFieldInstruction) instr);
-            case PUTFIELD -> generatePutFieldOp((PutFieldInstruction) instr);
-            case GOTO -> generateGotoOp((GotoInstruction) instr);
-            case RETURN -> generateReturnOp((ReturnInstruction) instr);
-
-            /*case BRANCH -> {
-                CondBranchInstruction condBranch = (CondBranchInstruction) instr;
-                Element left = condBranch.getLeftOperand();
-                Element right = condBranch.getRightOperand();
-                String label = condBranch.getLabel();
-                Operation operation = condBranch.getCondOperation();
-                break;
-            } */
+            case NOPER -> this.generateLoad(((SingleOpInstruction) instr).getSingleOperand());
+            case ASSIGN -> this.generateAssign((AssignInstruction) instr);
+            case BINARYOPER -> this.generateBinaryOp((BinaryOpInstruction) instr);
+            case UNARYOPER -> this.generateUnaryOp((UnaryOpInstruction) instr);
+            case CALL -> this.generateCallOp((CallInstruction) instr);
+            case GETFIELD -> this.generateGetFieldOp((GetFieldInstruction) instr);
+            case PUTFIELD -> this.generatePutFieldOp((PutFieldInstruction) instr);
+            case GOTO -> this.generateGotoOp((GotoInstruction) instr);
+            case RETURN -> this.generateReturnOp((ReturnInstruction) instr);
+            case BRANCH -> this.generateBranch((CondBranchInstruction) instr);
             default -> "";
         };
+    }
+
+    private String generateBranch(CondBranchInstruction instr) {
+        Element left = instr.getLeftOperand();
+        Element right = instr.getRightOperand();
+        String label = instr.getLabel();
+        Operation operation = instr.getCondOperation();
+        return "";
     }
 
     private Descriptor getDescriptor(Element elem) {
@@ -312,27 +312,29 @@ public class BackendStage implements JasminBackend {
         return "";
     }
 
-    /*private String generateCallOp(CallInstruction instr) {
+    private String generateCallOp(CallInstruction instr) {
         Element first = instr.getFirstArg();
         Element second = instr.getSecondArg();
         List<Element> operands = instr.getListOfOperands();
         CallType invocationType = OllirAccesser.getCallInvocation(instr);
 
         switch (invocationType) {
-            //case ldc -> break;
+            case ldc -> { return ""; }
             case NEW -> {
                 StringBuilder builder = new StringBuilder();
 
                 if(first.getType().getTypeOfElement() == ElementType.OBJECTREF) {
-                    builder.append("new ")
+                    builder.append("\t\tnew ")
                         .append(((Operand)first).getName())
-                        .append("\ndup\n");
+                        .append("\n\t\tdup\n");
                 } else if(first.getType().getTypeOfElement() == ElementType.ARRAYREF) {
                     if(operands.size() > 0) {
                         Element elem = operands.get(0);
-                        builder.append(generateElement(elem)).append("\n");
-                        builder.append("\nnewarray int\n");
-                        return builder.toString();
+
+                        return builder.append(generateLoad(elem))
+                            .append("\n")
+                            .append("\n\t\tnewarray int\n")
+                            .toString();
                     }
                 }
 
@@ -346,7 +348,8 @@ public class BackendStage implements JasminBackend {
             case invokespecial -> {
                 StringBuilder builder = new StringBuilder();
 
-                builder.append(invocationType.toString())
+                builder.append(this.generateLoad(first))
+                    .append(invocationType.toString())
                     .append(" ");
 
                 if(first.getType().getTypeOfElement() == ElementType.THIS) {
@@ -398,7 +401,7 @@ public class BackendStage implements JasminBackend {
         }
 
         return "";
-    }*/
+    }
 
     private String generateGetFieldOp(GetFieldInstruction instr) {
         Element second = instr.getSecondOperand();
