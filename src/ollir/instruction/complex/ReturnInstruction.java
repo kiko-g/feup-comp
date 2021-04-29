@@ -21,7 +21,7 @@ public class ReturnInstruction extends ComplexInstruction {
 
     @Override
     public String toString() {
-        return "ret" + OllirUtils.typeToOllir(returnType) + " " + instruction;
+        return "ret." + OllirUtils.typeToOllir(returnType) + " " + instruction;
     }
 
     @Override

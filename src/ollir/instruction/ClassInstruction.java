@@ -25,11 +25,11 @@ public class ClassInstruction implements JmmInstruction {
     @Override
     public String toString(String backspace) {
         return className + " {\n" +
+            fields.stream().map(this::symbolToField).collect(Collectors.joining()) + "\n" +
             "\t.construct " + className + "().V {\n" +
             "\t\tinvokespecial(this, \"<init>\").V;\n" +
-            "\t}\n" +
-            fields.stream().map(this::symbolToField).collect(Collectors.joining()) +
-            instructions.stream().map(inst -> inst.toString("\t")).collect(Collectors.joining()) +
+            "\t}\n\n" +
+            instructions.stream().map(inst -> inst.toString("\t")).collect(Collectors.joining("\n")) +
             "}\n";
     }
 

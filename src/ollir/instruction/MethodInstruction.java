@@ -28,7 +28,7 @@ public class MethodInstruction implements JmmInstruction {
     @Override
     public String toString(String backspace) {
         return backspace + ".method public " + methodName + "(" +
-            params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")." +
+            params.stream().map(symbol -> symbol.getName() + "." + OllirUtils.typeToOllir(symbol.getType())).collect(Collectors.joining(", ")) + ")." +
             OllirUtils.typeToOllir(returnType) + " {\n" +
             instructions.stream().map(inst -> inst.toString(backspace + "\t")).collect(Collectors.joining()) +
             backspace + "}\n";

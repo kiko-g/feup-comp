@@ -9,12 +9,14 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DotMethodInstruction extends BinaryOperationInstruction {
+public class DotStaticMethodInstruction extends BinaryOperationInstruction {
     private final String methodName;
     private final List<JmmInstruction> params;
+    private final String importClass;
 
-    public DotMethodInstruction(JmmInstruction obj, String methodName, List<JmmInstruction> params, Type returnType) {
-        super(obj, new NullInstruction(), new Operation(OperationType.DOT, returnType));
+    public DotStaticMethodInstruction(String importClass, String methodName, List<JmmInstruction> params, Type returnType) {
+        super(new NullInstruction(), new NullInstruction(), new Operation(OperationType.DOT, returnType));
+        this.importClass = importClass;
         this.methodName = methodName;
         this.params = params;
     }
@@ -32,7 +34,7 @@ public class DotMethodInstruction extends BinaryOperationInstruction {
         hasVariable = true;
 
         TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), "t" + ComplexInstruction.stackCounter++));
-        BinaryOperationInstruction newOperation = new DotMethodInstruction(lhs, methodName, params, operation.getResultType());
+        BinaryOperationInstruction newOperation = new DotStaticMethodInstruction(importClass, methodName, params, operation.getResultType());
 
         lhs = saveVariable;
         rhs = newOperation;
@@ -43,7 +45,7 @@ public class DotMethodInstruction extends BinaryOperationInstruction {
 
     @Override
     public String toString() {
-        return hasVariable ? super.toString() : "invokevirtual(" + lhs.toString() + ", \"" + methodName + "\"" +
+        return hasVariable ? super.toString() : "invokevirtual(" + importClass + ", \"" + methodName + "\"" +
             (params.size() > 0 ? ", " : "") +
             params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")." +
             OllirUtils.typeToOllir(operation.getResultType());

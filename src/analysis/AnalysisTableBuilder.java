@@ -115,7 +115,6 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
 
         for (Symbol parameter : parameters) {
             this.symbolTable.addParameter(method.getName(), parameter);
-            this.symbolTable.addLocalVariable(method.getName(), parameter);
         }
 
         return defaultVisit(node, method.getName());
@@ -145,7 +144,6 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
 
         for (Symbol parameter : parameters) {
             this.symbolTable.addParameter(method.getName(), parameter);
-            this.symbolTable.addLocalVariable(method.getName(), parameter);
         }
 
         return defaultVisit(node, method.getName());

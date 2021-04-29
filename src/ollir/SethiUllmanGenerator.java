@@ -48,6 +48,8 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
         addVisit("Bool",        this::visitBool);
         addVisit("This",        this::visitThis);
         addVisit("Return",      this::visitReturn);
+
+        setDefaultVisit(this::defaultVisit);
     }
 
     private List<JmmInstruction> visitIntArray(JmmNode node, String scope) {
@@ -73,34 +75,60 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
     }
 
     private List<JmmInstruction> visitReturn(JmmNode node, String scope) {
-        List<JmmInstruction> instructions = new ArrayList<>(visit(node.getChildren().get(0)));
+        List<JmmInstruction> instructions = new ArrayList<>(visit(node.getChildren().get(0), scope));
         JmmInstruction terminalVar = getTerminalInstruction(instructions, instructions.get(instructions.size() - 1));
 
-        instructions.add(new ReturnInstruction(terminalVar, OllirUtils.ollirToType(node.get("RETURN"))));
+        instructions.add(new ReturnInstruction(terminalVar, this.symbolTable.getReturnType(scope)));
 
         return instructions;
     }
 
     private List<JmmInstruction> visitDot(JmmNode node, String scope) {
-        List<JmmInstruction> leftInstructions = visit(node.getChildren().get(0), scope);
-        JmmInstruction leftOperand = getTerminalInstruction(leftInstructions, leftInstructions.get(leftInstructions.size() - 1));
-
+        JmmNode leftOperand = node.getChildren().get(0);
         JmmNode rightOperand = node.getChildren().get(1);
+        List<JmmInstruction> leftInstructions = visit(leftOperand, scope);
+        JmmInstruction leftInstruction;
 
-        List<JmmInstruction> instructions = new ArrayList<>(leftInstructions);
+        List<JmmInstruction> instructions = new ArrayList<>();
 
-        if (rightOperand.getKind().equals("Length")) {
-            instructions.add(new DotLengthInstruction(leftOperand));
-            return instructions;
+        if (leftInstructions.size() != 0) {
+            leftInstruction = getTerminalInstruction(leftInstructions, leftInstructions.get(leftInstructions.size() - 1));
+
+            instructions.addAll(leftInstructions);
+
+            if (rightOperand.getKind().equals("Length")) {
+                instructions.add(new DotLengthInstruction(leftInstruction));
+                return instructions;
+            }
+
+            String methodName = rightOperand.getChildren().get(0).get("VALUE");
+            Type returnType = OllirUtils.ollirToType(rightOperand.get("RETURN"));
+
+            List<JmmInstruction> paramTerminals = getParamInstructions(scope, rightOperand.getChildren().get(1), instructions);
+
+            instructions.add(new DotMethodInstruction(leftInstruction, methodName, paramTerminals, returnType));
+        } else {
+            String methodName = rightOperand.getChildren().get(0).get("VALUE");
+            Type returnType = OllirUtils.ollirToType(rightOperand.get("RETURN"));
+
+            List<JmmInstruction> paramTerminals = getParamInstructions(scope, rightOperand.getChildren().get(1), instructions);
+
+            instructions.add(new DotStaticMethodInstruction(leftOperand.get("VALUE"), methodName, paramTerminals, returnType));
         }
 
-        String methodName = rightOperand.getChildren().get(0).get("VALUE");
-        Type returnType = OllirUtils.ollirToType(rightOperand.getChildren().get(0).get("RETURN"));
-        List<JmmInstruction> params = visit(rightOperand.getChildren().get(1));
-
-        instructions.add(new DotMethodInstruction(leftOperand, methodName, params, returnType));
-
         return instructions;
+    }
+
+    private List<JmmInstruction> getParamInstructions(String scope, JmmNode paramNode, List<JmmInstruction> instructions) {
+        List<JmmInstruction> paramTerminals = new ArrayList<>();
+
+        for (JmmNode param : paramNode.getChildren()) {
+            List<JmmInstruction> paramInstructions = visit(param, scope);
+            paramTerminals.add(getTerminalInstruction(paramInstructions, paramInstructions.get(paramInstructions.size() - 1)));
+            instructions.addAll(paramInstructions);
+        }
+
+        return paramTerminals;
     }
 
     private List<JmmInstruction> visitAllChildren(JmmNode node, String scope) {

@@ -2,7 +2,6 @@ package ollir.instruction.complex;
 
 import ollir.instruction.JmmInstruction;
 import ollir.instruction.TerminalInstruction;
-import ollir.instruction.complex.ComplexInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
@@ -22,11 +21,11 @@ public class NewObjectInstruction extends ComplexInstruction {
     }
 
     public String toStringNew() {
-        return terminalInstruction + " :=." + className + "new(" + className + ")." + className;
+        return terminalInstruction + " :=." + className + " new(" + className + ")." + className;
     }
 
     public String toStringSpecial() {
-        return "invokespecial" + terminalInstruction + ",\"<init>\").V";
+        return "invokespecial(" + terminalInstruction + ",\"<init>\").V";
     }
 
     @Override

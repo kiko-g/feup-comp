@@ -35,6 +35,19 @@ public class OptimizationStage implements JmmOptimization {
         return new OllirResult(semanticsResult, ollirCode, reports);
     }
 
+    public String toCode(JmmSemanticsResult semanticsResult) {
+        JmmNode root = semanticsResult.getRootNode();
+        // More reports from this stage
+        List<Report> reports = new ArrayList<>();
+
+        SethiUllmanLabeler labeler = new SethiUllmanLabeler();
+        labeler.visit(root);
+
+        // Convert the AST to a String containing the equivalent OLLIR code
+        SethiUllmanGenerator generator = new SethiUllmanGenerator(semanticsResult.getSymbolTable());
+        return generator.visit(root).stream().map(inst -> inst.toString("")).collect(Collectors.joining());
+    }
+
     @Override
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
         // THIS IS JUST FOR CHECKPOINT 3

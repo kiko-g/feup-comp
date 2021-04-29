@@ -6,6 +6,10 @@ public class OllirUtils {
     public static String typeToOllir(Type type) {
         StringBuilder builder = new StringBuilder();
 
+        if(type == null) {
+            return "V";
+        }
+
         if (type.isArray()) {
             builder.append("array.");
         }

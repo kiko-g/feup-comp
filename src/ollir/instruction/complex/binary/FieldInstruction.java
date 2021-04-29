@@ -23,19 +23,19 @@ public class FieldInstruction extends BinaryOperationInstruction {
 
         hasVariable = true;
 
-        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), "t" + ComplexInstruction.stackCounter++));
+        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(field.getType(), "t" + ComplexInstruction.stackCounter++));
         BinaryOperationInstruction newOperation = new FieldInstruction(this.field);
 
         lhs = saveVariable;
         rhs = newOperation;
-        operation = new Operation(OperationType.EQUALS, operation.getResultType());
+        operation = new Operation(OperationType.EQUALS, field.getType());
 
         return lhs;
     }
 
     @Override
     public String toString() {
-        return hasVariable ? super.toString() : "getfield(this, " + lhs.toString() + ")." + OllirUtils.typeToOllir(field.getType());
+        return hasVariable ? super.toString() : "getfield(this, " + field.getName() + "." + OllirUtils.typeToOllir(field.getType()) + ")." + OllirUtils.typeToOllir(field.getType());
     }
 
     @Override

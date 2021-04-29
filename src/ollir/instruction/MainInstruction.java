@@ -1,5 +1,6 @@
 package ollir.instruction;
 
+import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class MainInstruction implements JmmInstruction {
     @Override
     public String toString(String backspace) {
         return backspace + ".method public main(" +
-            params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ").V {\n" +
+            params.stream().map(symbol -> symbol.getName() + "." + OllirUtils.typeToOllir(symbol.getType())).collect(Collectors.joining(", ")) + ").V {\n" +
             instructions.stream().map(inst -> inst.toString(backspace + "\t")).collect(Collectors.joining()) +
             backspace + "}\n";
     }

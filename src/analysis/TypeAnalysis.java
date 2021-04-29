@@ -1,6 +1,7 @@
 package analysis;
 
 import analysis.table.AnalysisTable;
+import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -205,6 +206,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         // check if method isn't from class
         if (!hasMethod) {
             if (AnalysisTable.CLASS_SCOPE.equals(typeNScope.scope) && this.symbolTable.getSuper() != null) {
+                node.put("RETURN", OllirUtils.typeToOllir(typeNScope.expected));
                 return typeNScope.expected;
             }
 
@@ -227,6 +229,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                 );
             }
 
+            node.put("RETURN", OllirUtils.typeToOllir(typeNScope.expected));
             return typeNScope.expected;
         }
 
@@ -234,6 +237,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
 
         if (methodParameters == null) {
             if (AnalysisTable.CLASS_SCOPE.equals(typeNScope.scope) && this.symbolTable.getSuper() != null) {
+                node.put("RETURN", OllirUtils.typeToOllir(typeNScope.expected));
                 return typeNScope.expected;
             }
 
@@ -282,10 +286,14 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                 );
             }
 
-            return this.symbolTable.getReturnType(AnalysisTable.getMethodString(methodName, methodParameters.stream().map(Symbol::getType).collect(Collectors.toList())));
+            Type returnType = this.symbolTable.getReturnType(AnalysisTable.getMethodString(methodName, methodParameters.stream().map(Symbol::getType).collect(Collectors.toList())));
+            node.put("RETURN", OllirUtils.typeToOllir(returnType));
+            return returnType;
         }
 
-        return this.symbolTable.getReturnType(method);
+        Type returnType = this.symbolTable.getReturnType(method);
+        node.put("RETURN", OllirUtils.typeToOllir(returnType));
+        return returnType;
     }
 
     private Type visitArray(JmmNode node, TypeNScope typeNScope) {

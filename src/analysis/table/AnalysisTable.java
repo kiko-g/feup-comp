@@ -108,7 +108,7 @@ public class AnalysisTable implements SymbolTable {
             }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     public boolean addParameter(String methodName, Symbol param) {
@@ -128,6 +128,15 @@ public class AnalysisTable implements SymbolTable {
 
     public Symbol getVariable(String scope, String name) {
         for (Symbol variable : this.symbolTable.getOrDefault(scope, new HashSet<>())) {
+            if (variable.getName().equals(name)) {
+                return variable;
+            }
+        }
+
+        List<Symbol> parameters = this.getParameters(scope);
+        parameters = parameters == null ? new ArrayList<>() : parameters;
+
+        for (Symbol variable : parameters) {
             if (variable.getName().equals(name)) {
                 return variable;
             }

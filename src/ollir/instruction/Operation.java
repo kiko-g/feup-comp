@@ -1,5 +1,6 @@
 package ollir.instruction;
 
+import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 public class Operation {
@@ -34,6 +35,6 @@ public class Operation {
             case NOT -> operation = "!";
         }
 
-        return operation + resultType;
+        return operation + "." + OllirUtils.typeToOllir(resultType);
     }
 }
