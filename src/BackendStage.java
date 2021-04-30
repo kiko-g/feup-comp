@@ -222,9 +222,11 @@ public class BackendStage implements JasminBackend {
             return generateOperation(getfield);
         } else {
             return "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
-                case INT32, BOOLEAN -> "iload_" + descriptor.getVirtualReg() + "\n";
-                case THIS -> "aload_0" + "\n";
-                case ARRAYREF, CLASS, OBJECTREF -> "aload_" + descriptor.getVirtualReg() + "\n";
+                case INT32, BOOLEAN -> descriptor.getVirtualReg() <= 3 ?
+                    "iload_" + descriptor.getVirtualReg() + "\n" : "iload " + descriptor.getVirtualReg() + "\n";
+                case THIS -> "aload_0\n";
+                case ARRAYREF, CLASS, OBJECTREF -> descriptor.getVirtualReg() <= 3 ?
+                    "aload_" + descriptor.getVirtualReg() + "\n" : "aload " + descriptor.getVirtualReg() + "\n";
                 default -> "";
             };
         }
@@ -235,9 +237,11 @@ public class BackendStage implements JasminBackend {
         String instruction = this.generateOperation(instr.getRhs());
 
         return instruction + "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
-            case INT32, BOOLEAN -> "istore_" + descriptor.getVirtualReg() + "\n";
-            case THIS -> "astore_0" + "\n";
-            case ARRAYREF, CLASS, OBJECTREF -> "astore_" + descriptor.getVirtualReg() + "\n";
+            case INT32, BOOLEAN -> descriptor.getVirtualReg() <= 3 ?
+                "istore_" + descriptor.getVirtualReg() + "\n" : "istore " + descriptor.getVirtualReg() + "\n";
+            case THIS -> "astore_0\n";
+            case ARRAYREF, CLASS, OBJECTREF -> descriptor.getVirtualReg() <= 3 ?
+                "astore_" + descriptor.getVirtualReg() + "\n" : "astore " + descriptor.getVirtualReg() + "\n";
             default -> "";
         };
     }

@@ -6,7 +6,7 @@ myClass {
 	.method public sum(A.array.i32, B.array.i32).array.i32 {
 		t1.i32 :=.i32 arraylength($1.A.array.i32).i32;
 		C.array.i32 :=.array.i32 new(array, t1.i32).array.i32;
-		//i.i32 :=.i32 0.i32;
+		i.i32 :=.i32 0.i32;
 		
 		//Loop:
 			//t1.i32 :=.i32 arraylength($1.A.array.i32).i32;

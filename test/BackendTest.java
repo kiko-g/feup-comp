@@ -16,7 +16,7 @@ public class BackendTest {
 
     public void test(Path resource, boolean mustFail) {
         OllirResult ollirRes = new OllirResult(
-                OllirUtils.parse(SpecsIo.getResource(resource.toString())), new AnalysisTable(), new ArrayList<>()
+            OllirUtils.parse(SpecsIo.getResource(resource.toString())), new AnalysisTable(), new ArrayList<>()
         );
 
         JasminResult result = new BackendStage().toJasmin(ollirRes);
