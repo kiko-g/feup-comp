@@ -1,5 +1,8 @@
+import org.specs.comp.ollir.ClassUnit;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.specs.util.SpecsCollections;
 import report.Report;
@@ -19,25 +22,22 @@ public class Main {
 
 		JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
 		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
-//		OllirResult ollirResult = new OllirResult(new ClassUnit(), semanticsResult.getSymbolTable(), new ArrayList<>());
-//		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
+		OllirResult ollirResult = new OllirResult(new ClassUnit(), semanticsResult.getSymbolTable(), new ArrayList<>());
+		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);
             semanticsResult = Analysis.run(parserResult);
-//			String ollirCode = new OptimizationStage().toCode(semanticsResult);
-//            System.out.println(ollirCode);
-//			ollirResult = new OptimizationStage().toOllir(semanticsResult);
-//			jasminResult = BackendStage.run(ollirResult);
-//			jasminResult.run();
-//			jasminResult,compule();
+			ollirResult = OptimizationStage.run(semanticsResult);
+			jasminResult = BackendStage.run(ollirResult);
+			jasminResult.compile();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
-		} catch (RuntimeException e) {
-		    e.printStackTrace();
+		} catch (RuntimeException ignored) {
         } finally {
 			List<Report> reports = SpecsCollections.concat(parserResult.getReports(), semanticsResult.getReports());
-//            reports = SpecsCollections.concat(reports, ollirResult.getReports());
+            reports = SpecsCollections.concat(reports, ollirResult.getReports());
+            reports = SpecsCollections.concat(reports, jasminResult.getReports());
 
 			reports.forEach(System.err::println);
 		}

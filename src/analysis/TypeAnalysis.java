@@ -44,6 +44,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         addVisit("Class", this::visitClass);
         addVisit("Method", this::visitMethod);
         addVisit("Main", this::visitMain);
+        addVisit("VarDecl", this::visitVarDecl);
         addVisit("If", this::visitConditionExpression);
         addVisit("While", this::visitConditionExpression);
         addVisit("Assign", this::visitEqual);
@@ -67,6 +68,37 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         addVisit("Length", this::returnLength);
         addVisit("This", this::returnThis);
         setDefaultVisit(this::defaultVisit);
+    }
+
+    private Type visitVarDecl(JmmNode node, TypeNScope typeNScope) {
+        JmmNode leftOperand = node.getChildren().get(0);
+
+        if (leftOperand.getKind().equals("ClassName")) {
+            String className = leftOperand.get("VALUE");
+
+            if (className.equals(this.symbolTable.getClassName())) {
+                return typeNScope.expected;
+            }
+
+            List<String> imports = this.symbolTable.getImports();
+            for (String importClass : imports) {
+                if (getImportName(importClass).equals(className)) {
+                    return typeNScope.expected;
+                }
+            }
+
+            this.reports.add(
+                new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(node.get("LINE")),
+                    Integer.parseInt(node.get("COLUMN")),
+                    "Could not find the class \"" + className + "\", are you missing an import?"
+                )
+            );
+        }
+
+        return typeNScope.expected;
     }
 
     private Type visitClass(JmmNode node, TypeNScope typeNScope) {
@@ -398,6 +430,8 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     }
 
     private Type returnIntArray(JmmNode node, TypeNScope typeNScope) {
+        defaultVisit(node, typeNScope);
+
         return INT_ARRAY;
     }
 
