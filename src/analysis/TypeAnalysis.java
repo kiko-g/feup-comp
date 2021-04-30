@@ -20,6 +20,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     public final static Type INT_ARRAY = new Type("int", true);
     public final static Type BOOL = new Type("boolean", false);
     public final static Type LENGTH = new Type("length", false);
+    public final static Type NULL = new Type("void", false);
 
     private final AnalysisTable symbolTable;
     private final List<Report> reports;
@@ -69,12 +70,12 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     }
 
     private Type visitClass(JmmNode node, TypeNScope typeNScope) {
-        TypeNScope scope = new TypeNScope(AnalysisTable.CLASS_SCOPE, null, null);
+        TypeNScope scope = new TypeNScope(AnalysisTable.CLASS_SCOPE, NULL, "");
         for (JmmNode child : node.getChildren()) {
             visit(child, scope);
         }
 
-        return null;
+        return NULL;
     }
 
     private Type visitObject(JmmNode node, TypeNScope typeNScope) {
@@ -95,7 +96,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
 
         TypeNScope scope = new TypeNScope(
             AnalysisTable.getMethodString(name.get("VALUE"), parameters.stream().map(Symbol::getType).collect(Collectors.toList())),
-            null,
+                NULL,
             typeNScope.scope
         );
 
@@ -114,7 +115,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
 
         TypeNScope scope = new TypeNScope(
             AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, parameters.stream().map(Symbol::getType).collect(Collectors.toList())),
-            null,
+                NULL,
             typeNScope.scope
         );
 
@@ -122,7 +123,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
             visit(child, scope);
         }
 
-        return null;
+        return NULL;
     }
 
     private Type visitConditionExpression(JmmNode node, TypeNScope typeNScope) {
@@ -134,7 +135,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
             visit(node.getChildren().get(i), typeNScope);
         }
 
-        return null;
+        return NULL;
     }
 
     private Type visitEqual(JmmNode node, TypeNScope typeNScope) {
@@ -197,7 +198,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
 
         String methodName = methodNameNode.get("VALUE");
 
-        TypeNScope newTypeNScope = new TypeNScope(typeNScope.previousScope, null, null);
+        TypeNScope newTypeNScope = new TypeNScope(typeNScope.previousScope, NULL, "");
         List<Type> givenParameters = paramsNode.getChildren().stream().map((child) -> this.visit(child, newTypeNScope)).collect(Collectors.toList());
 
         String method = AnalysisTable.getMethodString(methodName, givenParameters);
@@ -479,7 +480,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     }
 
     private Type defaultVisit(JmmNode node, TypeNScope typeNScope) {
-        Type type = null;
+        Type type = NULL;
         for (JmmNode child : node.getChildren()) {
             type = visit(child, typeNScope);
         }
