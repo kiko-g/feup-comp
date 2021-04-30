@@ -6,30 +6,28 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.specs.util.SpecsIo;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import static org.junit.Assert.fail;
 
 public class BackendTest {
 
     public void test(Path resource, boolean mustFail) {
-        BackendStage stage = new BackendStage();
-        AnalysisTable table = new AnalysisTable();
-        //table.setSuper("SuperClass");
         OllirResult ollirRes = new OllirResult(
-            OllirUtils.parse(SpecsIo.getResource(resource.toString())), table, new ArrayList<>()
+                OllirUtils.parse(SpecsIo.getResource(resource.toString())), new AnalysisTable(), new ArrayList<>()
         );
 
-        JasminResult result = stage.toJasmin(ollirRes);
-
-        //JasminResult result = TestUtils.backend(SpecsIo.getResource(resource.toString()));
+        JasminResult result = new BackendStage().toJasmin(ollirRes);
+        result.compile();
+        // JasminResult result = TestUtils.backend(SpecsIo.getResource(resource.toString()));
 
         if (mustFail) {
             TestUtils.mustFail(result.getReports());
         } else {
             TestUtils.noErrors(result.getReports());
         }
-
-        System.out.println(result.getJasminCode());
 
         //var output = result.run();
         //System.out.println(output);

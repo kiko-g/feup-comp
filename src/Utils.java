@@ -41,6 +41,7 @@ public class Utils {
         FileWriter writer = new FileWriter(String.valueOf(jsonFile));
         writer.write(content);
         writer.close();
+        System.out.println("Saved file " + fileName + " in " + folder + "!");
     }
 
     public static void printReports(List<Report> reports) {

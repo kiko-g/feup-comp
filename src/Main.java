@@ -30,6 +30,7 @@ public class Main {
 //			ollirResult = new OptimizationStage().toOllir(semanticsResult);
 //			jasminResult = BackendStage.run(ollirResult);
 //			jasminResult.run();
+//			jasminResult,compule();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException e) {

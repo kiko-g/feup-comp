@@ -3,9 +3,9 @@ myClass {
 		invokespecial(this, "<init>").V;
 	}
 	
-	.method public sum(A.array.i32, B.array.i32).V {
+	.method public sum(A.array.i32, B.array.i32).array.i32 {
 		t1.i32 :=.i32 arraylength($1.A.array.i32).i32;
-		//C.array.i32 :=.array.i32 new(array, t1.i32).array.i32;
+		C.array.i32 :=.array.i32 new(array, t1.i32).array.i32;
 		//i.i32 :=.i32 0.i32;
 		
 		//Loop:
@@ -19,6 +19,6 @@ myClass {
 			//i.i32 :=.i32 i.i32 +.i32 1.i32;
 			//goto Loop;
 		//End:
-			//ret.array.i32 C.array.i32;
+			ret.array.i32 C.array.i32;
 	}
 }

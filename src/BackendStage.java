@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,10 +31,9 @@ public class BackendStage implements JasminBackend {
 
     private int opLabel = 0;
 
-    public static JasminResult run(OllirResult ollirResult) {
+    public static JasminResult run(OllirResult ollirResult) throws IOException {
         // Checks input
         TestUtils.noErrors(ollirResult.getReports());
-
         return new BackendStage().toJasmin(ollirResult);
     }
 
@@ -53,6 +53,8 @@ public class BackendStage implements JasminBackend {
 
             jasminCode.append(this.generateClassDecl(ollirClass));
             jasminCode.append(this.generateClassMethods(ollirClass));
+
+            Utils.saveFile(this.className + ".j", "jasmin", jasminCode.toString());
 
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
 
@@ -119,7 +121,7 @@ public class BackendStage implements JasminBackend {
                     .append("\t\t.limit stack 99\n")
                     .append("\t\t.limit locals 99\n")
                     .append(this.generateClassMethodBody(method.getInstructions()))
-                    .append("\n\t\treturn\n");
+                    .append("\t\treturn\n");
             }
 
             else {
@@ -237,7 +239,7 @@ public class BackendStage implements JasminBackend {
             case THIS -> "astore_0" + "\n";
             case ARRAYREF, CLASS, OBJECTREF -> "astore_" + descriptor.getVirtualReg() + "\n";
             default -> "";
-        } + "\n";
+        };
     }
 
     private String generateBinaryOp(BinaryOpInstruction instr) {
@@ -324,16 +326,16 @@ public class BackendStage implements JasminBackend {
                 StringBuilder builder = new StringBuilder();
 
                 if(first.getType().getTypeOfElement() == ElementType.OBJECTREF) {
-                    builder.append("\t\tnew ")
+                    return builder.append("\t\tnew ")
                         .append(((Operand)first).getName())
-                        .append("\n\t\tdup\n");
+                        .append("\n\t\tdup\n")
+                        .toString();
                 } else if(first.getType().getTypeOfElement() == ElementType.ARRAYREF) {
                     if(operands.size() > 0) {
                         Element elem = operands.get(0);
 
                         return builder.append(generateLoad(elem))
-                            .append("\n")
-                            .append("\n\t\tnewarray int\n")
+                            .append("\t\tnewarray int\n")
                             .toString();
                     }
                 }
@@ -342,45 +344,21 @@ public class BackendStage implements JasminBackend {
             }
 
             case arraylength -> {
-                return "arraylength";
+                return this.generateLoad(first) + "\t\tarraylength\n";
             }
 
-            case invokespecial -> {
+            // TODO: fix invokestatic, virtual, special
+            case invokevirtual -> {
                 StringBuilder builder = new StringBuilder();
-
                 builder.append(this.generateLoad(first))
-                    .append(invocationType.toString())
-                    .append(" ");
-
-                if(first.getType().getTypeOfElement() == ElementType.THIS) {
-                    builder.append(this.className).append("/");
-                }
-
-                builder.append("<init>(");
-
-                for(Element param: instr.getListOfOperands()) {
-                    builder.append(BackendStage.generateType(param.getType()));
-                }
-
-                builder.append(")")
-                    .append(BackendStage.generateType(instr.getReturnType()));
-
-                return builder.toString();
-            }
-
-            case invokevirtual,
-                invokestatic -> {
-                StringBuilder builder = new StringBuilder();
-
-                builder.append(invocationType.toString())
-                    .append(" ");
+                        .append("\t\t")
+                        .append(invocationType.toString())
+                        .append(" ");
 
                 if(first.getType().getTypeOfElement() == ElementType.THIS) {
                     builder.append(this.className);
-                } else if(first.getType().getTypeOfElement() == ElementType.CLASS) {
-                    builder.append(((Operand)first).getName());
                 } else {
-                    return "";
+                    builder.append(((Operand)first).getName());
                 }
 
                 builder.append(".")
@@ -388,11 +366,43 @@ public class BackendStage implements JasminBackend {
                     .append("(");
 
                 for(Element param: instr.getListOfOperands()) {
-                    var a = OllirAccesser.getVarTable(this.currMethod);
                     builder.append(BackendStage.generateType(param.getType()));
                 }
 
-                builder.append(") ")
+                builder.append(")")
+                    .append(BackendStage.generateType(instr.getReturnType()))
+                    .append("\n");
+
+                return builder.toString();
+            }
+
+            case invokespecial,
+                invokestatic -> {
+                StringBuilder builder = new StringBuilder();
+
+                if(first.getType().getTypeOfElement() == ElementType.THIS) {
+                    builder.append(this.generateLoad(first))
+                        .append("\t\t")
+                        .append(invocationType.toString())
+                        .append(" ")
+                        .append(this.className);
+                } else {
+                    builder.append(this.generateLoad(first))
+                        .append("\t\t")
+                        .append(invocationType.toString())
+                        .append(" ")
+                        .append(((Operand)first).getName());
+                }
+
+                builder.append(".")
+                    .append(((LiteralElement)second).getLiteral().replace("\"", ""))
+                    .append("(");
+
+                for(Element param: instr.getListOfOperands()) {
+                    builder.append(BackendStage.generateType(param.getType()));
+                }
+
+                builder.append(")")
                     .append(BackendStage.generateType(instr.getReturnType()))
                     .append("\n");
 
@@ -446,8 +456,9 @@ public class BackendStage implements JasminBackend {
 
         Element elem = instr.getOperand();
         return this.generateLoad(elem) + switch (elem.getType().getTypeOfElement()) {
-            case INT32, BOOLEAN -> "\n\t\tireturn";
-            default -> "\n\t\tareturn";
+            case INT32, BOOLEAN -> "\t\tireturn";
+            case ARRAYREF -> "\t\tareturn";
+            default -> "";
         };
     }
 
