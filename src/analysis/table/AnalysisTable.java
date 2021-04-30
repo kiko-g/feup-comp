@@ -108,7 +108,7 @@ public class AnalysisTable implements SymbolTable {
             }
         }
 
-        return new ArrayList<>();
+        return null;
     }
 
     public boolean addParameter(String methodName, Symbol param) {

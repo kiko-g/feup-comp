@@ -172,7 +172,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Invalid type found. Expected \"<class>\" or \"this\", found \"" + leftType + "\""
+                    "Invalid type found. Expected \"<class>\" or \"this\", found \"" + typeToString(leftType) + "\""
                 )
             );
         }
@@ -184,7 +184,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Invalid type found. Expected \"<any_type>[]\", found \"" + rightType + "\""
+                    "Invalid type found. Expected \"<any_type>[]\", found \"" + typeToString(rightType) + "\""
                 )
             );
         }
@@ -267,7 +267,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                                 Stage.SEMANTIC,
                                 Integer.parseInt(node.get("LINE")),
                                 Integer.parseInt(node.get("COLUMN")),
-                                "Invalid type found. Expected \"" + expected + "\", found \"" + given + "\""
+                                "Invalid type found. Expected \"" + typeToString(expected) + "\", found \"" + typeToString(given) + "\""
                             )
                         );
                     }
@@ -280,9 +280,9 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                         Integer.parseInt(node.get("LINE")),
                         Integer.parseInt(node.get("COLUMN")),
                         "Invalid parameters given. Expected " + methodParameters.size() + " parameters: \""
-                            + methodParameters.stream().map(symbol -> symbol.getType().toString()).collect(Collectors.joining(", "))
+                            + methodParameters.stream().map(symbol -> this.typeToString(symbol.getType())).collect(Collectors.joining(", "))
                             + "\"; found " + givenParameters.size() + " parameters: \""
-                            + givenParameters.stream().map(Type::toString).collect(Collectors.joining(", ")) + "\""
+                            + givenParameters.stream().map(this::typeToString).collect(Collectors.joining(", ")) + "\""
                     )
                 );
             }
@@ -311,7 +311,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Invalid type found. Expected \"<type>[]\", found \"" + leftType + "\""
+                    "Invalid type found. Expected \"<type>[]\", found \"" + typeToString(leftType) + "\""
                 )
             );
         }
@@ -323,7 +323,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Invalid type found. Expected \"" + INT + "\", found \"" + rightType + "\""
+                    "Invalid type found. Expected \"" + typeToString(INT) + "\", found \"" + typeToString(rightType) + "\""
                 )
             );
         }
@@ -430,7 +430,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
                     "Invalid type found on " + (wrongType == rightType ? "right" : "left")
-                        + " side operand. Expected \"" + typeNScope.expected + "\", found \"" + wrongType + "\""
+                        + " side operand. Expected \"" + typeToString(typeNScope.expected) + "\", found \"" + typeToString(wrongType) + "\""
                 )
             );
         }
@@ -446,7 +446,7 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
                     Stage.SEMANTIC,
                     Integer.parseInt(node.get("LINE")),
                     Integer.parseInt(node.get("COLUMN")),
-                    "Invalid type found. Expected \"" + typeNScope.expected + "\", found \"" + childType + "\""
+                    "Invalid type found. Expected \"" + typeToString(typeNScope.expected) + "\", found \"" + typeToString(childType) + "\""
                 )
             );
         }
@@ -486,6 +486,10 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         }
 
         return type;
+    }
+
+    private String typeToString(Type type) {
+        return type.getName() + (type.isArray() ? "[]" : "");
     }
 
     public List<Report> getReports() {
