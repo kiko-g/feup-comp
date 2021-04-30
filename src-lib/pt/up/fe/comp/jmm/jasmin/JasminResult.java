@@ -1,12 +1,14 @@
 package pt.up.fe.comp.jmm.jasmin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import report.Report;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -15,6 +17,7 @@ import pt.up.fe.specs.util.SpecsSystem;
  * A semantic analysis returns the analysed tree and the generated symbol table.
  */
 public class JasminResult {
+
     private final String className;
     private final String jasminCode;
     private final List<Report> reports;
@@ -27,7 +30,7 @@ public class JasminResult {
 
     public JasminResult(OllirResult ollirResult, String jasminCode, List<Report> reports) {
         this(ollirResult.getOllirClass().getClassName(), jasminCode,
-            SpecsCollections.concat(ollirResult.getReports(), reports));
+                SpecsCollections.concat(ollirResult.getReports(), reports));
     }
 
     public String getClassName() {
@@ -70,22 +73,45 @@ public class JasminResult {
      * 
      * @param classpath
      *            additional paths for the classpath
+     * @param args
+     *            arguments for the Jasmin program
      * @return the output that is printed by the Jasmin program
      */
-    public String run(List<String> classpath) {
+    public String run(List<String> args, List<String> classpath) {
+        // Compile
         var classFile = compile();
 
-        StringBuilder classpathArg = new StringBuilder(classFile.getParentFile().getAbsolutePath());
+        var classpathArg = classFile.getParentFile().getAbsolutePath();
         if (!classpath.isEmpty()) {
             var sep = System.getProperty("path.separator");
             for (var classpathElement : classpath) {
-                classpathArg.append(sep).append(classpathElement);
+                classpathArg += sep + classpathElement;
             }
         }
 
         var classname = SpecsIo.removeExtension(classFile.getName());
-        var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg.toString(), classname), true, true);
+
+        var command = new ArrayList<String>();
+        command.add("java");
+        command.add("-cp");
+        command.add(classpathArg);
+        command.add(classname);
+        command.addAll(args);
+
+        var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg, classname), true, true);
+
         return output.getOutput();
+    }
+
+    /**
+     * Compiles and runs the current Jasmin code.
+     * 
+     * @param classpath
+     *            additional paths for the classpath
+     * @return the output that is printed by the Jasmin program
+     */
+    public String run(List<String> args) {
+        return run(args, Arrays.asList(TestUtils.getLibsClasspath()));
     }
 
     /**
@@ -94,6 +120,6 @@ public class JasminResult {
      * @return the output that is printed by the Jasmin program
      */
     public String run() {
-        return run(Arrays.asList(TestUtils.getLibsClasspath()));
+        return run(Collections.emptyList());
     }
 }
