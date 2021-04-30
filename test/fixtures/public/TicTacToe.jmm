@@ -98,14 +98,14 @@ class TicTacToe {
 
   // Returns a character signifying the winner.
   public int winner() {
-    int[] _array;
+    int[] array;
     int winner;
     int i;
     boolean completeArray;
     boolean completeArray1;
     boolean completeArray2;
     winner = 0-1;
-    _array = new int[3];
+    array = new int[3];
     completeArray = BoardBase.sameArray(row0);
     completeArray1 = BoardBase.sameArray(row1);
     completeArray2 = BoardBase.sameArray(row2);
@@ -122,29 +122,29 @@ class TicTacToe {
     else{
         i = 0;
         while(winner < 1 && i < 3){
-            _array[0] = row0[i];
-            _array[1] = row1[i];
-            _array[2] = row2[i];
-            completeArray = BoardBase.sameArray(_array);
-            if (completeArray && 0 < _array[0]){
-                winner = _array[0];
+            array[0] = row0[i];
+            array[1] = row1[i];
+            array[2] = row2[i];
+            completeArray = BoardBase.sameArray(array);
+            if (completeArray && 0 < array[0]){
+                winner = array[0];
             }else{}
             i=i+1;
         }
         if(winner < 1){
-            _array[0] = row0[0];
-            _array[1] = row1[1];
-            _array[2] = row2[2];
-			completeArray = BoardBase.sameArray(_array);
-            if (completeArray && 0 < _array[0]){
-                winner = _array[0];
+            array[0] = row0[0];
+            array[1] = row1[1];
+            array[2] = row2[2];
+			completeArray = BoardBase.sameArray(array);
+            if (completeArray && 0 < array[0]){
+                winner = array[0];
             }else{
-                _array[0] = row0[2];
-                _array[1] = row1[1];
-                _array[2] = row2[0];
-                completeArray = BoardBase.sameArray(_array);
-                if (completeArray && 0 < _array[0]){
-                    winner = _array[0];
+                array[0] = row0[2];
+                array[1] = row1[1];
+                array[2] = row2[0];
+                completeArray = BoardBase.sameArray(array);
+                if (completeArray && 0 < array[0]){
+                    winner = array[0];
                 }else{}
             }
         }else{}

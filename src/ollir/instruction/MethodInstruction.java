@@ -31,6 +31,7 @@ public class MethodInstruction implements JmmInstruction {
             params.stream().map(symbol -> symbol.getName() + "." + OllirUtils.typeToOllir(symbol.getType())).collect(Collectors.joining(", ")) + ")." +
             OllirUtils.typeToOllir(returnType) + " {\n" +
             instructions.stream().map(inst -> inst.toString(backspace + "\t")).collect(Collectors.joining()) +
+            (returnType == null ? backspace + "\tret.V;\n" : "") +
             backspace + "}\n";
     }
 }

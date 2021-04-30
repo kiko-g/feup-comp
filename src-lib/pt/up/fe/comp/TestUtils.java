@@ -1,21 +1,21 @@
 package pt.up.fe.comp;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Properties;
-
-import pt.up.fe.comp.jmm.parser.JmmParser;
-import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import report.Report;
+import pt.up.fe.comp.jmm.parser.JmmParser;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
+import report.Report;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Properties;
 
 public class TestUtils {
 
@@ -105,6 +105,7 @@ public class TestUtils {
             return ollirResult;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not generate OLLIR code", e);
         }
     }
