@@ -45,7 +45,7 @@ public class DotStaticMethodInstruction extends BinaryOperationInstruction {
 
     @Override
     public String toString() {
-        return hasVariable ? super.toString() : "invokevirtual(" + importClass + ", \"" + methodName + "\"" +
+        return hasVariable ? super.toString() : "invokestatic(" + importClass + ", \"" + methodName + "\"" +
             (params.size() > 0 ? ", " : "") +
             params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")." +
             OllirUtils.typeToOllir(operation.getResultType());

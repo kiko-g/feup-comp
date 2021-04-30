@@ -8,4 +8,8 @@ public abstract class ComplexInstruction implements JmmInstruction {
     public static int getStackCounter() {
         return stackCounter;
     }
+
+    public static void setStackCounter(int stackCounter) {
+        ComplexInstruction.stackCounter = stackCounter;
+    }
 }

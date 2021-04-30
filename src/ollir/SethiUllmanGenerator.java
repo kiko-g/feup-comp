@@ -33,7 +33,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
         addVisit("Mul",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.MUL, new Type("int", false))));
         addVisit("Div",         (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.DIV, new Type("int", false))));
         addVisit("LogicalAnd",  (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.AND, new Type("bool", false))));
-        addVisit("Less",        (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.LESS_THAN, new Type("int", false))));
+        addVisit("Less",        (node, sns) -> this.generateTwoChildren(node, sns, new Operation(OperationType.LESS_THAN, new Type("bool", false))));
         addVisit("Assign",      this::visitAssign);
         addVisit("ArrayAccess", this::visitArrayAccess);
         addVisit("Object",      this::visitObject);
@@ -202,7 +202,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
     private List<JmmInstruction> visitIntegerVal(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        instructions.add(new TerminalInstruction(new Symbol(new Type("int", false), node.get("VALUE"))));
+        instructions.add(new ConstantInstruction(new Symbol(new Type("int", false), node.get("VALUE"))));
 
         return instructions;
     }
@@ -226,6 +226,21 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
         JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1));
         JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+
+        if (rightVar instanceof ConstantInstruction) {
+            ConstantInstruction rightConstant = (ConstantInstruction) rightVar;
+
+            Symbol constantSymbol = rightConstant.getTerminal();
+            constantSymbol = new Symbol(constantSymbol.getType(), "t" + ComplexInstruction.getStackCounter());
+
+            ComplexInstruction.setStackCounter(ComplexInstruction.getStackCounter() + 1);
+
+            JmmInstruction constantAssign = new BinaryOperationInstruction(new TerminalInstruction(constantSymbol), rightConstant, new Operation(OperationType.EQUALS, constantSymbol.getType()));
+
+            instructionsRight.add(constantAssign);
+
+            rightVar = constantAssign.getVariable();
+        }
 
         List<JmmInstruction> instructions = new ArrayList<>(instructionsLeft);
         instructions.addAll(instructionsRight);
@@ -252,7 +267,11 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
             return instructions;
         }
 
-        leftVar = getTerminalInstruction(instructionsLeft, leftVar);
+        if (leftVar instanceof ArrayAccessInstruction) {
+            instructionsLeft.remove(leftVar);
+        } else {
+            leftVar = getTerminalInstruction(instructionsLeft, leftVar);
+        }
 
         instructions.addAll(instructionsLeft);
         instructions.addAll(instructionsRight);
@@ -370,7 +389,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
     }
 
     private JmmInstruction getTerminalInstruction(List<JmmInstruction> instructions, JmmInstruction var) {
-        if (var instanceof TerminalInstruction || var instanceof ArrayAccessInstruction) {
+        if (var instanceof TerminalInstruction) {
             instructions.remove(var);
             return var;
         }

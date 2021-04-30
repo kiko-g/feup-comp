@@ -24,10 +24,10 @@ public class WhileInstruction implements JmmInstruction {
 
     @Override
     public String toString(String backspace) {
-        return backspace + "While" + this.loopNum + ":" +
+        return backspace + "While" + this.loopNum + ":\n" +
             condition.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
             backspace + "\tif (" + conditionInstruction + ") goto Loop" + this.loopNum + ";\n" +
-            backspace + "\tgoto EndWhile" + this.loopNum + ":\n" +
+            backspace + "\tgoto EndWhile" + this.loopNum + ";\n" +
             backspace + "Loop" + this.loopNum + ":\n" +
             whileBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
             backspace + "\tgoto While" + this.loopNum + ";\n" +

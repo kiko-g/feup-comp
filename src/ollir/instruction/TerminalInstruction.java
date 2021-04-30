@@ -4,7 +4,7 @@ import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 
 public class TerminalInstruction implements JmmInstruction {
-    private final Symbol terminal;
+    protected final Symbol terminal;
 
     public TerminalInstruction(Symbol terminal) {
         this.terminal = terminal;
