@@ -79,39 +79,6 @@ public class SemanticTest {
     }
 
     /**
-     * Public Tests - Syntactic: Fail
-     */
-    @Test
-    public void testBlowUp() {
-        test(Path.of("test/fixtures/public/fail/syntactical/BlowUp.jmm"), true);
-    }
-
-    @Test
-    public void testCompleteWhileTest() {
-        test(Path.of("test/fixtures/public/fail/syntactical/CompleteWhileTest.jmm"), true);
-    }
-
-    @Test
-    public void testLengthError() {
-        test(Path.of("test/fixtures/public/fail/syntactical/LengthError.jmm"), true);
-    }
-
-    @Test
-    public void testMissingRightPar() {
-        test(Path.of("test/fixtures/public/fail/syntactical/MissingRightPar.jmm"), true);
-    }
-
-    @Test
-    public void testMultipleSequential() {
-        test(Path.of("test/fixtures/public/fail/syntactical/MultipleSequential.jmm"), true);
-    }
-
-    @Test
-    public void testNestedLoop() {
-        test(Path.of("test/fixtures/public/fail/syntactical/NestedLoop.jmm"), true);
-    }
-
-    /**
      * Public Tests - Semantic: Fail
      */
     @Test
@@ -180,11 +147,6 @@ public class SemanticTest {
     @Test
     public void testArrayAssign() {
         test(Path.of("test/fixtures/private/ArrayAssign.jmm"), false);
-    }
-
-    @Test
-    public void testArrayAssignFail() {
-        test(Path.of("test/fixtures/private/fail/ArrayAssignFail.jmm"), true);
     }
 
     @Test

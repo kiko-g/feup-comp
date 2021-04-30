@@ -71,6 +71,9 @@ public class ParserTest {
         test(Path.of("test/fixtures/public/WhileAndIF.jmm"), false);
     }
 
+    /**
+     * Public Tests - Syntactic: Fail
+     */
     @Test
     public void testBlowUp() {
         test(Path.of("test/fixtures/public/fail/syntactical/BlowUp.jmm"), true);
