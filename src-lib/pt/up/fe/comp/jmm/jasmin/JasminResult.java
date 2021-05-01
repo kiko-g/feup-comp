@@ -71,10 +71,11 @@ public class JasminResult {
     /**
      * Compiles and runs the current Jasmin code.
      * 
-     * @param classpath
-     *            additional paths for the classpath
      * @param args
      *            arguments for the Jasmin program
+     * @param classpath
+     *            additional paths for the classpath
+     * 
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> args, List<String> classpath) {
@@ -98,7 +99,7 @@ public class JasminResult {
         command.add(classname);
         command.addAll(args);
 
-        var output = SpecsSystem.runProcess(Arrays.asList("java", "-cp", classpathArg, classname), true, true);
+        var output = SpecsSystem.runProcess(command, true, true);
 
         return output.getOutput();
     }
@@ -106,8 +107,8 @@ public class JasminResult {
     /**
      * Compiles and runs the current Jasmin code.
      * 
-     * @param classpath
-     *            additional paths for the classpath
+     * @param args
+     *            arguments for the Jasmin program
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> args) {
