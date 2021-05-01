@@ -21,21 +21,12 @@ myClass {
 
 	.method public m1().V {
 		putfield(this, a.i32, 2.i32).V;  // this.a = 2;
-
-		//t2.String :=.String ldc("val = ").String;
 		t1.i32 :=.i32 invokevirtual(this,"get").i32;
-		//invokestatic(io, "println", t2.String, t1.i32).V;  //io.println("val = ", this.get());
-
 		c1.myClass :=.myClass new(myClass,3.i32).myClass;
 		invokespecial(c1.myClass,"<init>").V;  // myClass c1 = new myClass(3);
-
 		t3.i32 :=.i32 invokevirtual(c1.myClass, "get").i32;
-		//invokestatic(io, "println", t2.String, t3.i32).V; // io.println("val = ", c1.get());
-
 		invokevirtual(c1.myClass, "put", 2.i32).V;  // c1.put(2);
-
 		t4.i32 :=.i32 invokevirtual(c1.myClass, "get").i32;
-		//invokestatic(io, "println", t2.String, t4.i32).V; //io.println("val = ", c1.get());
 	}
 
 	.method public static main(args.array.String).V {

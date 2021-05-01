@@ -79,7 +79,7 @@ public class BackendStage implements JasminBackend {
         // Class: Extends
         classCode.append(".super ")
             .append(this.generateSuper())
-            .append("\n\n");
+            .append("\n");
 
         // Class: Fields
         classCode.append(this.generateClassFields(ollirClass));
