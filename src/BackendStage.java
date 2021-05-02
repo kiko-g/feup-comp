@@ -123,8 +123,7 @@ public class BackendStage implements JasminBackend {
             }
 
             else {
-                classMethodsCode.append(String.format("\t.method public %s(", method.isConstructMethod() ?
-                    this.className : method.getMethodName()));
+                classMethodsCode.append(String.format("\t.method public %s(", method.getMethodName()));
 
                 for(Element param:  method.getParams()) {
                     classMethodsCode.append(BackendStage.generateType(param.getType()));
@@ -216,7 +215,6 @@ public class BackendStage implements JasminBackend {
         return this.currMethod.getVarTable().get(((Operand) elem).getName());
     }
 
-    // TODO: if we uncommented lines int will be converted to boolean (see Simple.class)
     private String generateLoad(Element elem) {
         if(elem.isLiteral()) {
             String literal = ((LiteralElement) elem).getLiteral();
@@ -366,36 +364,7 @@ public class BackendStage implements JasminBackend {
                 return this.generateLoad(first) + "\t\tarraylength\n";
             }
 
-            // TODO: fix invokestatic, virtual, special
-            case invokevirtual -> {
-                StringBuilder builder = new StringBuilder();
-                builder.append(this.generateLoad(first))
-                        .append("\t\t")
-                        .append(invocationType.toString())
-                        .append(" ");
-
-                if(first.getType().getTypeOfElement() == ElementType.THIS) {
-                    builder.append(this.className);
-                } else {
-                    builder.append(((Operand)first).getName());
-                }
-
-                builder.append(".")
-                    .append(((LiteralElement)second).getLiteral().replace("\"", ""))
-                    .append("(");
-
-                for(Element param: instr.getListOfOperands()) {
-                    builder.append(BackendStage.generateType(param.getType()));
-                }
-
-                builder.append(")")
-                    .append(BackendStage.generateType(instr.getReturnType()))
-                    .append("\n");
-
-                return builder.toString();
-            }
-
-            case invokespecial,
+            case invokevirtual, invokespecial,
                 invokestatic -> {
                 StringBuilder builder = new StringBuilder();
 

@@ -1,5 +1,5 @@
 myClass2 {
-	.construct myClass().V {
+	.construct myClass2().V {
 		invokespecial(this, "<init>").V;
 	}
 	

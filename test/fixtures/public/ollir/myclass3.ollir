@@ -1,12 +1,12 @@
 myClass3 {
 	.field private a.i32;
 
-	.construct myClass(n.i32).V {
+	.construct myClass3(n.i32).V {
 		invokespecial(this, "<init>").V;
 		putfield(this, a.i32, $1.n.i32).V;
 	}
 
-	.construct myClass().V {
+	.construct myClass3().V {
 		invokespecial(this, "<init>").V;
 	}
 
