@@ -1,4 +1,4 @@
-.class public myClass4
+.class public myClass
 .super java/lang/Object
 
 	.method public <init>()V
@@ -11,7 +11,8 @@
 		.limit stack 99
 		.limit locals 99
 		aload_0
-		invokespecial myClass4.<init>()V
+		invokespecial myClass.<init>()V
+
 		return
 	.end method
 
@@ -23,14 +24,15 @@
 		iconst_0
 		istore 5
 		iload 4
-		iload_2
-		if_icmplt LABEL_0
-		iconst_0
-		goto LABEL_1
-	LABEL_0:
-		iconst_1
-	LABEL_1:
 		istore 6
+		aload_1
+		istore 7
+		iload 7
+		istore 8
+		iload 4
+		istore 4
+		iconst_1
+		istore 5
 		iload 5
 		ireturn
 	.end method

@@ -1,13 +1,12 @@
+import org.specs.comp.ollir.*;
+import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import org.specs.comp.ollir.*;
-import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.report.ReportType;
-import report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
+import report.Report;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -272,20 +271,19 @@ public class BackendStage implements JasminBackend {
 
             case LTH, LTHI32 -> {
                 StringBuilder builder = new StringBuilder();
-                String labelTrue = "LABEL " + this.opLabel++;
+                String labelTrue = "LABEL_" + this.opLabel++;
+                String labelContinue = "LABEL_" + this.opLabel++;
 
                 return this.generateLoad(leftElem) +
                     this.generateLoad(rightElem) +
                     builder.append("\t\tif_icmplt ")
                         .append(labelTrue)
                         .append("\n\t\ticonst_0\n")
-                        .append("\t\tgoto ").append(labelTrue)
-                        //.append("\n\t\t\ticonst_0\n")
-                        //.append("\t\t\tgoto ").append(labelContinue).append("\n\t\t\t")
-                        //.append(labelTrue)
-                        //.append(":\n\t\t\ticonst_1\n")
-                        //.append(labelContinue).append(":\n")
-                        .toString();
+                        .append("\t\tgoto ")
+                        .append(labelContinue).append("\n\t")
+                        .append(labelTrue).append(":\n")
+                        .append("\t\ticonst_1\n\t")
+                        .append(labelContinue).append(":\n");
             }
 
             case ADD, ADDI32 -> {
