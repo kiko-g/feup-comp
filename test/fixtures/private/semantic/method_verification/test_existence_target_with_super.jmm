@@ -1,4 +1,4 @@
-class Fac extends Fac2{
+class Fac3 extends Fac2{
 
     public static void main(String[]args){
         int var1;

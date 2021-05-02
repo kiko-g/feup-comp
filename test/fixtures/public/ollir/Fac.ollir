@@ -5,6 +5,8 @@ Fac {
 	
 	.method public compFac(num.i32).i32 {
 		if ($1.num.i32 <.i32 1.i32) goto else;
+		if ($1.num.i32 &&.boolean 1.i32) goto else;
+		if ($1.num.i32 &&.boolean 1.i32) goto else;
 			num_aux.i32 :=.i32 1.i32;
 			goto endif;
 		else:

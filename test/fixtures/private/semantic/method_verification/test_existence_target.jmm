@@ -1,4 +1,4 @@
-class Fac {
+class Fac2 {
     public int getInt(){
         return 1;
     }

@@ -28,7 +28,6 @@ public class BackendStage implements JasminBackend {
     private String extendsDef = null;
     private Method currMethod;
     private List<Report> reports = new ArrayList<>();
-
     private int opLabel = 0;
 
     public static JasminResult run(OllirResult ollirResult) {
@@ -124,7 +123,8 @@ public class BackendStage implements JasminBackend {
             }
 
             else {
-                classMethodsCode.append(String.format("\t.method public %s(", method.getMethodName()));
+                classMethodsCode.append(String.format("\t.method public %s(", method.isConstructMethod() ?
+                    this.className : method.getMethodName()));
 
                 for(Element param:  method.getParams()) {
                     classMethodsCode.append(BackendStage.generateType(param.getType()));
@@ -170,7 +170,6 @@ public class BackendStage implements JasminBackend {
             case NOPER -> this.generateLoad(((SingleOpInstruction) instr).getSingleOperand());
             case ASSIGN -> this.generateAssign((AssignInstruction) instr);
             case BINARYOPER -> this.generateBinaryOp((BinaryOpInstruction) instr);
-            case UNARYOPER -> this.generateUnaryOp((UnaryOpInstruction) instr);
             case CALL -> this.generateCallOp((CallInstruction) instr);
             case GETFIELD -> this.generateGetFieldOp((GetFieldInstruction) instr);
             case PUTFIELD -> this.generatePutFieldOp((PutFieldInstruction) instr);
@@ -201,22 +200,22 @@ public class BackendStage implements JasminBackend {
         }
 
         if(elem.getType().getTypeOfElement() == ElementType.THIS) {
-            return OllirAccesser.getVarTable(this.currMethod).get("this");
+            return this.currMethod.getVarTable().get("this");
         }
-
-        return OllirAccesser.getVarTable(this.currMethod).get(((Operand) elem).getName());
+        return this.currMethod.getVarTable().get(((Operand) elem).getName());
     }
 
+    // TODO: if we uncommented lines int will be converted to boolean (see Simple.class)
     private String generateLoad(Element elem) {
         if(elem.isLiteral()) {
             String literal = ((LiteralElement) elem).getLiteral();
 
             try {
                 int value = Integer.parseInt(literal);
-                if(value == -1) return "\t\ticonst_m1\n";
-                if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
-                if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
-                if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
+                //if(value == -1) return "\t\ticonst_m1\n";
+                //if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
+                //if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
+                //if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
                 return "\t\tldc " + value + "\n";
             } catch (NumberFormatException ignored) {
                 this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
@@ -324,35 +323,11 @@ public class BackendStage implements JasminBackend {
         return left;
     }
 
-    private String generateUnaryOp(UnaryOpInstruction instr) { ;
-        OperationType op = instr.getUnaryOperation().getOpType();
-
-        if (op == OperationType.NOTB) {
-            StringBuilder builder = new StringBuilder();
-            String labelTrue = "\t\tLABEL " + this.opLabel++;
-            String labelContinue = "\t\tLABEL " + this.opLabel++;
-
-            return builder.append("\t\t\tifeq ")
-                .append(labelTrue)
-                .append("\n")
-                .append("\t\t\ticonst_0\n")
-                .append("\t\t\tgoto ").append(labelContinue)
-                .append("\n\t\t\t")
-                .append(labelTrue)
-                .append(":\n\t\ticonst_1\n")
-                .append(labelContinue)
-                .append(":\n")
-                .toString();
-        }
-
-        return "";
-    }
-
     private String generateCallOp(CallInstruction instr) {
         Element first = instr.getFirstArg();
         Element second = instr.getSecondArg();
         List<Element> operands = instr.getListOfOperands();
-        CallType invocationType = OllirAccesser.getCallInvocation(instr);
+        CallType invocationType = instr.getInvocationType();
 
         switch (invocationType) {
             case ldc -> { return ""; }

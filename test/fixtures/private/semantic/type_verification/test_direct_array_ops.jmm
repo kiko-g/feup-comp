@@ -1,4 +1,4 @@
-class Fac {
+class Fac10 {
     public static void main(String[]args){
         int[] int1;
         int[] int2;

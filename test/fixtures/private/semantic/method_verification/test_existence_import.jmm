@@ -1,6 +1,6 @@
 import Class.Fac2;
 
-class Fac {
+class Fac1 {
 
     public static void main(String[]args){
         int var;

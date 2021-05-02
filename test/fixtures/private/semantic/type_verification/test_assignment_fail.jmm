@@ -1,4 +1,4 @@
-class Fac {
+class Fac8 {
     public int[] returnInt(){
         return 1;
     }

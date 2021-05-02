@@ -1,6 +1,6 @@
 import Class.Fac2;
 
-class Fac {
+class Fac9 {
     public int returnInt(){
         return 1;
     }

@@ -294,6 +294,16 @@ public class JMMTest {
      * Private Tests - Ollir code
      */
     @Test
+    public void testEx1() {
+        testJasmin(Path.of("fixtures/public/ollir/Ex1.ollir"), false);
+    }
+
+    @Test
+    public void testEx2() {
+        testJasmin(Path.of("fixtures/public/ollir/Ex2.ollir"), false);
+    }
+
+    @Test
     public void testFac() {
         testJasmin(Path.of("fixtures/public/ollir/Fac.ollir"), false);
     }

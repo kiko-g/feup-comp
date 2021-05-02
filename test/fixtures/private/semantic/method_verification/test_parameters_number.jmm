@@ -1,4 +1,4 @@
-class Fac {
+class Fac5 {
     public int[] returnArray(int var1, boolean var2){
         return new int[3];
     }
