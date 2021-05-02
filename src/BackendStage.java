@@ -187,7 +187,9 @@ public class BackendStage implements JasminBackend {
 
         String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
         return operatorsLoads + switch(operation.getOpType()) {
+            case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
             case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
+            case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
             default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
         };
     }
@@ -265,7 +267,24 @@ public class BackendStage implements JasminBackend {
         OperationType op = instr.getUnaryOperation().getOpType();
 
         switch (op) {
-            case AND, ANDI32 -> {
+            case NOT, NOTB -> {
+                StringBuilder builder = new StringBuilder();
+                String labelTrue = "LABEL_" + this.opLabel++;
+                String labelContinue = "LABEL_" + this.opLabel++;
+
+                return this.generateLoad(leftElem) +
+                    this.generateLoad(rightElem) +
+                    builder.append("\t\tif_icmpne ")
+                        .append(labelTrue)
+                        .append("\n\t\ticonst_0\n")
+                        .append("\t\tgoto ")
+                        .append(labelContinue).append("\n\t")
+                        .append(labelTrue).append(":\n")
+                        .append("\t\ticonst_1\n\t")
+                        .append(labelContinue).append(":\n");
+            }
+
+            case ANDB, ANDI32 -> {
                 return left + right + "\n\t\tiand\n";
             }
 
