@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JASMIN Instructions
@@ -31,7 +32,7 @@ public class BackendStage implements JasminBackend {
 
     private int opLabel = 0;
 
-    public static JasminResult run(OllirResult ollirResult) throws IOException {
+    public static JasminResult run(OllirResult ollirResult) {
         // Checks input
         TestUtils.noErrors(ollirResult.getReports());
         return new BackendStage().toJasmin(ollirResult);
@@ -57,7 +58,6 @@ public class BackendStage implements JasminBackend {
             Utils.saveFile(this.className + ".j", "jasmin", jasminCode.toString());
 
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
-
         } catch (Exception e) {
             return new JasminResult(ollirClass.getClassName(), null,
                 Arrays.asList(Report.newError(Stage.GENERATION, "Exception during Jasmin generation", e)));
@@ -135,12 +135,13 @@ public class BackendStage implements JasminBackend {
                     .append(BackendStage.generateType(method.getReturnType()))
                     .append("\n\t\t.limit stack 99\n")
                     .append("\t\t.limit locals 99\n")
-                    .append(this.generateClassMethodBody(method.getInstructions()))
-                    .append("\n");
+                    .append(this.generateClassMethodBody(method.getInstructions()));
 
                 if(method.getReturnType().getTypeOfElement() == ElementType.VOID) {
-                    classMethodsCode.append("\t\treturn\n");
+                    classMethodsCode.append("\t\treturn");
                 }
+
+                classMethodsCode.append("\n");
             }
 
             classMethodsCode.append("\t.end method\n\n");
@@ -153,6 +154,12 @@ public class BackendStage implements JasminBackend {
         StringBuilder methodInstCode = new StringBuilder();
 
         for(Instruction instr: instructions) {
+            for(Map.Entry<String, Instruction> entry: this.currMethod.getLabels().entrySet()) {
+                if(entry.getValue().getId() == instr.getId()) {
+                    methodInstCode.append("\t" + entry.getKey() + ":\n");
+                }
+            }
+
             methodInstCode.append(this.generateOperation(instr));
         }
 
@@ -176,11 +183,14 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateBranch(CondBranchInstruction instr) {
-        Element left = instr.getLeftOperand();
-        Element right = instr.getRightOperand();
         String label = instr.getLabel();
         Operation operation = instr.getCondOperation();
-        return "";
+
+        String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+        return operatorsLoads + switch(operation.getOpType()) {
+            case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
+            default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
+        };
     }
 
     private Descriptor getDescriptor(Element elem) {
@@ -256,11 +266,11 @@ public class BackendStage implements JasminBackend {
         OperationType op = instr.getUnaryOperation().getOpType();
 
         switch (op) {
-            case ANDI32 -> {
+            case AND, ANDI32 -> {
                 return left + right + "\n\t\tiand\n";
             }
 
-            case LTHI32 -> {
+            case LTH, LTHI32 -> {
                 StringBuilder builder = new StringBuilder();
                 String labelTrue = "\t\tLABEL " + this.opLabel++;
                 String labelContinue = "\t\tLABEL " + this.opLabel++;
@@ -275,20 +285,20 @@ public class BackendStage implements JasminBackend {
                     .toString();
             }
 
-            case ADDI32 -> {
-                return left + right + "iadd\n";
+            case ADD, ADDI32 -> {
+                return left + right + "\t\tiadd\n";
             }
 
-            case SUBI32 -> {
-                return left + right + "isub\n";
+            case SUB, SUBI32 -> {
+                return left + right + "\t\tisub\n";
             }
 
-            case MULI32 -> {
-                return left + right + "imul\n";
+            case MUL, MULI32 -> {
+                return left + right + "\t\timul\n";
             }
 
-            case DIVI32 -> {
-                return left + right + "idiv\n";
+            case DIV, DIVI32 -> {
+                return left + right + "\t\tidiv\n";
             }
         }
         return left;
@@ -472,6 +482,7 @@ public class BackendStage implements JasminBackend {
             case INT32 -> "I";
             case BOOLEAN -> "Z";
             case VOID -> "V";
+            case CLASS -> "L";
             default -> throw new IllegalStateException("Unexpected value: " + type.getTypeOfElement());
         };
     }

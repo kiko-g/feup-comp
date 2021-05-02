@@ -1,0 +1,225 @@
+Turing {
+	.field private NTABLE.array.i32;
+	.field private TAPE.array.i32;
+	.field private curState.i32;
+	.field private WTABLE.array.i32;
+	.field private L.i32;
+	.field private H.i32;
+	.field private curPos.i32;
+	.field private R.i32;
+	.field private NUM_SYMBOLS.i32;
+	.field private MTABLE.array.i32;
+	.field private NUM_STATES.i32;
+
+	.construct Turing().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public main(a.array.String).V {
+		t545.Turing :=.Turing new(Turing).Turing;
+		invokespecial(t545.Turing,"<init>").V;
+		t.Turing :=.Turing t545.Turing;
+		invokevirtual(t.Turing, "init_bb_3s2sy").bool;
+		invokevirtual(t.Turing, "run").bool;
+		ret.V;
+	}
+
+	.method public init_bb_3s2sy().bool {
+		t546.array.i32 :=.array.i32 invokevirtual(this, "initGeneric", 3.i32, 2.i32, 18.i32).array.i32;
+		putfield(this, TAPE.array.i32, t546.array.i32).V;
+		t547.i32 :=.i32 getfield(this, R.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 0.i32, 1.i32, t547.i32, 1.i32).bool;
+		t548.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 1.i32, 1.i32, t548.i32, 0.i32).bool;
+		t549.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 2.i32, 1.i32, t549.i32, 1.i32).bool;
+		t550.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 0.i32, 1.i32, t550.i32, 2.i32).bool;
+		t551.i32 :=.i32 getfield(this, R.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 1.i32, 1.i32, t551.i32, 1.i32).bool;
+		t552.i32 :=.i32 getfield(this, R.i32).i32;
+		t553.i32 :=.i32 getfield(this, H.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 2.i32, 1.i32, t552.i32, t553.i32).bool;
+		ret.bool true.bool;
+	}
+
+	.method public init_bb_4s2sy().bool {
+		t554.array.i32 :=.array.i32 invokevirtual(this, "initGeneric", 4.i32, 2.i32, 20.i32).array.i32;
+		putfield(this, TAPE.array.i32, t554.array.i32).V;
+		t555.i32 :=.i32 getfield(this, R.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 0.i32, 1.i32, t555.i32, 1.i32).bool;
+		t556.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 1.i32, 1.i32, t556.i32, 0.i32).bool;
+		t557.i32 :=.i32 getfield(this, R.i32).i32;
+		t558.i32 :=.i32 getfield(this, H.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 2.i32, 1.i32, t557.i32, t558.i32).bool;
+		t559.i32 :=.i32 getfield(this, R.i32).i32;
+		invokevirtual(this, "setTrans", 0.i32, 3.i32, 1.i32, t559.i32, 3.i32).bool;
+		t560.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 0.i32, 1.i32, t560.i32, 1.i32).bool;
+		t561.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 1.i32, 0.i32, t561.i32, 2.i32).bool;
+		t562.i32 :=.i32 getfield(this, L.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 2.i32, 1.i32, t562.i32, 3.i32).bool;
+		t563.i32 :=.i32 getfield(this, R.i32).i32;
+		invokevirtual(this, "setTrans", 1.i32, 3.i32, 0.i32, t563.i32, 0.i32).bool;
+		ret.bool true.bool;
+	}
+
+	.method public run().bool {
+		t.Turing :=.Turing this;
+		halt.bool :=.bool false.bool;
+		While18:
+			if (halt.bool !.bool halt.bool) goto Loop18;
+			goto EndWhile18;
+		Loop18:
+			invokevirtual(this, "printTape").bool;
+			t564.i32 :=.i32 invokestatic(io, "read").i32;
+			dummy.i32 :=.i32 t564.i32;
+			t565.bool :=.bool invokevirtual(t.Turing, "trans").bool;
+			t566.bool :=.bool t565.bool !.bool t565.bool;
+			halt.bool :=.bool t566.bool;
+			goto While18;
+		EndWhile18:
+		invokevirtual(this, "printTape").bool;
+		ret.bool true.bool;
+	}
+
+	.method public printTape().bool {
+		i.i32 :=.i32 0.i32;
+		While19:
+			t567.array.i32 :=.array.i32 getfield(this, TAPE.array.i32).array.i32;
+			t568.i32 :=.i32 arraylength(t567.array.i32).i32;
+			if (i.i32 <.bool t568.i32) goto Loop19;
+			goto EndWhile19;
+		Loop19:
+			t569.i32 :=.i32 getfield(this, curPos.i32).i32;
+			t570.bool :=.bool i.i32 <.bool t569.i32;
+			t573.bool :=.bool t570.bool !.bool t570.bool;
+			t571.i32 :=.i32 getfield(this, curPos.i32).i32;
+			t572.bool :=.bool t571.i32 <.bool i.i32;
+			t574.bool :=.bool t572.bool !.bool t572.bool;
+			t575.bool :=.bool t573.bool &&.bool t574.bool;
+			if (t575.bool !.bool t575.bool) goto True37;
+				t576.i32 :=.i32 getfield(this, curState.i32).i32;
+				t577.i32 :=.i32 t576.i32 +.i32 1.i32;
+				invokestatic(io, "print", t577.i32).V;
+				goto Endif37;
+			True37:
+				invokestatic(io, "print", 0.i32).V;
+			Endif37:
+			t578.i32 :=.i32 i.i32 +.i32 1.i32;
+			i.i32 :=.i32 t578.i32;
+			goto While19;
+		EndWhile19:
+		invokestatic(io, "println").V;
+		i.i32 :=.i32 0.i32;
+		While20:
+			t579.array.i32 :=.array.i32 getfield(this, TAPE.array.i32).array.i32;
+			t580.i32 :=.i32 arraylength(t579.array.i32).i32;
+			if (i.i32 <.bool t580.i32) goto Loop20;
+			goto EndWhile20;
+		Loop20:
+			t581.array.i32 :=.array.i32 getfield(this, TAPE.array.i32).array.i32;
+			t582.i32 :=.i32 t581[i.i32].i32;
+			invokestatic(io, "print", t582.i32).V;
+			t583.i32 :=.i32 i.i32 +.i32 1.i32;
+			i.i32 :=.i32 t583.i32;
+			goto While20;
+		EndWhile20:
+		invokestatic(io, "println").V;
+		invokestatic(io, "println").V;
+		ret.bool true.bool;
+	}
+
+	.method public trans().bool {
+		t584.array.i32 :=.array.i32 getfield(this, TAPE.array.i32).array.i32;
+		t585.i32 :=.i32 getfield(this, curPos.i32).i32;
+		t586.i32 :=.i32 t584[t585.i32].i32;
+		curS.i32 :=.i32 t586.i32;
+		t588.array.i32 :=.array.i32 getfield(this, WTABLE.array.i32).array.i32;
+		t587.i32 :=.i32 getfield(this, curState.i32).i32;
+		t589.i32 :=.i32 invokevirtual(this, "ss2i", curS.i32, t587.i32).i32;
+		t590.i32 :=.i32 t588[t589.i32].i32;
+		write.i32 :=.i32 t590.i32;
+		t592.array.i32 :=.array.i32 getfield(this, MTABLE.array.i32).array.i32;
+		t591.i32 :=.i32 getfield(this, curState.i32).i32;
+		t593.i32 :=.i32 invokevirtual(this, "ss2i", curS.i32, t591.i32).i32;
+		t594.i32 :=.i32 t592[t593.i32].i32;
+		move.i32 :=.i32 t594.i32;
+		t596.array.i32 :=.array.i32 getfield(this, NTABLE.array.i32).array.i32;
+		t595.i32 :=.i32 getfield(this, curState.i32).i32;
+		t597.i32 :=.i32 invokevirtual(this, "ss2i", curS.i32, t595.i32).i32;
+		t598.i32 :=.i32 t596[t597.i32].i32;
+		next.i32 :=.i32 t598.i32;
+		t599.array.i32 :=.array.i32 getfield(this, TAPE.array.i32).array.i32;
+		t600.i32 :=.i32 getfield(this, curPos.i32).i32;
+		t599[t600.i32].i32 :=.i32 write.i32;
+		t601.i32 :=.i32 getfield(this, curPos.i32).i32;
+		t602.i32 :=.i32 t601.i32 +.i32 move.i32;
+		putfield(this, curPos.i32, t602.i32).V;
+		putfield(this, curState.i32, next.i32).V;
+		t603.i32 :=.i32 getfield(this, H.i32).i32;
+		t604.i32 :=.i32 getfield(this, curState.i32).i32;
+		t605.bool :=.bool t603.i32 <.bool t604.i32;
+		t609.bool :=.bool t605.bool !.bool t605.bool;
+		t606.i32 :=.i32 getfield(this, curState.i32).i32;
+		t607.i32 :=.i32 getfield(this, H.i32).i32;
+		t608.bool :=.bool t606.i32 <.bool t607.i32;
+		t610.bool :=.bool t608.bool !.bool t608.bool;
+		if (t609.bool &&.bool t610.bool) goto True38;
+			halt.bool :=.bool true.bool;
+			goto Endif38;
+		True38:
+			halt.bool :=.bool false.bool;
+		Endif38:
+		ret.bool halt.bool;
+	}
+
+	.method public initGeneric(NUM_ST.i32, NUM_SY.i32, TAPE_LENGTH.i32).array.i32 {
+		putfield(this, NUM_SYMBOLS.i32, $0.NUM_SY.i32).V;
+		putfield(this, NUM_STATES.i32, $2.NUM_ST.i32).V;
+		t611.i32 :=.i32 getfield(this, NUM_SYMBOLS.i32).i32;
+		t612.i32 :=.i32 getfield(this, NUM_STATES.i32).i32;
+		t613.i32 :=.i32 t611.i32 *.i32 t612.i32;
+		tlen.i32 :=.i32 t613.i32;
+		t614.i32 :=.i32 0.i32 -.i32 1.i32;
+		putfield(this, H.i32, t614.i32).V;
+		t615.i32 :=.i32 0.i32 -.i32 1.i32;
+		putfield(this, L.i32, t615.i32).V;
+		putfield(this, R.i32, 1.i32).V;
+		t616.array.i32 :=.array.i32 new(array, tlen.i32).array.i32;
+		putfield(this, WTABLE.array.i32, t616.array.i32).V;
+		t617.array.i32 :=.array.i32 new(array, tlen.i32).array.i32;
+		putfield(this, MTABLE.array.i32, t617.array.i32).V;
+		t618.array.i32 :=.array.i32 new(array, tlen.i32).array.i32;
+		putfield(this, NTABLE.array.i32, t618.array.i32).V;
+		t619.array.i32 :=.array.i32 new(array, $1.TAPE_LENGTH.i32).array.i32;
+		TAPE_RET.array.i32 :=.array.i32 t619.array.i32;
+		putfield(this, curState.i32, 0.i32).V;
+		t620.i32 :=.i32 arraylength(TAPE_RET.array.i32).i32;
+		t621.i32 :=.i32 t620.i32 /.i32 2.i32;
+		putfield(this, curPos.i32, t621.i32).V;
+		ret.array.i32 TAPE_RET.array.i32;
+	}
+
+	.method public ss2i(symbol.i32, state.i32).i32 {
+		t622.i32 :=.i32 getfield(this, NUM_STATES.i32).i32;
+		t623.i32 :=.i32 $0.symbol.i32 *.i32 t622.i32;
+		t624.i32 :=.i32 t623.i32 +.i32 $1.state.i32;
+		ret.i32 t624.i32;
+	}
+
+	.method public setTrans(symbol.i32, state.i32, write.i32, move.i32, next.i32).bool {
+		t625.array.i32 :=.array.i32 getfield(this, WTABLE.array.i32).array.i32;
+		t626.i32 :=.i32 invokevirtual(this, "ss2i", $0.symbol.i32, $3.state.i32).i32;
+		t625[t626.i32].i32 :=.i32 $1.write.i32;
+		t627.array.i32 :=.array.i32 getfield(this, MTABLE.array.i32).array.i32;
+		t628.i32 :=.i32 invokevirtual(this, "ss2i", $0.symbol.i32, $3.state.i32).i32;
+		t627[t628.i32].i32 :=.i32 $4.move.i32;
+		t629.array.i32 :=.array.i32 getfield(this, NTABLE.array.i32).array.i32;
+		t630.i32 :=.i32 invokevirtual(this, "ss2i", $0.symbol.i32, $3.state.i32).i32;
+		t629[t630.i32].i32 :=.i32 $2.next.i32;
+		ret.bool true.bool;
+	}
+}

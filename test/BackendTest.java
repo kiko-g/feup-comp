@@ -34,6 +34,26 @@ public class BackendTest {
         //assertEquals("Hello, World!", output.trim());
     }
 
+    public void testAll(Path resource, boolean mustFail) {
+        OllirResult ollirRes = new OllirResult(
+                OllirUtils.parse(SpecsIo.getResource(resource.toString())), new AnalysisTable(), new ArrayList<>()
+        );
+
+        JasminResult result = new BackendStage().toJasmin(ollirRes);
+        result.compile();
+        // JasminResult result = TestUtils.backend(SpecsIo.getResource(resource.toString()));
+
+        if (mustFail) {
+            TestUtils.mustFail(result.getReports());
+        } else {
+            TestUtils.noErrors(result.getReports());
+        }
+
+        //var output = result.run();
+        //System.out.println(output);
+        //assertEquals("Hello, World!", output.trim());
+    }
+
     @Test
     public void testFac() {
         test(Path.of("fixtures/public/ollir/Fac.ollir"), false);

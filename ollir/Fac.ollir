@@ -1,0 +1,14 @@
+Fac {
+
+	.construct Fac().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public main(args.array.String).V {
+		t263.i32 :=.i32 invokestatic(Fac2, "getInt", 1.i32, 2.i32, true.bool).i32;
+		var.i32 :=.i32 t263.i32;
+		t264.Fac :=.Fac invokestatic(Fac2, "getObj").Fac;
+		facTest.Fac :=.Fac t264.Fac;
+		ret.V;
+	}
+}

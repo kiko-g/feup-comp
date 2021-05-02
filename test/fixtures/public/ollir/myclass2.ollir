@@ -1,4 +1,4 @@
-myClass {
+myClass2 {
 	.construct myClass().V {
 		invokespecial(this, "<init>").V;
 	}
@@ -8,17 +8,17 @@ myClass {
 		C.array.i32 :=.array.i32 new(array, t1.i32).array.i32;
 		i.i32 :=.i32 0.i32;
 		
-		//Loop:
+		Loop:
 			t1.i32 :=.i32 arraylength($1.A.array.i32).i32;
-			//if (i.i32 >=.i32 t1.i32) goto End;
+			if (i.i32 <.i32 t1.i32) goto End;
 			
 			t2.i32 :=.i32 $1.A[i.i32].i32;
 			t3.i32 :=.i32 $2.B[i.i32].i32;
 			t4.i32 :=.i32 t2.i32 +.i32 t3.i32;
 			C[i.i32].i32 :=.i32 t4.i32;
 			i.i32 :=.i32 i.i32 +.i32 1.i32;
-			//goto Loop;
-		//End:
+			goto Loop;
+		End:
 			ret.array.i32 C.array.i32;
 	}
 }
