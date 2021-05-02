@@ -15,3 +15,18 @@
 		return
 	.end method
 
+	.method public check([III)Z
+		.limit stack 99
+		.limit locals 99
+		iconst_0
+		istore 4
+		iconst_0
+		istore 5
+		iload 4
+		iload_2
+		if_icmplt
+		iconst_0		istore 6
+		iload 5
+		ireturn
+	.end method
+

@@ -272,17 +272,20 @@ public class BackendStage implements JasminBackend {
 
             case LTH, LTHI32 -> {
                 StringBuilder builder = new StringBuilder();
-                String labelTrue = "\t\tLABEL " + this.opLabel++;
-                String labelContinue = "\t\tLABEL " + this.opLabel++;
+                String labelTrue = "LABEL " + this.opLabel++;
 
-                return builder.append("\t\t\tif_icmplt ")
-                    .append(labelTrue)
-                    .append("\n\t\t\ticonst_0\n")
-                    .append("\t\t\tgoto ").append(labelContinue).append("\n\t\t\t")
-                    .append(labelTrue)
-                    .append(":\n\t\t\ticonst_1\n")
-                    .append(labelContinue).append(":\n")
-                    .toString();
+                return this.generateLoad(leftElem) +
+                    this.generateLoad(rightElem) +
+                    builder.append("\t\tif_icmplt ")
+                        .append(labelTrue)
+                        .append("\n\t\ticonst_0\n")
+                        .append("\t\tgoto ").append(labelTrue)
+                        //.append("\n\t\t\ticonst_0\n")
+                        //.append("\t\t\tgoto ").append(labelContinue).append("\n\t\t\t")
+                        //.append(labelTrue)
+                        //.append(":\n\t\t\ticonst_1\n")
+                        //.append(labelContinue).append(":\n")
+                        .toString();
             }
 
             case ADD, ADDI32 -> {
