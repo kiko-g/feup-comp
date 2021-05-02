@@ -167,20 +167,30 @@ public class BackendStage implements JasminBackend {
 
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
-            case NOPER -> this.generateLoad(((SingleOpInstruction) instr).getSingleOperand());
-            case ASSIGN -> this.generateAssign((AssignInstruction) instr);
+            //case NOPER -> this.generateLoad(((SingleOpInstruction) instr).getSingleOperand());
+            case NOPER -> this.generateSingleOp((SingleOpInstruction) instr);
+            case ASSIGN -> this.generateAssignOp((AssignInstruction) instr);
             case BINARYOPER -> this.generateBinaryOp((BinaryOpInstruction) instr);
             case CALL -> this.generateCallOp((CallInstruction) instr);
             case GETFIELD -> this.generateGetFieldOp((GetFieldInstruction) instr);
             case PUTFIELD -> this.generatePutFieldOp((PutFieldInstruction) instr);
             case GOTO -> this.generateGotoOp((GotoInstruction) instr);
             case RETURN -> this.generateReturnOp((ReturnInstruction) instr);
-            case BRANCH -> this.generateBranch((CondBranchInstruction) instr);
+            case BRANCH -> this.generateBranchOp((CondBranchInstruction) instr);
             default -> "";
         };
     }
 
-    private String generateBranch(CondBranchInstruction instr) {
+    private String generateSingleOp(SingleOpInstruction instr) {
+        if(instr.getSingleOperand() instanceof ArrayOperand) {
+            Element index = ((ArrayOperand)instr.getSingleOperand()).getIndexOperands().get(0);
+            return this.generateLoad(instr.getSingleOperand()) + this.generateLoad(index) + "\t\tiaload\n";
+        }
+
+        return this.generateLoad(instr.getSingleOperand());
+    }
+
+    private String generateBranchOp(CondBranchInstruction instr) {
         String label = instr.getLabel();
         Operation operation = instr.getCondOperation();
 
@@ -188,6 +198,7 @@ public class BackendStage implements JasminBackend {
         return operatorsLoads + switch(operation.getOpType()) {
             case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
             case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
+            case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
             case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
             default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
         };
@@ -212,10 +223,10 @@ public class BackendStage implements JasminBackend {
 
             try {
                 int value = Integer.parseInt(literal);
-                //if(value == -1) return "\t\ticonst_m1\n";
-                //if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
-                //if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
-                //if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
+                if(value == -1) return "\t\ticonst_m1\n";
+                if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
+                if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
+                if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
                 return "\t\tldc " + value + "\n";
             } catch (NumberFormatException ignored) {
                 this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
@@ -242,7 +253,7 @@ public class BackendStage implements JasminBackend {
         }
     }
 
-    private String generateAssign(AssignInstruction instr) {
+    private String generateAssignOp(AssignInstruction instr) {
         Descriptor descriptor = this.getDescriptor(instr.getDest());
         String instruction = this.generateOperation(instr.getRhs());
 
@@ -330,7 +341,6 @@ public class BackendStage implements JasminBackend {
         CallType invocationType = instr.getInvocationType();
 
         switch (invocationType) {
-            case ldc -> { return ""; }
             case NEW -> {
                 StringBuilder builder = new StringBuilder();
 
