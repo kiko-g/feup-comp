@@ -1,6 +1,6 @@
 import io;
 
-class Turing {
+class TuringV2 {
 
     int NUM_SYMBOLS;
     int NUM_STATES;
@@ -20,9 +20,9 @@ class Turing {
     int curPos;
 
     public static void main(String[] a) {
-        Turing t;
+        TuringV2 t;
         
-        t = new Turing();
+        t = new TuringV2();
         t.init_bb_3s2sy();
         t.run();
     }
@@ -64,7 +64,7 @@ class Turing {
     public boolean run() {
         int dummy;
         boolean halt;
-        Turing t;
+        TuringV2 t;
         
         
         t = this;

@@ -49,6 +49,8 @@ public class BinaryOperationInstruction extends ComplexInstruction {
 
     @Override
     public String toString() {
-        return lhs.toString() + " " + operation.toString() + " " + rhs.toString();
+        return (lhs instanceof TerminalInstruction ? ((TerminalInstruction) lhs).toStringType() : lhs.toString()) + " " +
+            operation.toString() + " " +
+            (rhs instanceof TerminalInstruction ? ((TerminalInstruction) rhs).toStringType() : rhs.toString());
     }
 }

@@ -188,7 +188,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
     private List<JmmInstruction> visitThis(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>();
-        instructions.add(new TerminalInstruction(new Symbol(new Type("", false), "this")));
+        instructions.add(new TerminalInstruction(new Symbol(new Type(this.symbolTable.getClassName(), false), "this")));
 
         return instructions;
     }

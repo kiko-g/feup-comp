@@ -27,6 +27,10 @@ public class TerminalInstruction implements JmmInstruction {
     @Override
     public String toString() {
         if(terminal.getName().equals("this")) return "this";
+        return toStringType();
+    }
+
+    public String toStringType() {
         return terminal.getName() + "." + OllirUtils.typeToOllir(terminal.getType());
     }
 }

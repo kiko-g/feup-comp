@@ -310,23 +310,23 @@ void ArrayAccessExpressionOrAssign() #void: {} {
 }
 
 void Operations() #void: {} {
-    RelationalLessOp() (<AND> RelationalLessOp() #LogicalAnd(2))*
+    RelationalLessOp() (<AND> TerminalExp() RelationalLessOp() #LogicalAnd(2))*
 }
 
 void RelationalLessOp() #void: {} {
-    ArithmeticAdditiveOp() (<LESS> ArithmeticAdditiveOp() #Less(2))*
+    ArithmeticAdditiveOp() (<LESS> TerminalExp() ArithmeticAdditiveOp() #Less(2))*
 }
 
 void ArithmeticAdditiveOp() #void: {} {
     ArithmeticMultiplicativeOp()
-        (<PLUS> ArithmeticMultiplicativeOp() #Add(2))*
-        (<MINUS> ArithmeticMultiplicativeOp() #Sub(2))*
+        (<PLUS> TerminalExp() ArithmeticMultiplicativeOp() #Add(2))*
+        (<MINUS> TerminalExp() ArithmeticMultiplicativeOp() #Sub(2))*
 }
 
 void ArithmeticMultiplicativeOp() #void: {} {
     AccessOp()
-    (<MUL> AccessOp() #Mul(2))*
-    (<DIV> AccessOp() #Div(2))*
+    (<MUL>  TerminalExp() AccessOp() #Mul(2))*
+    (<DIV> TerminalExp() AccessOp() #Div(2))*
 }
 
 void AccessOp() #void: {} {
