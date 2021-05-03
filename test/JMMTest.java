@@ -40,8 +40,9 @@ public class JMMTest {
 
             // Backend stage
             JasminResult backendResult = TestUtils.backend(ollirResult);
-            backendResult.compile();
-            checkErrors(ollirResult.getReports(), failStage);
+            checkErrors(backendResult.getReports(), failStage);
+
+            backendResult.run();
         } catch (CorrectStageError ignored) {
         } catch (Exception e) {
             fail(e.getMessage());
@@ -69,7 +70,7 @@ public class JMMTest {
                 if(report.getStage() == stage) {
                     throw new CorrectStageError();
                 } else {
-                    fail(report.getMessage());
+                    fail(report.toString());
                 }
             }
         }

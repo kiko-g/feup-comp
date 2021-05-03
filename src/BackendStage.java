@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * JASMIN Instructions
@@ -113,6 +114,8 @@ public class BackendStage implements JasminBackend {
 
         for(Method method: ollirClass.getMethods()) {
             this.currMethod = method;
+
+            if(method.isConstructMethod()) continue;
 
             if(method.getMethodName().equals("main")) {
                 classMethodsCode.append("\t.method public static main([Ljava/lang/String;)V\n")
@@ -231,6 +234,16 @@ public class BackendStage implements JasminBackend {
             }
         }
 
+        if(elem instanceof Operand && elem.getType().getTypeOfElement() == ElementType.BOOLEAN) {
+            if(((Operand) elem).getName().equals("true")) {
+                return "\t\ticonst_1" + "\n";
+            }
+
+            if(((Operand) elem).getName().equals("false")) {
+                return "\t\ticonst_0" + "\n";
+            }
+        }
+
         Descriptor descriptor = this.getDescriptor(elem);
         if(descriptor.getScope() == VarScope.FIELD) {
             Instruction getfield = new GetFieldInstruction(
@@ -255,12 +268,18 @@ public class BackendStage implements JasminBackend {
         Descriptor descriptor = this.getDescriptor(instr.getDest());
         String instruction = this.generateOperation(instr.getRhs());
 
+        if (instr.getDest() instanceof ArrayOperand) {
+            ArrayOperand arrayOperand = (ArrayOperand) instr.getDest();
+            Element index = arrayOperand.getIndexOperands().get(0);
+            return this.generateLoad(arrayOperand) + this.generateLoad(index) + instruction + "\t\tiastore\n";
+        }
+
         return instruction + "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
-            case INT32, BOOLEAN -> descriptor.getVirtualReg() <= 3 ?
-                "istore_" + descriptor.getVirtualReg() + "\n" : "istore " + descriptor.getVirtualReg() + "\n";
+            case INT32, BOOLEAN -> (descriptor.getVirtualReg() <= 3 ? "istore_" : "istore ") +
+                    descriptor.getVirtualReg() + "\n";
             case THIS -> "astore_0\n";
-            case ARRAYREF, CLASS, OBJECTREF -> descriptor.getVirtualReg() <= 3 ?
-                "astore_" + descriptor.getVirtualReg() + "\n" : "astore " + descriptor.getVirtualReg() + "\n";
+            case ARRAYREF, CLASS, OBJECTREF ->  (descriptor.getVirtualReg() <= 3 ? "astore_" : "astore ")
+                    + descriptor.getVirtualReg() + "\n";
             default -> "";
         };
     }
@@ -364,35 +383,27 @@ public class BackendStage implements JasminBackend {
                 return this.generateLoad(first) + "\t\tarraylength\n";
             }
 
-            case invokevirtual, invokespecial,
-                invokestatic -> {
-                StringBuilder builder = new StringBuilder();
+            case invokestatic -> {
+                StringBuilder builder = new StringBuilder()
+                    .append(instr.getListOfOperands().stream().map(this::generateLoad).collect(Collectors.joining()))
+                    .append("\t\t")
+                    .append(invocationType.toString())
+                    .append(" ");
 
-                if(first.getType().getTypeOfElement() == ElementType.THIS) {
-                    builder.append(this.generateLoad(first))
-                        .append("\t\t")
-                        .append(invocationType.toString())
-                        .append(" ")
-                        .append(this.className);
-                } else {
-                    builder.append(this.generateLoad(first))
-                        .append("\t\t")
-                        .append(invocationType.toString())
-                        .append(" ")
-                        .append(((Operand)first).getName());
-                }
+                builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
 
-                builder.append(".")
-                    .append(((LiteralElement)second).getLiteral().replace("\"", ""))
-                    .append("(");
+                return builder.toString();
+            }
 
-                for(Element param: instr.getListOfOperands()) {
-                    builder.append(BackendStage.generateType(param.getType()));
-                }
+            case invokevirtual, invokespecial -> {
+                StringBuilder builder = new StringBuilder()
+                    .append(this.generateLoad(first))
+                    .append(instr.getListOfOperands().stream().map(this::generateLoad).collect(Collectors.joining()))
+                    .append("\t\t")
+                    .append(invocationType.toString())
+                    .append(" ");
 
-                builder.append(")")
-                    .append(BackendStage.generateType(instr.getReturnType()))
-                    .append("\n");
+                builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
 
                 return builder.toString();
             }
@@ -401,36 +412,43 @@ public class BackendStage implements JasminBackend {
         return "";
     }
 
-    private String generateGetFieldOp(GetFieldInstruction instr) {
-        Element second = instr.getSecondOperand();
-        Operand obj = (Operand) instr.getSecondOperand();
-
+    private String generateMethodCallBody(CallInstruction instr, Element element, LiteralElement method) {
         StringBuilder builder = new StringBuilder();
-        return builder.append(this.generateLoad(second))
-            .append("\n\t\tgetfield ")
-            .append(this.className)
-            .append("/")
-            .append(obj.getName())
-            .append(" ")
-            .append(generateType(second.getType()))
-            .append("\n")
-            .toString();
+
+        switch (element.getType().getTypeOfElement()) {
+            case THIS, OBJECTREF -> builder.append(((ClassType) element.getType()).getName());
+            case CLASS -> builder.append(((Operand) element).getName());
+        }
+
+        builder.append(".")
+            .append(method.getLiteral().replace("\"", ""))
+            .append("(");
+
+        for (Element param : instr.getListOfOperands()) {
+            builder.append(BackendStage.generateType(param.getType()));
+        }
+
+        return builder.append(")")
+            .append(BackendStage.generateType(instr.getReturnType()))
+            .append("\n").toString();
+    }
+
+    private String generateGetFieldOp(GetFieldInstruction instr) {
+        Operand second = (Operand) instr.getSecondOperand();
+        Element obj = instr.getFirstOperand();
+
+        return this.generateLoad(obj) +
+            "\t\tgetfield " + this.className + "/" + second.getName() + " " + generateType(second.getType()) + "\n";
     }
 
     private String generatePutFieldOp(PutFieldInstruction instr) {
-        Operand obj = (Operand)instr.getFirstOperand();
+        Element obj = instr.getFirstOperand();
+        Operand field = (Operand) instr.getSecondOperand();
         Element third = instr.getThirdOperand();
 
-        StringBuilder builder = new StringBuilder();
-        return builder.append(this.generateLoad(instr.getSecondOperand()))
-            .append("\n\t\tputfield ")
-            .append(this.className)
-            .append("/")
-            .append(obj.getName())
-            .append(" ")
-            .append(generateType(third.getType()))
-            .append("\n")
-            .toString();
+        return this.generateLoad(obj) +
+            this.generateLoad(third) +
+            "\t\tputfield " + this.className + "/" + field.getName() + " " + generateType(field.getType()) + "\n";
     }
 
     private String generateGotoOp(GotoInstruction instr) {
@@ -456,7 +474,7 @@ public class BackendStage implements JasminBackend {
             case INT32 -> "I";
             case BOOLEAN -> "Z";
             case VOID -> "V";
-            case CLASS -> "L";
+            case OBJECTREF -> "L" + ((ClassType) type).getName() + ";";
             default -> throw new IllegalStateException("Unexpected value: " + type.getTypeOfElement());
         };
     }
