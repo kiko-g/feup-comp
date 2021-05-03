@@ -114,7 +114,7 @@ public interface JmmNode {
 
     default String toJson() {
         Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
+                // .excludeFieldsWithoutExposeAnnotation()
                 .setPrettyPrinting()
                 .registerTypeAdapter(JmmNode.class, new JmmSerializer())
                 .create();
