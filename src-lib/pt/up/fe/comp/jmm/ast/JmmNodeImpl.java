@@ -109,6 +109,7 @@ public class JmmNodeImpl implements JmmNode {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(JmmNode.class, new JmmDeserializer())
                 .registerTypeAdapter(JmmNodeImpl.class, new JmmDeserializer())
+                .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.fromJson(source, JmmNodeImpl.class);
     }
