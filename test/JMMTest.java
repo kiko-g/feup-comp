@@ -296,12 +296,12 @@ public class JMMTest {
      */
     @Test
     public void testEx1() {
-        testJasmin(Path.of("fixtures/public/ollir/Ex1.ollir"), false);
+        testJasmin(Path.of("fixtures/private/ollir/ex1a.ollir"), false);
     }
 
     @Test
     public void testEx2() {
-        testJasmin(Path.of("fixtures/public/ollir/Ex2.ollir"), false);
+        testJasmin(Path.of("fixtures/private/ollir/ex1b.ollir"), false);
     }
 
     @Test

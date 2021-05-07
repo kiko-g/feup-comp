@@ -142,27 +142,72 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<Symbol> parameters = this.symbolTable.getParameters(scope);
         for (int i = 0; i < parameters.size(); i++) {
             if (parameters.get(i).getName().equals(node.get("VALUE"))) {
-                Symbol param = new Symbol(parameters.get(i).getType(), "$" + i + "." + parameters.get(i).getName());
-                instructions.add(new TerminalInstruction(param));
+                String varName = this.dealWithReservedKeywordVar(scope, parameters.get(i).getName());
+                instructions.add(new TerminalInstruction(new Symbol(parameters.get(i).getType(), "$" + i + "." + varName)));
                 return instructions;
             }
         }
 
         for (Symbol symbol : symbolTable.getLocalVariables(scope)) {
             if (symbol.getName().equals(node.get("VALUE"))) {
-                instructions.add(new TerminalInstruction(symbol));
+                String varName = this.dealWithReservedKeywordVar(scope, symbol.getName());
+                instructions.add(new TerminalInstruction(new Symbol(symbol.getType(), varName)));
                 return instructions;
             }
         }
 
         for (Symbol symbol : symbolTable.getFields()) {
             if (symbol.getName().equals(node.get("VALUE"))) {
-                instructions.add(new GetFieldInstruction(symbol));
+                String varName = this.dealWithReservedKeywordVar(scope, symbol.getName());
+                instructions.add(new GetFieldInstruction(new Symbol(symbol.getType(), varName)));
                 return instructions;
             }
         }
 
         return instructions;
+    }
+
+    private String dealWithReservedKeywordVar(String scope, String name) {
+        String finalVarName = name.replaceAll("\\$", "");
+
+        while(nameHasConflict(name, finalVarName, scope)) {
+            finalVarName = "_" + finalVarName;
+        }
+
+        return finalVarName;
+    }
+
+    private boolean nameHasConflict(String originalName, String varName, String scope) {
+        List<Symbol> parameters = this.symbolTable.getParameters(scope);
+        List<Symbol> localVariables = this.symbolTable.getLocalVariables(scope);
+        List<Symbol> fields = this.symbolTable.getFields();
+
+        if(varName.equals(originalName)) {
+            for(Symbol param : parameters) {
+                if (param.getName().equals(varName)) {
+                    return true;
+                }
+            }
+
+            for(Symbol localVar : localVariables) {
+                if (localVar.getName().equals(varName)) {
+                    return true;
+                }
+            }
+
+            for(Symbol field : fields) {
+                if (field.getName().equals(varName)) {
+                    return true;
+                }
+            }
+        }
+
+        switch(varName) {
+            case "array", "i32", "ret", "bool", "field", "method" -> {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<JmmInstruction> generateTwoChildren(JmmNode node, String scope, Operation operation) {
