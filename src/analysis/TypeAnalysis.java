@@ -10,7 +10,6 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import report.Report;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -117,17 +116,11 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
     }
 
     private Type visitMethod(JmmNode node, TypeNScope typeNScope) {
-        JmmNode returnType = node.getChildren().get(0);
-        JmmNode name = node.getChildren().get(1);
-
-        List<Symbol> parameters = new ArrayList<>();
-
-        if(node.getChildren().size() >= 3 && node.getChildren().get(2).getKind().equals("MethodParameters")) {
-            this.fillMethodParameters(node.getChildren().get(2), parameters);
-        }
+        List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
+        Symbol methodSymbol = methodSymbols.remove(0);
 
         TypeNScope scope = new TypeNScope(
-            AnalysisTable.getMethodString(name.get("VALUE"), parameters.stream().map(Symbol::getType).collect(Collectors.toList())),
+            AnalysisTable.getMethodString(methodSymbol.getName(), methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList())),
                 NULL,
             typeNScope.scope
         );
@@ -136,17 +129,15 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
             visit(child, scope);
         }
 
-        return getType(returnType);
+        return methodSymbol.getType();
     }
 
     private Type visitMain(JmmNode node, TypeNScope typeNScope) {
-        JmmNode params = node.getChildren().get(0);
-
-        List<Symbol> parameters = new ArrayList<>();
-        this.fillMethodParameters(params, parameters);
+        List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
+        methodSymbols.remove(0);
 
         TypeNScope scope = new TypeNScope(
-            AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, parameters.stream().map(Symbol::getType).collect(Collectors.toList())),
+            AnalysisTable.getMethodString(AnalysisTable.MAIN_SCOPE, methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList())),
                 NULL,
             typeNScope.scope
         );
@@ -486,14 +477,6 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         }
     }
 
-    private Type getType(JmmNode node) {
-        if (node.getKind().equals("Array")) {
-            return new Type(node.getChildren().get(0).get("VALUE"), true);
-        }
-
-        return new Type(node.get("VALUE"), false);
-    }
-
     private String getImportName(String importStatement) {
         int delimiterIndex = importStatement.lastIndexOf(AnalysisTableBuilder.DELIMITER);
 
@@ -502,15 +485,6 @@ public class TypeAnalysis extends AJmmVisitor<TypeAnalysis.TypeNScope, Type> {
         }
 
         return importStatement.substring(delimiterIndex + 1);
-    }
-
-    private void fillMethodParameters(JmmNode node, List<Symbol> parameters) {
-        for(JmmNode child: node.getChildren()) {
-            JmmNode firstChild = child.getChildren().get(0);
-            JmmNode secondChild = child.getChildren().get(1);
-
-            parameters.add(new Symbol(getType(firstChild), secondChild.get("VALUE")));
-        }
     }
 
     private Type defaultVisit(JmmNode node, TypeNScope typeNScope) {

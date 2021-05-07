@@ -4,7 +4,7 @@ class Fac1 {
 
     public static void main(String[]args){
         int var;
-        Fac facTest;
+        Fac2 facTest;
 
         var=Fac2.getInt(1,2,true);
         facTest=Fac2.getObj();

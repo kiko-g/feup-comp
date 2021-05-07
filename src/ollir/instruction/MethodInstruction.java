@@ -2,22 +2,19 @@ package ollir.instruction;
 
 import ollir.OllirUtils;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
-import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MethodInstruction implements JmmInstruction {
-    private final String methodName;
+    private final Symbol methodSymbol;
     private final List<Symbol> params;
     private final List<JmmInstruction> instructions;
-    private final Type returnType;
 
-    public MethodInstruction(String methodName, List<Symbol> params, List<JmmInstruction> instructions, Type returnType) {
-        this.methodName = methodName;
+    public MethodInstruction(Symbol methodSymbol, List<Symbol> params, List<JmmInstruction> instructions) {
+        this.methodSymbol = methodSymbol;
         this.params = params;
         this.instructions = instructions;
-        this.returnType = returnType;
     }
 
     @Override
@@ -27,11 +24,11 @@ public class MethodInstruction implements JmmInstruction {
 
     @Override
     public String toString(String backspace) {
-        return backspace + ".method public " + methodName + "(" +
+        return backspace + ".method public " + methodSymbol.getName() + "(" +
             params.stream().map(symbol -> symbol.getName() + "." + OllirUtils.typeToOllir(symbol.getType())).collect(Collectors.joining(", ")) + ")." +
-            OllirUtils.typeToOllir(returnType) + " {\n" +
+            OllirUtils.typeToOllir(methodSymbol.getType()) + " {\n" +
             instructions.stream().map(inst -> inst.toString(backspace + "\t")).collect(Collectors.joining()) +
-            (returnType == null ? backspace + "\tret.V;\n" : "") +
+            (methodSymbol.getType().getName().equals("void") ? backspace + "\tret.V;\n" : "") +
             backspace + "}\n";
     }
 }
