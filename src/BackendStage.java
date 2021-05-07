@@ -28,8 +28,10 @@ public class BackendStage implements JasminBackend {
     private String className;
     private String extendsDef = null;
     private Method currMethod;
-    private List<Report> reports = new ArrayList<>();
     private int opLabel = 0;
+    private int instrCurrStackSize = 0;
+    private int instrMaxStackSize = 0;
+    private List<Report> reports = new ArrayList<>();
 
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
@@ -114,14 +116,16 @@ public class BackendStage implements JasminBackend {
 
         for(Method method: ollirClass.getMethods()) {
             this.currMethod = method;
+            this.generateLocalLimits();
 
             if(method.isConstructMethod()) continue;
 
             if(method.getMethodName().equals("main")) {
+                String body = this.generateClassMethodBody(method.getInstructions());
                 classMethodsCode.append("\t.method public static main([Ljava/lang/String;)V\n")
-                    .append("\t\t.limit stack 99\n")
-                    .append("\t\t.limit locals 99\n")
-                    .append(this.generateClassMethodBody(method.getInstructions()))
+                    .append(this.generateStackLimits())
+                    .append(this.generateLocalLimits())
+                    .append(body)
                     .append("\t\treturn\n");
             }
 
@@ -132,11 +136,13 @@ public class BackendStage implements JasminBackend {
                     classMethodsCode.append(BackendStage.generateType(param.getType()));
                 }
 
+                String body = this.generateClassMethodBody(method.getInstructions());
+
                 classMethodsCode.append(")")
                     .append(BackendStage.generateType(method.getReturnType()))
-                    .append("\n\t\t.limit stack 99\n")
-                    .append("\t\t.limit locals 99\n")
-                    .append(this.generateClassMethodBody(method.getInstructions()));
+                    .append(this.generateStackLimits())
+                    .append(this.generateLocalLimits())
+                    .append(body);
 
                 if(method.getReturnType().getTypeOfElement() == ElementType.VOID) {
                     classMethodsCode.append("\t\treturn");
@@ -151,6 +157,25 @@ public class BackendStage implements JasminBackend {
         return classMethodsCode.toString();
     }
 
+    private String generateStackLimits() {
+        return "\n\t\t.limit stack " + this.instrMaxStackSize + "\n";
+    }
+
+    private String generateLocalLimits() {
+        if(this.currMethod.isConstructMethod()) {
+            return "";
+        }
+
+        int limit = 0;
+        for(Descriptor descriptor: this.currMethod.getVarTable().values()) {
+            if(descriptor.getScope() != VarScope.FIELD) {
+                limit ++;
+            }
+        }
+
+        return "\t\t.limit locals " + limit + "\n";
+    }
+
     private String generateClassMethodBody(List<Instruction> instructions) {
         StringBuilder methodInstCode = new StringBuilder();
 
@@ -162,6 +187,12 @@ public class BackendStage implements JasminBackend {
             }
 
             methodInstCode.append(this.generateOperation(instr));
+
+            if(this.instrCurrStackSize > this.instrMaxStackSize) {
+                this.instrMaxStackSize = this.instrCurrStackSize;
+            }
+
+            this.instrCurrStackSize = 0;
         }
 
         return methodInstCode.toString();
@@ -169,7 +200,6 @@ public class BackendStage implements JasminBackend {
 
     private String generateOperation(Instruction instr) {
         return switch (instr.getInstType()) {
-            //case NOPER -> this.generateLoad(((SingleOpInstruction) instr).getSingleOperand());
             case NOPER -> this.generateSingleOp((SingleOpInstruction) instr);
             case ASSIGN -> this.generateAssignOp((AssignInstruction) instr);
             case BINARYOPER -> this.generateBinaryOp((BinaryOpInstruction) instr);
@@ -219,6 +249,8 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateLoad(Element elem) {
+        this.instrCurrStackSize ++;
+
         if(elem.isLiteral()) {
             String literal = ((LiteralElement) elem).getLiteral();
 
