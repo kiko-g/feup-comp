@@ -105,7 +105,7 @@ public interface JmmNode {
     }
 
     /**
-     * Inserts a node at the given position
+     * Inserts a node at the given position, shifts nodes from the position by one.
      * 
      * @param child
      * @param index
@@ -153,4 +153,44 @@ public interface JmmNode {
             child.toTree(tree, prefix + " ");
         }
     }
+
+    /**
+     * Removes the child at the specified position.
+     *
+     * <p>
+     * Puts the parent of the child as null.
+     *
+     * TODO: should remove all it's children recursively?
+     *
+     * @param index
+     * @return
+     */
+
+    /**
+     * Removes the child at the specified position.
+     * 
+     * @param index
+     * @return the node that has been removed
+     */
+    default JmmNode removeChild(int index) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * Removes the given child.
+     * 
+     * @param node
+     * @return the node that has been removed, which is the same as the given node
+     */
+    default JmmNode removeChild(JmmNode node) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * Removes this node from the tree.
+     */
+    default void delete() {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
 }
