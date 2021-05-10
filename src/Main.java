@@ -4,7 +4,6 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
-import pt.up.fe.specs.util.SpecsCollections;
 import report.Report;
 
 import java.io.IOException;
@@ -34,12 +33,22 @@ public class Main {
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) {
+		    ignored.printStackTrace();
         } finally {
-			List<Report> reports = SpecsCollections.concat(parserResult.getReports(), semanticsResult.getReports());
-            reports = SpecsCollections.concat(reports, ollirResult.getReports());
-            reports = SpecsCollections.concat(reports, jasminResult.getReports());
+			List<Report> reports = new ArrayList<>(parserResult.getReports());
+            if(semanticsResult.getReports().size() > reports.size()) {
+                reports = semanticsResult.getReports();
+            }
 
-			reports.forEach(System.err::println);
+            if(ollirResult.getReports().size() > reports.size()) {
+                reports = ollirResult.getReports();
+            }
+
+            if(jasminResult.getReports().size() > reports.size()) {
+                reports = jasminResult.getReports();
+            }
+
+            reports.forEach(System.err::println);
 		}
 	}
 

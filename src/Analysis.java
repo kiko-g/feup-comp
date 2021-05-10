@@ -1,4 +1,5 @@
 import analysis.AnalysisTableBuilder;
+import analysis.InitializationAnalysis;
 import analysis.TypeAnalysis;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.TestUtils;
@@ -37,6 +38,14 @@ public class Analysis implements JmmAnalysis {
         typeAnalysis.visit(root);
 
         if(TestUtils.getNumErrors(typeAnalysis.getReports()) != 0) {
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
+            return new JmmSemanticsResult(parserResult, null, reports);
+        }
+
+        InitializationAnalysis initializationAnalysis = new InitializationAnalysis(tableBuilder.getSymbolTable(), reports);
+        initializationAnalysis.visit(root);
+
+        if(TestUtils.getNumErrors(initializationAnalysis.getReports()) != 0) {
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, "Semantically invalid Program!"));
             return new JmmSemanticsResult(parserResult, null, reports);
         }

@@ -69,6 +69,7 @@ public class TestUtils {
             return analysis.semanticAnalysis(parserResult);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not analyse code", e);
         }
 

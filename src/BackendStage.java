@@ -31,7 +31,7 @@ public class BackendStage implements JasminBackend {
     private int opLabel = 0;
     private int instrCurrStackSize = 0;
     private int instrMaxStackSize = 0;
-    private List<Report> reports = new ArrayList<>();
+    private final List<Report> reports = new ArrayList<>();
 
     public static JasminResult run(OllirResult ollirResult) {
         // Checks input
@@ -44,7 +44,6 @@ public class BackendStage implements JasminBackend {
         ClassUnit ollirClass = ollirResult.getOllirClass();
         StringBuilder jasminCode = new StringBuilder();
 
-        this.reports = ollirResult.getReports();
         this.className = ollirClass.getClassName();
         this.extendsDef = ollirResult.getSymbolTable().getSuper();
 
