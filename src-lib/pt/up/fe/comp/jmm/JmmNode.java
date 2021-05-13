@@ -182,7 +182,7 @@ public interface JmmNode {
      * @param node
      * @return the node that has been removed, which is the same as the given node
      */
-    default JmmNode removeChild(JmmNode node) {
+    default int removeChild(JmmNode node) {
         throw new RuntimeException("Not implemented for this class: " + getClass());
     }
 
