@@ -1,13 +1,12 @@
 package pt.up.fe.comp.jmm.parser;
 
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.JmmSerializer;
-import report.Report;
+import pt.up.fe.comp.jmm.report.Report;
+
+import java.util.List;
 
 public class JmmParserResult {
 

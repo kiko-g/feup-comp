@@ -6,13 +6,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import report.Report;
+import report.StyleReport;
 
-class ReportSerializer implements JsonSerializer<Report> {
+class ReportSerializer implements JsonSerializer<StyleReport> {
 
     @Override
-    public JsonElement serialize(Report jsonElement, Type type,
-            JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(StyleReport jsonElement, Type type,
+                                 JsonSerializationContext jsonSerializationContext) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", jsonElement.getType().name());
         jsonObject.addProperty("stage", jsonElement.getStage().name());

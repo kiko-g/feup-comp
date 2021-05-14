@@ -1,7 +1,7 @@
 import MathUtils; //lowerLimit,upperLimit
-import Quicksort;
+import QuickSort;
 
-class Lazysort extends Quicksort {
+class Lazysort extends QuickSort {
     public static void main(String[] a) {
         int[] L;
         int i;

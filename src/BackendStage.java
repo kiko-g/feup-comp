@@ -3,9 +3,10 @@ import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
-import report.Report;
+import report.StyleReport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public class BackendStage implements JasminBackend {
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
         } catch (Exception e) {
             return new JasminResult(ollirClass.getClassName(), null,
-                Arrays.asList(Report.newError(Stage.GENERATION, "Exception during Jasmin generation", e)));
+                Arrays.asList(StyleReport.newError(Stage.GENERATION, "Exception during Jasmin generation", e)));
         }
     }
 
@@ -238,7 +239,7 @@ public class BackendStage implements JasminBackend {
 
     private Descriptor getDescriptor(Element elem) {
         if(elem.isLiteral()) {
-            this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Tried to get a descriptor of a literal"));
+            this.reports.add(new StyleReport(ReportType.ERROR, Stage.GENERATION, "Tried to get a descriptor of a literal"));
             return null;
         }
 
@@ -262,7 +263,7 @@ public class BackendStage implements JasminBackend {
                 if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
                 return "\t\tldc " + value + "\n";
             } catch (NumberFormatException ignored) {
-                this.reports.add(new Report(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
+                this.reports.add(new StyleReport(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
             }
         }
 

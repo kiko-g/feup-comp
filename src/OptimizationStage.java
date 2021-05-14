@@ -6,8 +6,9 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
-import report.Report;
+import report.StyleReport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public class OptimizationStage implements JmmOptimization {
             Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".ollir", "ollir", ollirCode);
         } catch (Exception e) {
             return new OllirResult(new ClassUnit(), null,
-                Arrays.asList(Report.newError(Stage.OPTIMIZATION, "Exception during Ollir code generation", e)));
+                Arrays.asList(StyleReport.newError(Stage.OPTIMIZATION, "Exception during Ollir code generation", e)));
         }
 
         return new OllirResult(semanticsResult, ollirCode, reports);

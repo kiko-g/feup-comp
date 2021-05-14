@@ -5,9 +5,10 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
-import report.Report;
+import report.StyleReport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,7 +141,7 @@ public class InitializationAnalysis extends AJmmVisitor<InitializationAnalysis.S
             return;
         }
 
-        reports.add(new Report(
+        reports.add(new StyleReport(
                 ReportType.WARNING,
                 Stage.SEMANTIC,
                 Integer.parseInt(node.get("LINE")),

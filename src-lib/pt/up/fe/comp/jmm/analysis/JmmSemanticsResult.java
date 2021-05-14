@@ -6,8 +6,8 @@ import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.ast.JmmSerializer;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
-import report.Report;
 
 import java.util.List;
 

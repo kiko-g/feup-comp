@@ -5,7 +5,6 @@ class Array {
 	    int[] i;
 	    int a;
         i[0] = i[0];
-        i[0];
         a = i[0];
 	}
 }

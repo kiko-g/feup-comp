@@ -1,5 +1,4 @@
-import report.Report;
-import pt.up.fe.specs.util.SpecsCollections;
+import report.StyleReport;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -44,13 +43,13 @@ public class Utils {
         System.out.println("Saved file " + fileName + " in " + folder + "!");
     }
 
-    public static void printReports(List<Report> reports) {
+    public static void printReports(List<StyleReport> reports) {
         if(reports == null || reports.size() == 0) {
             System.out.println("No reports were generated");
             return;
         }
 
-        for (Report report : reports) {
+        for (StyleReport report : reports) {
             switch (report.getType()) {
                 case WARNING:
                 case ERROR:
@@ -65,9 +64,9 @@ public class Utils {
         }
     }
 
-    public static List<Report> concatReports(List<Report> ... reports) {
-        List<Report> concatReports = new ArrayList<>();
-        for(List<Report> stageReport: reports) {
+    public static List<StyleReport> concatReports(List<StyleReport> ... reports) {
+        List<StyleReport> concatReports = new ArrayList<>();
+        for(List<StyleReport> stageReport: reports) {
             concatReports.addAll(stageReport);
         }
 

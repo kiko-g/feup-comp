@@ -2,10 +2,10 @@ package pt.up.fe.comp.jmm.jasmin;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
-import report.Report;
 
 import java.io.File;
 import java.util.ArrayList;

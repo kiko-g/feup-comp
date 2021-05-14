@@ -4,7 +4,7 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
-import report.Report;
+import pt.up.fe.comp.jmm.report.Report;
 
 import java.io.IOException;
 import java.util.ArrayList;
