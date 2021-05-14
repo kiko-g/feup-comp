@@ -81,6 +81,7 @@ public class JmmNodeImpl implements JmmNode {
 
     public void add(JmmNodeImpl child) {
         children.add(child);
+        child.setParent(this);
     }
 
     @Override
@@ -94,6 +95,7 @@ public class JmmNodeImpl implements JmmNode {
 
     public void add(JmmNodeImpl child, int index) {
         this.children.add(index, child);
+        child.setParent(this);
     }
 
     /**
