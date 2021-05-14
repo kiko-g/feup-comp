@@ -20,6 +20,22 @@ public class Operation {
         return resultType;
     }
 
+    public Operation inverseOperation() {
+        return switch (operationType) {
+            case ADD -> new Operation(OperationType.SUB, this.resultType);
+            case SUB -> new Operation(OperationType.ADD, this.resultType);
+            case MUL -> new Operation(OperationType.DIV, this.resultType);
+            case DIV -> new Operation(OperationType.MUL, this.resultType);
+            case AND -> new Operation(OperationType.OR, this.resultType);
+            case OR -> new Operation(OperationType.AND, this.resultType);
+            case LESS_THAN -> new Operation(OperationType.GREATER_OR_EQUAL, this.resultType);
+            case GREATER_OR_EQUAL -> new Operation(OperationType.LESS_THAN, this.resultType);
+            case NOT -> new Operation(OperationType.IS_EQUAL, this.resultType);
+            case IS_EQUAL -> new Operation(OperationType.NOT, this.resultType);
+            default -> this;
+        };
+    }
+
     @Override
     public String toString() {
         String operation = "";
@@ -30,9 +46,12 @@ public class Operation {
             case MUL -> operation = "*";
             case DIV -> operation = "/";
             case AND -> operation = "&&";
+            case OR -> operation = "||";
             case LESS_THAN -> operation = "<";
+            case GREATER_OR_EQUAL -> operation = ">=";
             case EQUALS -> operation = ":=";
             case NOT -> operation = "!";
+            case IS_EQUAL -> operation = "==";
         }
 
         return operation + "." + OllirUtils.typeToOllir(resultType);

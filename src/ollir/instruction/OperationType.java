@@ -8,7 +8,10 @@ public enum OperationType {
     DIV,
     LESS_THAN,
     AND,
+    OR,
     NOT,
+    IS_EQUAL,
+    GREATER_OR_EQUAL,
     ARRAY_ACCESS,
     DOT,
     NONE

@@ -24,7 +24,14 @@ public class IfInstruction implements JmmInstruction {
         }
 
         if (this.conditionInstruction instanceof TerminalInstruction) {
-            this.conditionInstruction = new BinaryOperationInstruction(this.conditionInstruction, this.conditionInstruction, new Operation(OperationType.AND, new Type("bool", false)));
+            this.conditionInstruction = new BinaryOperationInstruction(this.conditionInstruction, this.conditionInstruction, new Operation(OperationType.IS_EQUAL, new Type("bool", false)));
+        }
+
+        if (this.conditionInstruction instanceof BinaryOperationInstruction) {
+            BinaryOperationInstruction ifCondition = (BinaryOperationInstruction) this.conditionInstruction;
+            if (ifCondition.getOperation() != null) {
+                ifCondition.setOperation(ifCondition.getOperation().inverseOperation());
+            }
         }
 
         this.ifBody = ifBody;
@@ -40,11 +47,11 @@ public class IfInstruction implements JmmInstruction {
     @Override
     public String toString(String backspace) {
         return condition.stream().map(instruction -> instruction.toString(backspace)).collect(Collectors.joining()) +
-            backspace + "if (" + conditionInstruction + ") goto True" + ifNum + ";\n" +
-            elseBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
-            backspace + "\tgoto Endif" + ifNum + ";\n" +
-            backspace + "True" + ifNum + ":\n" +
+            backspace + "if (" + conditionInstruction + ") goto Else" + ifNum + ";\n" +
             ifBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
+            backspace + "\tgoto Endif" + ifNum + ";\n" +
+            backspace + "Else" + ifNum + ":\n" +
+            elseBody.stream().map(instruction -> instruction.toString(backspace + "\t")).collect(Collectors.joining()) +
             backspace + "Endif" + ifNum + ":\n";
     }
 }

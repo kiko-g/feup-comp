@@ -24,6 +24,14 @@ public class BinaryOperationInstruction extends ComplexInstruction {
         this.operation = instruction.operation;
     }
 
+    public Operation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
     @Override
     public JmmInstruction getVariable() {
         if (operation.getOperationType() == OperationType.EQUALS) {
