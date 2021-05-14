@@ -63,9 +63,6 @@ public class InitializationAnalysis extends AJmmVisitor<InitializationAnalysis.S
     private Symbol visitVar(JmmNode node, ScopeNAssign scopeNAssign) {
         for (Symbol symbol : this.symbolTable.getParameters(scopeNAssign.scope)) {
             if (symbol.getName().equals(node.get("VALUE"))) {
-                if(!scopeNAssign.isAssignment) {
-                    checkInitialization(node, scopeNAssign.scope, symbol);
-                }
                 return symbol;
             }
         }
@@ -81,9 +78,6 @@ public class InitializationAnalysis extends AJmmVisitor<InitializationAnalysis.S
 
         for (Symbol symbol : this.symbolTable.getFields()) {
             if (symbol.getName().equals(node.get("VALUE"))) {
-                if(!scopeNAssign.isAssignment) {
-                    checkInitialization(node, scopeNAssign.scope, symbol);
-                }
                 return symbol;
             }
         }
@@ -97,6 +91,8 @@ public class InitializationAnalysis extends AJmmVisitor<InitializationAnalysis.S
 
         String methodScope = AnalysisTable.getMethodString(methodSymbol.getName(), methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList()));
 
+        this.initialized.put(methodScope, new ArrayList<>());
+
         for (int i = 2; i < node.getNumChildren(); i++){
             if (node.getChildren().get(i).getKind().equals("MethodParameters")) {
                 continue;
@@ -104,8 +100,6 @@ public class InitializationAnalysis extends AJmmVisitor<InitializationAnalysis.S
 
             visit(node.getChildren().get(i), new ScopeNAssign(methodScope, false));
         }
-
-        this.initialized.put(methodScope, new ArrayList<>());
 
         return null;
     }

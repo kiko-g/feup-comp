@@ -43,9 +43,9 @@ public class JMMTest {
             checkErrors(backendResult.getReports(), failStage);
 
             backendResult.run();
+            backendResult.getReports().forEach(System.err::println);
         } catch (CorrectStageError ignored) {
         } catch (Exception e) {
-            e.printStackTrace();
             fail(e.getMessage());
         }
     }
