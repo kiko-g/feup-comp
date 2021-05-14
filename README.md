@@ -39,7 +39,12 @@ Where ``<jar filename>`` is the name of the JAR file that has been copied to the
 To test the program, run ``gradle test``. This will execute the build, and run the JUnit tests in the ``test`` folder. If you want to see output printed during the tests, use the flag ``-i`` (i.e., ``gradle test -i``).
 You can also see a test report by opening ``build/reports/tests/test/index.html``.
 
-# Checkpoints
+## Checkpoints
 1. [Checkpoint 1](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-1)
 2. [Checkpoint 2](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-2)
 3. [Checkpoint 3](#)
+
+## Code Generation Optimizations
+### By Default
+- chooses the instruction with the lowest cost, between **iconst_**, **bipush**, **sipush**, **ldc**, based on the integer it needs to push to the stack.
+- uses **iinc** for incrementing/decrementing local variables by a constant value.

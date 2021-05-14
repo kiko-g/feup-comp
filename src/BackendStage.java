@@ -297,14 +297,40 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateAssignOp(AssignInstruction instr) {
-        Descriptor descriptor = this.getDescriptor(instr.getDest());
-        String instruction = this.generateOperation(instr.getRhs());
-
         if (instr.getDest() instanceof ArrayOperand) {
+            String instruction = this.generateOperation(instr.getRhs());
             ArrayOperand arrayOperand = (ArrayOperand) instr.getDest();
             Element index = arrayOperand.getIndexOperands().get(0);
             return this.generateLoad(arrayOperand) + this.generateLoad(index) + instruction + "\t\tiastore\n";
         }
+
+        if(instr.getRhs().getInstType() == InstructionType.BINARYOPER) {
+            String destName = ((Operand)(instr.getDest())).getName();
+            BinaryOpInstruction rhs = (BinaryOpInstruction)instr.getRhs();
+            Element leftOperand = rhs.getLeftOperand();
+            Element rightOperand = rhs.getRightOperand();
+
+            if(rhs.getUnaryOperation().getOpType() == OperationType.ADD ||
+                rhs.getUnaryOperation().getOpType() == OperationType.SUB) {
+                if(!leftOperand.isLiteral() && ((Operand)leftOperand).getName().equals(destName)
+                        && rightOperand.isLiteral()) {
+                    Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)leftOperand).getName());
+                    this.instrCurrStackSize ++;
+                    return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)rightOperand).getLiteral() + "\n";
+                }
+
+                if(!((BinaryOpInstruction)instr.getRhs()).getRightOperand().isLiteral()
+                        && ((Operand)((BinaryOpInstruction)instr.getRhs()).getRightOperand()).getName().equals(destName)
+                        && ((BinaryOpInstruction)instr.getRhs()).getLeftOperand().isLiteral()) {
+                    Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)rightOperand).getName());
+                    this.instrCurrStackSize ++;
+                    return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)leftOperand).getLiteral() + "\n";
+                }
+            }
+        }
+
+        String instruction = this.generateOperation(instr.getRhs());
+        Descriptor descriptor = this.getDescriptor(instr.getDest());
 
         return instruction + "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
             case INT32, BOOLEAN -> (descriptor.getVirtualReg() <= 3 ? "istore_" : "istore ") +
@@ -323,9 +349,7 @@ public class BackendStage implements JasminBackend {
         String left = this.generateLoad(leftElem);
         String right = this.generateLoad(rightElem);
 
-        OperationType op = instr.getUnaryOperation().getOpType();
-
-        switch (op) {
+        switch (instr.getUnaryOperation().getOpType()) {
             case NOT, NOTB -> {
                 StringBuilder builder = new StringBuilder();
                 String labelTrue = "LABEL_" + this.opLabel++;
