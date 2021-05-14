@@ -230,6 +230,7 @@ public class BackendStage implements JasminBackend {
             case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
             case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
             case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
+            case ORB, ORI32 -> "\t\tior\n" + "\t\ticonst_0\n" + "\t\tif_icmpgt " + label + "\n";
             case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
             default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
         };
@@ -339,11 +340,32 @@ public class BackendStage implements JasminBackend {
                         .append(labelContinue).append("\n\t")
                         .append(labelTrue).append(":\n")
                         .append("\t\ticonst_1\n\t")
-                        .append(labelContinue).append(":\n");
+                        .append(labelContinue).append(":\n").toString();
+            }
+
+            case EQ, EQI32 -> {
+                StringBuilder builder = new StringBuilder();
+                String labelTrue = "LABEL_" + this.opLabel++;
+                String labelContinue = "LABEL_" + this.opLabel++;
+
+                return this.generateLoad(leftElem) +
+                        this.generateLoad(rightElem) +
+                        builder.append("\t\tif_icmpeq ")
+                                .append(labelTrue)
+                                .append("\n\t\ticonst_0\n")
+                                .append("\t\tgoto ")
+                                .append(labelContinue).append("\n\t")
+                                .append(labelTrue).append(":\n")
+                                .append("\t\ticonst_1\n\t")
+                                .append(labelContinue).append(":\n").toString();
             }
 
             case ANDB, ANDI32 -> {
                 return left + right + "\n\t\tiand\n";
+            }
+
+            case ORB, ORI32 -> {
+                return left + right + "\n\t\tior\n";
             }
 
             case LTH, LTHI32 -> {
@@ -352,15 +374,32 @@ public class BackendStage implements JasminBackend {
                 String labelContinue = "LABEL_" + this.opLabel++;
 
                 return this.generateLoad(leftElem) +
-                    this.generateLoad(rightElem) +
-                    builder.append("\t\tif_icmplt ")
-                        .append(labelTrue)
-                        .append("\n\t\ticonst_0\n")
-                        .append("\t\tgoto ")
-                        .append(labelContinue).append("\n\t")
-                        .append(labelTrue).append(":\n")
-                        .append("\t\ticonst_1\n\t")
-                        .append(labelContinue).append(":\n");
+                        this.generateLoad(rightElem) +
+                        builder.append("\t\tif_icmplt ")
+                                .append(labelTrue)
+                                .append("\n\t\ticonst_0\n")
+                                .append("\t\tgoto ")
+                                .append(labelContinue).append("\n\t")
+                                .append(labelTrue).append(":\n")
+                                .append("\t\ticonst_1\n\t")
+                                .append(labelContinue).append(":\n").toString();
+            }
+
+            case GTE, GTEI32 -> {
+                StringBuilder builder = new StringBuilder();
+                String labelTrue = "LABEL_" + this.opLabel++;
+                String labelContinue = "LABEL_" + this.opLabel++;
+
+                return this.generateLoad(leftElem) +
+                        this.generateLoad(rightElem) +
+                        builder.append("\t\tif_icmpge ")
+                                .append(labelTrue)
+                                .append("\n\t\ticonst_0\n")
+                                .append("\t\tgoto ")
+                                .append(labelContinue).append("\n\t")
+                                .append(labelTrue).append(":\n")
+                                .append("\t\ticonst_1\n\t")
+                                .append(labelContinue).append(":\n").toString();
             }
 
             case ADD, ADDI32 -> {
