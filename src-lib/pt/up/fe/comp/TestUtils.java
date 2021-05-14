@@ -1,21 +1,21 @@
 package pt.up.fe.comp;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Properties;
+
+import pt.up.fe.comp.jmm.JmmParser;
+import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.parser.JmmParser;
-import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.specs.util.SpecsIo;
-import report.Report;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Properties;
 
 public class TestUtils {
 
@@ -69,7 +69,6 @@ public class TestUtils {
             return analysis.semanticAnalysis(parserResult);
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Could not analyse code", e);
         }
 
@@ -97,7 +96,7 @@ public class TestUtils {
                 semanticsResult = optimization.optimize(semanticsResult);
             }
 
-            var ollirResult = optimization.toOllir(semanticsResult);
+            var ollirResult = optimization.toOllir(semanticsResult, optimize);
 
             if (optimize) {
                 ollirResult = optimization.optimize(ollirResult);
@@ -106,7 +105,6 @@ public class TestUtils {
             return ollirResult;
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Could not generate OLLIR code", e);
         }
     }
