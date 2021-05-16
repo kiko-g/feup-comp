@@ -60,9 +60,11 @@ You can also see a test report by opening ``build/reports/tests/test/index.html`
 - [X] **Limits** (`.limit stack` and `.limit locals`)
 
 ## Code Generation Instruction Selection
-- [X] Pushes integer to the stack with the lowest cost (`iconst_`, `bipush`, `sipush`, `ldc`).
-- [X] `iinc` for incrementing/decrementing local variables by a constant value (`i = i + 2` and `i = i - 5`).
-- [ ] `ishl`, `ishr` for using shifts with multiplications/division with a power of 2 number.
+- [X] `iconst_`, `bipush`, `sipush`, `ldc`, for pushing integer to the stack with the lowest cost.
+- [X] `iinc` for incrementing/decrementing local variables by a constant value.
+- [x] `ishl`, `ishr` for using shifts with multiplications/division with a power of 2 number.
+- [x] `ineg` for subtracting a variable to 0.
+- [x] `iflt`, `iflt`, `ifge`, `ifgt`, `ifeq`, `ifneq` for if statements comparing with 0
 ## Extra features
 - [ ] Declaration of objects with constructor and parameters
 - [ ] Use do-while template when possible
