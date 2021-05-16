@@ -7,6 +7,5 @@ gradle
 gradlew
 gradlew.bat
 *.iml
-ollir
-jasmin
-!test/fixtures/private/ollir
+/ollir
+/jasmin

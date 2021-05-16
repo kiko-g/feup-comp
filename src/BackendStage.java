@@ -309,7 +309,9 @@ public class BackendStage implements JasminBackend {
                         && rightOperand.isLiteral()) {
                     Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)leftOperand).getName());
 
-                    return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)rightOperand).getLiteral() + "\n";
+                    return "\t\tiinc " + descriptor.getVirtualReg() + " " +
+                        (rhs.getUnaryOperation().getOpType() == OperationType.ADD ? "" : "-") +
+                        ((LiteralElement)rightOperand).getLiteral() + "\n";
                 }
 
                 if(!((BinaryOpInstruction)instr.getRhs()).getRightOperand().isLiteral()
@@ -317,7 +319,9 @@ public class BackendStage implements JasminBackend {
                         && ((BinaryOpInstruction)instr.getRhs()).getLeftOperand().isLiteral()) {
                     Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)rightOperand).getName());
 
-                    return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)leftOperand).getLiteral() + "\n";
+                    return "\t\tiinc " + descriptor.getVirtualReg() + " " +
+                        (rhs.getUnaryOperation().getOpType() == OperationType.ADD ? "" : "-") +
+                        ((LiteralElement)leftOperand).getLiteral() + "\n";
                 }
             }
         }
@@ -582,8 +586,9 @@ public class BackendStage implements JasminBackend {
             case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
             case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
             case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
-            case ORB, ORI32 -> "\t\tior\n" + "\t\ticonst_0\n" + "\t\tif_icmpgt " + label + "\n";
-            case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
+            case ORB, ORI32 -> "\t\tior\n" + "\t\tifgt " + label + "\n";
+            case ANDB, ANDI32 -> "\t\tiand\n" + "\t\tifgt " + label + "\n";
+            case EQ -> "\t\tif_icmpeq " + label + "\n";
             default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
         };
     }

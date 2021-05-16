@@ -249,11 +249,12 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
         List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+        JmmInstruction rightVar = instructionsRight.get(instructionsRight.size() - 1);
 
         JmmInstruction leftVar = instructionsLeft.get(instructionsLeft.size() - 1);
 
         if (leftVar instanceof GetFieldInstruction) {
+            rightVar = this.getTerminalInstruction(instructionsRight, rightVar);
             instructionsLeft.remove(leftVar);
             instructions.addAll(instructionsRight);
             instructions.add(new PutFieldInstruction(((GetFieldInstruction) leftVar).getField(), rightVar));
@@ -266,8 +267,22 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
             leftVar = getTerminalInstruction(instructionsLeft, leftVar);
         }
 
+        if (rightVar instanceof TerminalInstruction ||
+                (rightVar instanceof BinaryOperationInstruction && ((BinaryOperationInstruction) rightVar).getOperation().getOperationType() != OperationType.EQUALS)) {
+            instructionsRight.remove(rightVar);
+        } else {
+            rightVar = rightVar.getVariable();
+        }
+
         instructions.addAll(instructionsLeft);
         instructions.addAll(instructionsRight);
+
+        if (rightVar instanceof NewObjectInstruction) {
+            ((NewObjectInstruction) rightVar).setLhs(leftVar);
+            instructions.add(rightVar);
+            return instructions;
+        }
+
         instructions.add(new BinaryOperationInstruction(leftVar, rightVar, new Operation(OperationType.EQUALS, paramType)));
 
         return instructions;

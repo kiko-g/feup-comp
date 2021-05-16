@@ -27,7 +27,6 @@ public class Operation {
             case MUL -> new Operation(OperationType.DIV, this.resultType);
             case DIV -> new Operation(OperationType.MUL, this.resultType);
             case AND -> new Operation(OperationType.OR, this.resultType);
-            case OR -> new Operation(OperationType.AND, this.resultType);
             case LESS_THAN -> new Operation(OperationType.GREATER_OR_EQUAL, this.resultType);
             case GREATER_OR_EQUAL -> new Operation(OperationType.LESS_THAN, this.resultType);
             case NOT -> new Operation(OperationType.IS_EQUAL, this.resultType);

@@ -1,31 +1,38 @@
-package ollir.instruction.complex;
+package ollir.instruction.complex.binary;
 
 import ollir.instruction.JmmInstruction;
+import ollir.instruction.Operation;
+import ollir.instruction.OperationType;
 import ollir.instruction.TerminalInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-public class NewObjectInstruction extends ComplexInstruction {
+public class NewObjectInstruction extends BinaryOperationInstruction {
     private final String className;
-    private final TerminalInstruction terminalInstruction;
 
     public NewObjectInstruction(String className) {
-        this.terminalInstruction = new TerminalInstruction(new Symbol(new Type(className, false), "t" + stackCounter++));
+        super(new TerminalInstruction(new Symbol(new Type(className, false), "t" + stackCounter++)),
+            null,
+            new Operation(OperationType.NONE, new Type(className, false)));
 
         this.className = className;
     }
 
+    public void setLhs(JmmInstruction lhs) {
+        this.lhs = lhs;
+    }
+
     @Override
     public JmmInstruction getVariable() {
-        return terminalInstruction;
+        return this.lhs;
     }
 
     public String toStringNew() {
-        return terminalInstruction + " :=." + className + " new(" + className + ")." + className;
+        return lhs + " :=." + className + " new(" + className + ")." + className;
     }
 
     public String toStringSpecial() {
-        return "invokespecial(" + terminalInstruction + ",\"<init>\").V";
+        return "invokespecial(" + lhs + ",\"<init>\").V";
     }
 
     @Override

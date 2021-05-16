@@ -24,6 +24,14 @@ public class BinaryOperationInstruction extends ComplexInstruction {
         this.operation = instruction.operation;
     }
 
+    public JmmInstruction getRhs() {
+        return rhs;
+    }
+
+    public JmmInstruction getLhs() {
+        return lhs;
+    }
+
     public Operation getOperation() {
         return operation;
     }

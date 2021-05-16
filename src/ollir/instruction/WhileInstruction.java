@@ -3,6 +3,7 @@ package ollir.instruction;
 import ollir.instruction.complex.binary.BinaryOperationInstruction;
 import ollir.instruction.complex.binary.DotMethodInstruction;
 import ollir.instruction.complex.binary.DotStaticMethodInstruction;
+import ollir.instruction.complex.binary.NotInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
@@ -30,7 +31,15 @@ public class WhileInstruction implements JmmInstruction {
         if (this.conditionInstruction instanceof BinaryOperationInstruction) {
             BinaryOperationInstruction ifCondition = (BinaryOperationInstruction) this.conditionInstruction;
             if (ifCondition.getOperation() != null) {
-                ifCondition.setOperation(ifCondition.getOperation().inverseOperation());
+                if(ifCondition.getOperation().getOperationType() != OperationType.LESS_THAN) {
+                    JmmInstruction newLeftInstruction = new NotInstruction(ifCondition.getLhs());
+                    condition.add(newLeftInstruction);
+                    JmmInstruction newRightInstruction = new NotInstruction(ifCondition.getRhs());
+                    condition.add(newRightInstruction);
+                    this.conditionInstruction = new BinaryOperationInstruction(newLeftInstruction.getVariable(), newRightInstruction.getVariable(), ifCondition.getOperation().inverseOperation());
+                } else {
+                    ifCondition.setOperation(ifCondition.getOperation().inverseOperation());
+                }
             }
         }
 

@@ -105,6 +105,7 @@ public class TestUtils {
             return ollirResult;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not generate OLLIR code", e);
         }
     }

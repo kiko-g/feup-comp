@@ -144,7 +144,7 @@ public class JMMTest {
 
     @Test
     public void testWhileAndIF() {
-        test(Path.of("test/fixtures/public/WhileAndIF.jmm"), new ArrayList<>(),Stage.OTHER);
+        test(Path.of("test/fixtures/public/WhileAndIF.jmm"), Path.of("test/fixtures/public/WhileAndIF.txt"), new ArrayList<>());
     }
 
     /**
