@@ -152,13 +152,15 @@ public class BackendStage implements JasminBackend {
             }
 
             classMethodsCode.append("\t.end method\n\n");
+            this.instrCurrStackSize = 0;
+            this.instrMaxStackSize = 0;
         }
 
         return classMethodsCode.toString();
     }
 
     private String generateStackLimits() {
-        return "\n\t\t.limit stack " + this.instrMaxStackSize + "\n";
+        return "\n\t\t.limit stack " + (this.instrMaxStackSize + 2) + "\n";
     }
 
     private String generateLocalLimits() {
@@ -166,14 +168,12 @@ public class BackendStage implements JasminBackend {
             return "";
         }
 
-        int limit = 0;
-        for(Descriptor descriptor: this.currMethod.getVarTable().values()) {
-            if(descriptor.getScope() != VarScope.FIELD) {
-                limit ++;
-            }
+        int locals = this.currMethod.getVarTable().size();
+        if(!this.currMethod.isStaticMethod()) {
+            locals++;
         }
 
-        return "\t\t.limit locals " + limit + "\n";
+        return "\t\t.limit locals " + locals + "\n";
     }
 
     private String generateClassMethodBody(List<Instruction> instructions) {
@@ -182,17 +182,14 @@ public class BackendStage implements JasminBackend {
         for(Instruction instr: instructions) {
             for(Map.Entry<String, Instruction> entry: this.currMethod.getLabels().entrySet()) {
                 if(entry.getValue().getId() == instr.getId()) {
-                    methodInstCode.append("\t" + entry.getKey() + ":\n");
+                    methodInstCode.append(this.generatePops())
+                        .append("\t")
+                        .append(entry.getKey())
+                        .append(":\n");
                 }
             }
 
             methodInstCode.append(this.generateOperation(instr));
-
-            if(this.instrCurrStackSize > this.instrMaxStackSize) {
-                this.instrMaxStackSize = this.instrCurrStackSize;
-            }
-
-            this.instrCurrStackSize = 0;
         }
 
         return methodInstCode.toString();
@@ -216,25 +213,13 @@ public class BackendStage implements JasminBackend {
     private String generateSingleOp(SingleOpInstruction instr) {
         if(instr.getSingleOperand() instanceof ArrayOperand) {
             Element index = ((ArrayOperand)instr.getSingleOperand()).getIndexOperands().get(0);
-            return this.generateLoad(instr.getSingleOperand()) + this.generateLoad(index) + "\t\tiaload\n";
+            String load = this.generateLoad(instr.getSingleOperand()) + this.generateLoad(index);
+            this.instrCurrStackSize -= 1;
+
+            return load + "\t\tiaload\n";
         }
 
         return this.generateLoad(instr.getSingleOperand());
-    }
-
-    private String generateBranchOp(CondBranchInstruction instr) {
-        String label = instr.getLabel();
-        Operation operation = instr.getCondOperation();
-
-        String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
-        return operatorsLoads + switch(operation.getOpType()) {
-            case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
-            case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
-            case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
-            case ORB, ORI32 -> "\t\tior\n" + "\t\ticonst_0\n" + "\t\tif_icmpgt " + label + "\n";
-            case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
-            default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
-        };
     }
 
     private Descriptor getDescriptor(Element elem) {
@@ -250,7 +235,10 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateLoad(Element elem) {
-        this.instrCurrStackSize ++;
+        ++this.instrCurrStackSize;
+        if(this.instrCurrStackSize > this.instrMaxStackSize) {
+            this.instrMaxStackSize = this.instrCurrStackSize;
+        }
 
         if(elem.isLiteral()) {
             String literal = ((LiteralElement) elem).getLiteral();
@@ -302,7 +290,11 @@ public class BackendStage implements JasminBackend {
             String instruction = this.generateOperation(instr.getRhs());
             ArrayOperand arrayOperand = (ArrayOperand) instr.getDest();
             Element index = arrayOperand.getIndexOperands().get(0);
-            return this.generateLoad(arrayOperand) + this.generateLoad(index) + instruction + "\t\tiastore\n";
+
+            String load = this.generateLoad(arrayOperand) + this.generateLoad(index);
+            this.instrCurrStackSize -= 3;
+
+            return load + instruction + "\t\tiastore\n";
         }
 
         if(instr.getRhs().getInstType() == InstructionType.BINARYOPER) {
@@ -316,7 +308,7 @@ public class BackendStage implements JasminBackend {
                 if(!leftOperand.isLiteral() && ((Operand)leftOperand).getName().equals(destName)
                         && rightOperand.isLiteral()) {
                     Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)leftOperand).getName());
-                    this.instrCurrStackSize ++;
+
                     return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)rightOperand).getLiteral() + "\n";
                 }
 
@@ -324,7 +316,7 @@ public class BackendStage implements JasminBackend {
                         && ((Operand)((BinaryOpInstruction)instr.getRhs()).getRightOperand()).getName().equals(destName)
                         && ((BinaryOpInstruction)instr.getRhs()).getLeftOperand().isLiteral()) {
                     Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)rightOperand).getName());
-                    this.instrCurrStackSize ++;
+
                     return "\t\tiinc " + descriptor.getVirtualReg() + " " + ((LiteralElement)leftOperand).getLiteral() + "\n";
                 }
             }
@@ -332,6 +324,7 @@ public class BackendStage implements JasminBackend {
 
         String instruction = this.generateOperation(instr.getRhs());
         Descriptor descriptor = this.getDescriptor(instr.getDest());
+        this.instrCurrStackSize -= 1;
 
         return instruction + "\t\t" + switch (descriptor.getVarType().getTypeOfElement()) {
             case INT32, BOOLEAN -> (descriptor.getVirtualReg() <= 3 ? "istore_" : "istore ") +
@@ -349,6 +342,7 @@ public class BackendStage implements JasminBackend {
 
         String left = this.generateLoad(leftElem);
         String right = this.generateLoad(rightElem);
+        this.instrCurrStackSize -= 1;
 
         switch (instr.getUnaryOperation().getOpType()) {
             case NOT, NOTB -> {
@@ -356,16 +350,14 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return this.generateLoad(leftElem) +
-                    this.generateLoad(rightElem) +
-                    builder.append("\t\tif_icmpne ")
-                        .append(labelTrue)
-                        .append("\n\t\ticonst_0\n")
-                        .append("\t\tgoto ")
-                        .append(labelContinue).append("\n\t")
-                        .append(labelTrue).append(":\n")
-                        .append("\t\ticonst_1\n\t")
-                        .append(labelContinue).append(":\n").toString();
+                return left + right + builder.append("\t\tif_icmpne ")
+                    .append(labelTrue)
+                    .append("\n\t\ticonst_0\n")
+                    .append("\t\tgoto ")
+                    .append(labelContinue).append("\n\t")
+                    .append(labelTrue).append(":\n")
+                    .append("\t\ticonst_1\n\t")
+                    .append(labelContinue).append(":\n").toString();
             }
 
             case EQ, EQI32 -> {
@@ -373,16 +365,14 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return this.generateLoad(leftElem) +
-                        this.generateLoad(rightElem) +
-                        builder.append("\t\tif_icmpeq ")
-                                .append(labelTrue)
-                                .append("\n\t\ticonst_0\n")
-                                .append("\t\tgoto ")
-                                .append(labelContinue).append("\n\t")
-                                .append(labelTrue).append(":\n")
-                                .append("\t\ticonst_1\n\t")
-                                .append(labelContinue).append(":\n").toString();
+                return left + right + builder.append("\t\tif_icmpeq ")
+                    .append(labelTrue)
+                    .append("\n\t\ticonst_0\n")
+                    .append("\t\tgoto ")
+                    .append(labelContinue).append("\n\t")
+                    .append(labelTrue).append(":\n")
+                    .append("\t\ticonst_1\n\t")
+                    .append(labelContinue).append(":\n").toString();
             }
 
             case ANDB, ANDI32 -> {
@@ -398,16 +388,14 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return this.generateLoad(leftElem) +
-                        this.generateLoad(rightElem) +
-                        builder.append("\t\tif_icmplt ")
-                                .append(labelTrue)
-                                .append("\n\t\ticonst_0\n")
-                                .append("\t\tgoto ")
-                                .append(labelContinue).append("\n\t")
-                                .append(labelTrue).append(":\n")
-                                .append("\t\ticonst_1\n\t")
-                                .append(labelContinue).append(":\n").toString();
+                return left + right + builder.append("\t\tif_icmplt ")
+                    .append(labelTrue)
+                    .append("\n\t\ticonst_0\n")
+                    .append("\t\tgoto ")
+                    .append(labelContinue).append("\n\t")
+                    .append(labelTrue).append(":\n")
+                    .append("\t\ticonst_1\n\t")
+                    .append(labelContinue).append(":\n").toString();
             }
 
             case GTE, GTEI32 -> {
@@ -415,16 +403,14 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return this.generateLoad(leftElem) +
-                        this.generateLoad(rightElem) +
-                        builder.append("\t\tif_icmpge ")
-                                .append(labelTrue)
-                                .append("\n\t\ticonst_0\n")
-                                .append("\t\tgoto ")
-                                .append(labelContinue).append("\n\t")
-                                .append(labelTrue).append(":\n")
-                                .append("\t\ticonst_1\n\t")
-                                .append(labelContinue).append(":\n").toString();
+                return left + right + builder.append("\t\tif_icmpge ")
+                    .append(labelTrue)
+                    .append("\n\t\ticonst_0\n")
+                    .append("\t\tgoto ")
+                    .append(labelContinue).append("\n\t")
+                    .append(labelTrue).append(":\n")
+                    .append("\t\ticonst_1\n\t")
+                    .append(labelContinue).append(":\n").toString();
             }
 
             case ADD, ADDI32 -> {
@@ -457,6 +443,8 @@ public class BackendStage implements JasminBackend {
                 StringBuilder builder = new StringBuilder();
 
                 if(first.getType().getTypeOfElement() == ElementType.OBJECTREF) {
+                    this.instrCurrStackSize += 2;
+
                     return builder.append("\t\tnew ")
                         .append(((Operand)first).getName())
                         .append("\n\t\tdup\n")
@@ -464,8 +452,9 @@ public class BackendStage implements JasminBackend {
                 } else if(first.getType().getTypeOfElement() == ElementType.ARRAYREF) {
                     if(operands.size() > 0) {
                         Element elem = operands.get(0);
+                        String load = generateLoad(elem);
 
-                        return builder.append(generateLoad(elem))
+                        return builder.append(load)
                             .append("\t\tnewarray int\n")
                             .toString();
                     }
@@ -485,12 +474,14 @@ public class BackendStage implements JasminBackend {
                     .append(invocationType.toString())
                     .append(" ");
 
+                this.instrCurrStackSize -= instr.getListOfOperands().size();
                 builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
+                this.instrCurrStackSize += instr.getReturnType().getTypeOfElement() != ElementType.VOID ? 1 : 0;
 
                 return builder.toString();
             }
 
-            case invokevirtual, invokespecial -> {
+            case invokevirtual -> {
                 StringBuilder builder = new StringBuilder()
                     .append(this.generateLoad(first))
                     .append(instr.getListOfOperands().stream().map(this::generateLoad).collect(Collectors.joining()))
@@ -498,6 +489,22 @@ public class BackendStage implements JasminBackend {
                     .append(invocationType.toString())
                     .append(" ");
 
+                this.instrCurrStackSize -= (instr.getListOfOperands().size() + 1);
+                builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
+                this.instrCurrStackSize += instr.getReturnType().getTypeOfElement() != ElementType.VOID ? 1 : 0;
+
+                return builder.toString();
+            }
+
+            case invokespecial -> {
+                StringBuilder builder = new StringBuilder()
+                    .append(this.generateLoad(first))
+                    .append(instr.getListOfOperands().stream().map(this::generateLoad).collect(Collectors.joining()))
+                    .append("\t\t")
+                    .append(invocationType.toString())
+                    .append(" ");
+
+                this.instrCurrStackSize -= (instr.getListOfOperands().size() + 2);
                 builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
 
                 return builder.toString();
@@ -531,7 +538,6 @@ public class BackendStage implements JasminBackend {
     private String generateGetFieldOp(GetFieldInstruction instr) {
         Operand second = (Operand) instr.getSecondOperand();
         Element obj = instr.getFirstOperand();
-
         return this.generateLoad(obj) +
             "\t\tgetfield " + this.className + "/" + second.getName() + " " + generateType(second.getType()) + "\n";
     }
@@ -541,13 +547,15 @@ public class BackendStage implements JasminBackend {
         Operand field = (Operand) instr.getSecondOperand();
         Element third = instr.getThirdOperand();
 
-        return this.generateLoad(obj) +
-            this.generateLoad(third) +
+        String load = this.generateLoad(obj) + this.generateLoad(third);
+        this.instrCurrStackSize -= 2;
+
+        return load +
             "\t\tputfield " + this.className + "/" + field.getName() + " " + generateType(field.getType()) + "\n";
     }
 
     private String generateGotoOp(GotoInstruction instr) {
-        return "\t\tgoto " + instr.getLabel() + "\n";
+        return this.generatePops() + "\t\tgoto " + instr.getLabel() + "\n";
     }
 
     private String generateReturnOp(ReturnInstruction instr) {
@@ -561,6 +569,39 @@ public class BackendStage implements JasminBackend {
             case ARRAYREF -> "\t\tareturn";
             default -> "";
         };
+    }
+
+    private String generateBranchOp(CondBranchInstruction instr) {
+        String label = instr.getLabel();
+        Operation operation = instr.getCondOperation();
+
+        String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+        this.instrCurrStackSize -= 2;
+
+        return this.generatePops() + operatorsLoads + switch(operation.getOpType()) {
+            case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
+            case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
+            case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
+            case ORB, ORI32 -> "\t\tior\n" + "\t\ticonst_0\n" + "\t\tif_icmpgt " + label + "\n";
+            case EQ, ANDB, ANDI32 -> "\t\tif_icmpeq " + label + "\n";
+            default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
+        };
+    }
+
+    private String generatePops() {
+        StringBuilder pop = new StringBuilder();
+
+        for(int i = this.instrCurrStackSize; i > 0; i--) {
+            if(this.instrCurrStackSize > 1) {
+                pop.append("\t\tpop2\n");
+                i--;
+            } else {
+                pop.append("\t\tpop\n");
+            }
+        }
+
+        this.instrCurrStackSize = 0;
+        return pop.toString();
     }
 
     private static String generateType(Type type) {

@@ -30,7 +30,6 @@ class QuickSort {
         }
 
         return true;
-
     }
 
     public boolean quicksort(int[] L) {
@@ -77,6 +76,5 @@ class QuickSort {
         L[hi] = tmp;
 
         return i;
-
     }
 }

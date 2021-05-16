@@ -329,5 +329,4 @@ public class JMMTest {
     public void testMyClass4() {
         testJasmin(Path.of("fixtures/public/ollir/myclass4.ollir"), false);
     }
-
 }
