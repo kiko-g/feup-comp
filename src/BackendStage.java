@@ -242,17 +242,7 @@ public class BackendStage implements JasminBackend {
 
         if(elem.isLiteral()) {
             String literal = ((LiteralElement) elem).getLiteral();
-
-            try {
-                int value = Integer.parseInt(literal);
-                if(value == -1) return "\t\ticonst_m1\n";
-                if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
-                if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
-                if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
-                return "\t\tldc " + value + "\n";
-            } catch (NumberFormatException ignored) {
-                this.reports.add(new StyleReport(ReportType.ERROR, Stage.GENERATION, "Literal" + literal + "is not an integer!"));
-            }
+            return this.generateInt(literal);
         }
 
         if(elem instanceof Operand && elem.getType().getTypeOfElement() == ElementType.BOOLEAN) {
@@ -285,6 +275,21 @@ public class BackendStage implements JasminBackend {
         }
     }
 
+    private String generateInt(String elem) {
+        try {
+            int value = Integer.parseInt(elem);
+            if(value == -1) return "\t\ticonst_m1\n";
+            if(value >= 0 && value <= 5) return "\t\ticonst_" + value + "\n";
+            if(value >= -128 && value <= 127) return "\t\tbipush " + value + "\n";
+            if(value >= -32768 && value <= 32767) return "\t\tsipush " + value + "\n";
+            return "\t\tldc " + value + "\n";
+        } catch (NumberFormatException ignored) {
+            this.reports.add(new StyleReport(ReportType.ERROR, Stage.GENERATION, "Literal" + elem + "is not an integer!"));
+        }
+
+        return "";
+    }
+
     private String generateAssignOp(AssignInstruction instr) {
         if (instr.getDest() instanceof ArrayOperand) {
             String instruction = this.generateOperation(instr.getRhs());
@@ -307,9 +312,8 @@ public class BackendStage implements JasminBackend {
                 rhs.getUnaryOperation().getOpType() == OperationType.SUB) {
                 if(!leftOperand.isLiteral() && ((Operand)leftOperand).getName().equals(destName)
                         && rightOperand.isLiteral()) {
-                    Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)leftOperand).getName());
 
-                    return "\t\tiinc " + descriptor.getVirtualReg() + " " +
+                    return "\t\tiinc " + this.getDescriptor(instr.getDest()).getVirtualReg() + " " +
                         (rhs.getUnaryOperation().getOpType() == OperationType.ADD ? "" : "-") +
                         ((LiteralElement)rightOperand).getLiteral() + "\n";
                 }
@@ -317,9 +321,8 @@ public class BackendStage implements JasminBackend {
                 if(!((BinaryOpInstruction)instr.getRhs()).getRightOperand().isLiteral()
                         && ((Operand)((BinaryOpInstruction)instr.getRhs()).getRightOperand()).getName().equals(destName)
                         && ((BinaryOpInstruction)instr.getRhs()).getLeftOperand().isLiteral()) {
-                    Descriptor descriptor = this.currMethod.getVarTable().get(((Operand)rightOperand).getName());
 
-                    return "\t\tiinc " + descriptor.getVirtualReg() + " " +
+                    return "\t\tiinc " + this.getDescriptor(instr.getDest()).getVirtualReg() + " " +
                         (rhs.getUnaryOperation().getOpType() == OperationType.ADD ? "" : "-") +
                         ((LiteralElement)leftOperand).getLiteral() + "\n";
                 }
@@ -426,11 +429,21 @@ public class BackendStage implements JasminBackend {
             }
 
             case MUL, MULI32 -> {
-                return left + right + "\t\timul\n";
+                if(leftElem.isLiteral() && BackendStage.isPowerOfTwo(Integer.parseInt(((LiteralElement)leftElem).getLiteral()))) {
+                    return this.generateInt(BackendStage.getLog2(((LiteralElement) leftElem).getLiteral())) + right + "\t\tishl\n";
+                } else if(rightElem.isLiteral() && BackendStage.isPowerOfTwo(Integer.parseInt(((LiteralElement)rightElem).getLiteral()))) {
+                    return this.generateInt(BackendStage.getLog2(((LiteralElement) rightElem).getLiteral())) + left  + "\t\tishl\n";
+                } else {
+                    return left + right + "\t\timul\n";
+                }
             }
 
             case DIV, DIVI32 -> {
-                return left + right + "\t\tidiv\n";
+                if(rightElem.isLiteral() && BackendStage.isPowerOfTwo(Integer.parseInt(((LiteralElement)rightElem).getLiteral()))) {
+                    return left + this.generateInt(BackendStage.getLog2(((LiteralElement) rightElem).getLiteral())) + "\t\tishr\n";
+                } else {
+                    return left + right + "\t\tidiv\n";
+                }
             }
         }
         return left;
@@ -618,5 +631,13 @@ public class BackendStage implements JasminBackend {
             case OBJECTREF -> "L" + ((ClassType) type).getName() + ";";
             default -> throw new IllegalStateException("Unexpected value: " + type.getTypeOfElement());
         };
+    }
+
+    private static String getLog2(String x) {
+        return String.valueOf((int)(Math.log(Integer.parseInt(x)) / Math.log(2)));
+    }
+
+    private static boolean isPowerOfTwo(int x) {
+        return x != 0 && (x & (x - 1)) == 0;
     }
 }

@@ -44,7 +44,34 @@ You can also see a test report by opening ``build/reports/tests/test/index.html`
 2. [Checkpoint 2](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-2)
 3. [Checkpoint 3](#)
 
-## Code Generation Optimizations
-### By Default
-- chooses the instruction with the lowest cost, between **iconst_**, **bipush**, **sipush**, **ldc**, based on the integer it needs to push to the stack.
-- uses **iinc** for incrementing/decrementing local variables by a constant value.
+## Code Generation Features
+- [X] **Class**
+- [X] **Fields**
+- [X] **Methods**
+- [X] **Instructions**
+- [X] **Conditionals** (`if` and `if-else`)
+- [X] **Loops** (`while`)
+- [X] **Arrays** 
+    - [X] Array initialization (`newarray int`)
+    - [X] Array Store (`astore`)
+    - [X] Array Access (`aload`)
+    - [X] Array Position Store (`iastore`)
+    - [X] Array Position Access (`iaload`)
+- [X] **Limits** (`.limit stack` and `.limit locals`)
+
+## Code Generation Instruction Selection
+- [X] Pushes integer to the stack with the lowest cost (`iconst_`, `bipush`, `sipush`, `ldc`).
+- [X] `iinc` for incrementing/decrementing local variables by a constant value (`i = i + 2` and `i = i - 5`).
+- [ ] `ishl`, `ishr` for using shifts with multiplications/division with a power of 2 number.
+## Extra features
+- [ ] Declaration of objects with constructor and parameters
+- [ ] Use do-while template when possible
+- [x] Checks if a variable is initialized
+- [x] Functions overload
+- [x] Pop instructions to avoid the accumulation of stack size
+
+## TODO
+- [ ] Liveness analysis
+- [ ] Graph coloring
+- [ ] Dead code removal
+- [ ] Constant folding
