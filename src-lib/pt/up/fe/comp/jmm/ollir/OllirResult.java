@@ -1,22 +1,26 @@
 package pt.up.fe.comp.jmm.ollir;
 
+import java.util.List;
+
 import org.specs.comp.ollir.ClassUnit;
+
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 
-import java.util.List;
-
 /**
  * An OLLIR result returns the parsed OLLIR code and the corresponding symbol table.
  */
 public class OllirResult {
+
+    private final String ollirCode;
     private final ClassUnit ollirClass;
     private final SymbolTable symbolTable;
     private final List<Report> reports;
 
-    public OllirResult(ClassUnit ollirClass, SymbolTable symbolTable, List<Report> reports) {
+    private OllirResult(String ollirCode, ClassUnit ollirClass, SymbolTable symbolTable, List<Report> reports) {
+        this.ollirCode = ollirCode;
         this.ollirClass = ollirClass;
         this.symbolTable = symbolTable;
         this.reports = reports;
@@ -30,8 +34,12 @@ public class OllirResult {
      * @param reports
      */
     public OllirResult(JmmSemanticsResult semanticsResult, String ollirCode, List<Report> reports) {
-        this(OllirUtils.parse(ollirCode), semanticsResult.getSymbolTable(),
+        this(ollirCode, OllirUtils.parse(ollirCode), semanticsResult.getSymbolTable(),
                 SpecsCollections.concat(semanticsResult.getReports(), reports));
+    }
+
+    public String getOllirCode() {
+        return ollirCode;
     }
 
     public ClassUnit getOllirClass() {
