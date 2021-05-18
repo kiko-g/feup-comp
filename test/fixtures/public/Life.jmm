@@ -241,18 +241,18 @@ class Life {
         int x;
         int y;
         int xLim;
-        int[] ret;
+        int[] result;
 
         xLim = xMax + 1;
 
         y = absPos / xLim;
         x = absPos - y * xLim;
 
-        ret = new int[2];
-        ret[0] = x;
-        ret[1] = y;
+        result = new int[2];
+        result[0] = x;
+        result[1] = y;
 
-        return ret;
+        return result;
 
     }
 
@@ -266,7 +266,7 @@ class Life {
         int downY;
 
         int[] cart;
-        int[] ret;
+        int[] result;
 
         cart = this.cartIdx(absPos);
         x = cart[0];
@@ -294,41 +294,41 @@ class Life {
             upY = y - 1;
         }
 
-        ret = new int[8];
+        result = new int[8];
         // Clockwise from N
-        ret[0] = this.trIdx(x, upY);
-        ret[1] = this.trIdx(upX, upY);
-        ret[2] = this.trIdx(upX, y);
-        ret[3] = this.trIdx(upX, downY);
-        ret[4] = this.trIdx(x, downY);
-        ret[5] = this.trIdx(downX, downY);
-        ret[6] = this.trIdx(downX, y);
-        ret[7] = this.trIdx(downX, upY);
+        result[0] = this.trIdx(x, upY);
+        result[1] = this.trIdx(upX, upY);
+        result[2] = this.trIdx(upX, y);
+        result[3] = this.trIdx(upX, downY);
+        result[4] = this.trIdx(x, downY);
+        result[5] = this.trIdx(downX, downY);
+        result[6] = this.trIdx(downX, y);
+        result[7] = this.trIdx(downX, upY);
 
-        return ret;
+        return result;
 
     }
 
     public int getLiveNeighborN(int absPos) {
         int[] neigh;
         int i;
-        int ret;
+        int result;
 
-        ret = 0;
+        result = 0;
 
         neigh = this.getNeighborCoords(absPos);
 
         i = 0;
         while (i < neigh.length) {
             if (this.ne(field[neigh[i]],0))
-                ret = ret + 1;
+                result = result + 1;
             else {
             }
 
             i = i + 1;
         }
 
-        return ret;
+        return result;
     }
 
     public boolean busyWait(int ms) {

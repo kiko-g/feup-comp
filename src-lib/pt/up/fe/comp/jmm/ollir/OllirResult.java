@@ -1,5 +1,6 @@
 package pt.up.fe.comp.jmm.ollir;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.specs.comp.ollir.ClassUnit;
@@ -24,6 +25,13 @@ public class OllirResult {
         this.ollirClass = ollirClass;
         this.symbolTable = symbolTable;
         this.reports = reports;
+    }
+
+    public OllirResult(String ollirCode) {
+        this.ollirCode = ollirCode;
+        this.ollirClass = OllirUtils.parse(ollirCode);
+        this.symbolTable = null;
+        this.reports = Collections.emptyList();
     }
 
     /**
