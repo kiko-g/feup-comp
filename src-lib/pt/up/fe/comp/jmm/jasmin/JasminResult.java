@@ -1,22 +1,34 @@
 package pt.up.fe.comp.jmm.jasmin;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import pt.up.fe.specs.util.system.OutputType;
+import pt.up.fe.specs.util.system.ProcessOutputAsString;
+import pt.up.fe.specs.util.system.StreamToString;
+import pt.up.fe.specs.util.utilities.StringLines;
 
 /**
  * A semantic analysis returns the analysed tree and the generated symbol table.
  */
 public class JasminResult {
+
+    private static Long HUMAN_DELAY_MS = 250l;
+    private static Long TIMEOUT_NS = 5_000_000_000l;
 
     private final String className;
     private final String jasminCode;
@@ -75,10 +87,12 @@ public class JasminResult {
      *            arguments for the Jasmin program
      * @param classpath
      *            additional paths for the classpath
+     * @param input
+     *            input to give to the program that will run
      * 
      * @return the output that is printed by the Jasmin program
      */
-    public String run(List<String> args, List<String> classpath) {
+    public String run(List<String> args, List<String> classpath, String input) {
         // Compile
         var classFile = compile();
 
@@ -99,9 +113,38 @@ public class JasminResult {
         command.add(classname);
         command.addAll(args);
 
-        var output = SpecsSystem.runProcess(command, true, true);
+        // Build process
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.directory(SpecsIo.getWorkingDir());
+        Consumer<OutputStream> stdin = null;
+        if (input != null && !input.isEmpty()) {
+            stdin = outputStream -> {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream)))) {
+                    for (var line : StringLines.getLines(input)) {
+                        // Simulate person typing (1s between each iteration)
+                        SpecsSystem.sleep(HUMAN_DELAY_MS);
+                        pw.println(line);
+                        pw.flush();
+                    }
+                }
 
-        return output.getOutput();
+            };
+        }
+
+        var stdout = new StreamToString(true, true, OutputType.StdOut);
+        var stderr = new StreamToString(true, true, OutputType.StdErr);
+
+        var output = SpecsSystem.runProcess(builder, stdout, stderr, stdin, TIMEOUT_NS);
+
+        // var output2 = SpecsSystem.runProcess(command, true, true);
+        var processedOutput = new ProcessOutputAsString(output.getReturnValue(), output.getStdOut(),
+                output.getStdErr());
+
+        return processedOutput.getOutput();
+    }
+
+    public String run(List<String> args, List<String> classpath) {
+        return run(args, classpath, null);
     }
 
     /**
@@ -122,5 +165,13 @@ public class JasminResult {
      */
     public String run() {
         return run(Collections.emptyList());
+    }
+
+    public String run(String input) {
+        return run(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath()), input);
+    }
+
+    public String run(List<String> args, String input) {
+        return run(args, Arrays.asList(TestUtils.getLibsClasspath()), input);
     }
 }
