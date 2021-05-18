@@ -1,0 +1,54 @@
+import io;
+
+class Shape {
+    int x;
+    int y;
+    int area;
+    int perimeter;
+    int width;
+    int height;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() { 
+        return y;
+    }
+    
+    public void setX(int posX) {
+        x = posX;
+    }
+
+    public void setY(int posY) { 
+        y = posY;
+    }
+
+   public void changePos(int x, int y) {
+      this.setX(x);
+      this.setY(y);
+   }
+
+   public void shiftPos(int deltaX, int deltaY) {
+      this.changePos(x + deltaX, y + deltaY);
+   }
+
+   public void print() {
+       io.println(x);
+       io.println(y);
+       io.println(width);
+       io.println(height);
+       io.println(area);
+       io.println(perimeter);
+   }
+
+    /*
+    public int getAngle(int x1, int y1, int x2, int y2, int x3, int y3) {
+        return Math.acos(((x3-x1)*(x2-x1)+(y3-y1)*(y2-y1)) / Math.sqrt((x3-x1)*(x3-x1)+(y3-y1)*(y3-y1)) / Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))) * 180 / Math.PI;
+    }
+
+    public int getSideLength(int x1, int y1, int x2, int y2) {
+        return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)));
+    }
+    */
+}

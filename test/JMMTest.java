@@ -354,4 +354,32 @@ public class JMMTest {
     public void testMyClass4() {
         testJasmin(Path.of("fixtures/public/ollir/myclass4.ollir"), false);
     }
+
+    /**
+     * Demo Tests
+     */
+    @Test
+    public void testDemo1() {
+        test(Path.of("test/fixtures/public/demo/Test1.jmm"), new ArrayList<>(), Stage.OTHER);
+    }
+
+    @Test
+    public void testDemo2() {
+        test(Path.of("test/fixtures/public/demo/Test2.jmm"), new ArrayList<>(), Stage.OTHER);
+    }
+
+    @Test
+    public void testDemo3() {
+        test(Path.of("test/fixtures/public/demo/Test3.jmm"), new ArrayList<>(), Stage.OTHER);
+    }
+
+    @Test
+    public void testDemo4() {
+        test(Path.of("test/fixtures/public/demo/Test4.jmm"), new ArrayList<>(), Stage.OTHER);
+    }
+
+    @Test
+    public void testDemo5() {
+        test(Path.of("test/fixtures/public/demo/Test5.jmm"), new ArrayList<>(), Stage.OTHER);
+    }
 }

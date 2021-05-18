@@ -1,0 +1,60 @@
+import io;
+
+class Calendar {
+    public int[] getMonthsDays(boolean isLeapYear) {
+        int[] monthsDays;
+        monthsDays = new int[12];
+
+        monthsDays[0] = 31;
+        if (isLeapYear) {
+            monthsDays[1] = 29;
+        } else {
+            monthsDays[1] = 28;
+        }
+        monthsDays[2] = 31;
+        monthsDays[3] = 30;
+        monthsDays[4] = 31;
+        monthsDays[5] = 30;
+        monthsDays[6] = 31;
+        monthsDays[7] = 31;
+        monthsDays[8] = 30;
+        monthsDays[9] = 31;
+        monthsDays[10] = 30;
+        monthsDays[11] = 31;
+
+        return monthsDays;
+    }
+
+    public int daysToSeconds(int days) {
+        int dayHours;
+        int hourMinutes;
+        int minuteSeconds;
+        int daySeconds;
+
+        dayHours = 24;
+        hourMinutes = 60;
+        minuteSeconds = 60;
+        daySeconds = minuteSeconds * hourMinutes * dayHours;
+
+        return daySeconds * days;
+    }
+
+    public static void main(String[] args) {
+        Calendar calendar;
+        int[] monthsDays;
+        int[] monthsSeconds;
+        int month;
+
+        calendar = new Calendar();
+        monthsDays = calendar.getMonthsDays(false);
+        monthsSeconds = new int[12];
+
+        month = 0;
+        while(month < 12) {
+            monthsSeconds[month] = calendar.daysToSeconds(monthsDays[month]);
+            io.println(month+1);
+            io.println(monthsSeconds[month]);
+            month = month + 1;
+        }
+    }
+}

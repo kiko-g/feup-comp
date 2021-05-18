@@ -1,0 +1,17 @@
+class Vertex {
+    int x;
+    int y;
+
+    public void create(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public getX() {
+        return this.x;
+    }
+
+    public getY() {
+        return this.y;
+    }
+}

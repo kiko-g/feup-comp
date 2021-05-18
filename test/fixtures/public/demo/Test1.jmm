@@ -1,0 +1,40 @@
+import io;
+
+class Person {
+    int id;
+    int age;
+
+    public int create(int personId, int personAge) {
+        id = personId;
+        age = personAge;
+
+        return 0;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public int setId(int personId) {
+        id = personId;
+        return 0;
+    }
+
+    public int setAge(int personAge) {
+        age = personAge;
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Person person;
+        person = new Person();
+        person.create(1, 26);
+
+        io.println(person.getId());
+        io.println(person.getAge());
+    }
+}
