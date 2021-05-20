@@ -3,10 +3,16 @@ import io;
 class Person {
     int id;
     int age;
+    int method;
+    int ret;
+    int[] array;
 
-    public int create(int personId, int personAge) {
-        id = personId;
+    public int create(int $personId, int personAge, int methodVal, int retVal, int[] arrayy) {
+        id = $personId;
         age = personAge;
+        method = methodVal;
+        ret = retVal;
+        array = arrayy;
 
         return 0;
     }
@@ -32,7 +38,7 @@ class Person {
     public static void main(String[] args) {
         Person person;
         person = new Person();
-        person.create(1, 26);
+        person.create(1, 26, 51, 31, new int[5]);
 
         io.println(person.getId());
         io.println(person.getAge());

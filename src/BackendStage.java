@@ -46,7 +46,7 @@ public class BackendStage implements JasminBackend {
         StringBuilder jasminCode = new StringBuilder();
 
         this.className = ollirClass.getClassName();
-        this.extendsDef = ollirResult.getSymbolTable().getSuper();
+        this.extendsDef = ollirClass.getSuperClass();
 
         try {
             ollirClass.checkMethodLabels();

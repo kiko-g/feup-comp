@@ -39,7 +39,7 @@ public class OptimizationStage implements JmmOptimization {
         try {
             Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".ollir", "ollir", ollirCode);
         } catch (Exception e) {
-            return new OllirResult(new ClassUnit(), null,
+            return new OllirResult(semanticsResult, "",
                 Arrays.asList(StyleReport.newError(Stage.OPTIMIZATION, "Exception during Ollir code generation", e)));
         }
 

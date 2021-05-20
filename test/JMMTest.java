@@ -75,11 +75,7 @@ public class JMMTest {
     }
 
     public void testJasmin(Path resource, boolean mustFail) {
-        OllirResult ollirRes = new OllirResult(
-                OllirUtils.parse(SpecsIo.getResource(resource.toString())), new AnalysisTable(), new ArrayList<>()
-        );
-
-        JasminResult result = new BackendStage().toJasmin(ollirRes);
+        JasminResult result = TestUtils.backend(new OllirResult(SpecsIo.getResource(resource.toString())));
         result.compile();
 
         if (mustFail) {
@@ -360,26 +356,26 @@ public class JMMTest {
      */
     @Test
     public void testDemo1() {
-        test(Path.of("test/fixtures/public/demo/Test1.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test1.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 
     @Test
     public void testDemo2() {
-        test(Path.of("test/fixtures/public/demo/Test2.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test2.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 
     @Test
     public void testDemo3() {
-        test(Path.of("test/fixtures/public/demo/Test3.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test3.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 
     @Test
     public void testDemo4() {
-        test(Path.of("test/fixtures/public/demo/Test4.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test4.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 
     @Test
     public void testDemo5() {
-        test(Path.of("test/fixtures/public/demo/Test5.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test5.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 }

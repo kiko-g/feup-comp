@@ -21,7 +21,7 @@ public class Main {
 
 		JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
 		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
-		OllirResult ollirResult = new OllirResult(new ClassUnit(), semanticsResult.getSymbolTable(), new ArrayList<>());
+		OllirResult ollirResult = new OllirResult(semanticsResult, "", new ArrayList<>());
 		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
 
 		try {

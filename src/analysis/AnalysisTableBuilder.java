@@ -298,24 +298,25 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
             }
         }
 
-        switch(varName) {
-            case "array", "i32", "ret", "bool", "field", "method", "void" -> {
-                return true;
-            }
-        }
-        return false;
+        return checkReservedWord(varName);
+    }
+
+    private boolean checkReservedWord(String varName) {
+        return varName.startsWith("array") || varName.startsWith("i32") || varName.startsWith("ret") ||
+            varName.startsWith("bool") || varName.startsWith("field") || varName.startsWith("method") ||
+            varName.startsWith("void");
     }
 
     private String dealWithReservedKeywordVar(String name, int currentIndex, List<JmmNodeSymbol> params) {
-        StringBuilder finalVarName = new StringBuilder(name.replaceAll("\\$", ""));
+        String finalVarName = name.replaceAll("\\$", "");
         boolean canConflictWithVars = false;
 
-        while(nameHasConflict(name, currentIndex, canConflictWithVars, params)) {
-            finalVarName.insert(0, "_");
+        while(nameHasConflict(finalVarName, currentIndex, canConflictWithVars, params)) {
+            finalVarName = "_" + finalVarName;
             canConflictWithVars = true;
         }
 
-        return finalVarName.toString();
+        return finalVarName;
     }
 
     private boolean nameHasConflict(String varName, int currentIndex, boolean canConflictWithVars, List<JmmNodeSymbol> params) {
@@ -331,12 +332,7 @@ public class AnalysisTableBuilder extends AJmmVisitor<String, String> {
             }
         }
 
-        switch(varName) {
-            case "array", "i32", "ret", "bool", "field", "method", "void" -> {
-                return true;
-            }
-        }
-        return false;
+        return checkReservedWord(varName);
     }
 
     public AnalysisTable getSymbolTable() {
