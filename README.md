@@ -68,6 +68,8 @@ You can also see a test report by opening ``build/reports/tests/test/index.html`
 ## Extra features
 - [ ] Declaration of objects with constructor and parameters
 - [ ] Use do-while template when possible
+- [x] Variables with keyword names: array, i32, ret, bool, field, method and void
+- [x] Variables starting with $
 - [x] Checks if a variable is initialized
 - [x] Functions overload
 - [x] Pop instructions to avoid the accumulation of stack size

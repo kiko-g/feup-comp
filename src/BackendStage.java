@@ -349,6 +349,7 @@ public class BackendStage implements JasminBackend {
 
         switch (instr.getUnaryOperation().getOpType()) {
             case NOT, NOTB -> {
+                String pop = this.generatePops();
                 String left = this.generateLoad(leftElem);
                 String right = this.generateLoad(rightElem);
                 this.instrCurrStackSize--;
@@ -357,7 +358,7 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return left + right + builder.append("\t\tif_icmpne ")
+                return pop + left + right + builder.append("\t\tif_icmpne ")
                     .append(labelTrue)
                     .append("\n\t\ticonst_0\n")
                     .append("\t\tgoto ")
@@ -368,6 +369,7 @@ public class BackendStage implements JasminBackend {
             }
 
             case EQ, EQI32 -> {
+                String pop = this.generatePops();
                 String left = this.generateLoad(leftElem);
                 String right = this.generateLoad(rightElem);
                 this.instrCurrStackSize--;
@@ -376,7 +378,7 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return left + right + builder.append("\t\tif_icmpeq ")
+                return pop + left + right + builder.append("\t\tif_icmpeq ")
                     .append(labelTrue)
                     .append("\n\t\ticonst_0\n")
                     .append("\t\tgoto ")
@@ -403,6 +405,7 @@ public class BackendStage implements JasminBackend {
             }
 
             case LTH, LTHI32 -> {
+                String pop = this.generatePops();
                 String left = this.generateLoad(leftElem);
                 String right = this.generateLoad(rightElem);
                 this.instrCurrStackSize--;
@@ -411,7 +414,7 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return left + right + builder.append("\t\tif_icmplt ")
+                return pop + left + right + builder.append("\t\tif_icmplt ")
                     .append(labelTrue)
                     .append("\n\t\ticonst_0\n")
                     .append("\t\tgoto ")
@@ -422,6 +425,7 @@ public class BackendStage implements JasminBackend {
             }
 
             case GTE, GTEI32 -> {
+                String pop = this.generatePops();
                 String left = this.generateLoad(leftElem);
                 String right = this.generateLoad(rightElem);
                 this.instrCurrStackSize--;
@@ -430,7 +434,7 @@ public class BackendStage implements JasminBackend {
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return left + right + builder.append("\t\tif_icmpge ")
+                return pop + left + right + builder.append("\t\tif_icmpge ")
                     .append(labelTrue)
                     .append("\n\t\ticonst_0\n")
                     .append("\t\tgoto ")
@@ -465,9 +469,9 @@ public class BackendStage implements JasminBackend {
                 this.instrCurrStackSize--;
                 
                 if(leftElem.isLiteral() && BackendStage.isPowerOfTwo(Integer.parseInt(((LiteralElement)leftElem).getLiteral()))) {
-                    return this.generateInt(BackendStage.getLog2(((LiteralElement) leftElem).getLiteral())) + right + "\t\tishl\n";
+                    return right + this.generateInt(BackendStage.getLog2(((LiteralElement) leftElem).getLiteral())) + "\t\tishl\n";
                 } else if(rightElem.isLiteral() && BackendStage.isPowerOfTwo(Integer.parseInt(((LiteralElement)rightElem).getLiteral()))) {
-                    return this.generateInt(BackendStage.getLog2(((LiteralElement) rightElem).getLiteral())) + left  + "\t\tishl\n";
+                    return left + this.generateInt(BackendStage.getLog2(((LiteralElement) rightElem).getLiteral()))  + "\t\tishl\n";
                 } else {
                     return left + right + "\t\timul\n";
                 }
@@ -560,7 +564,7 @@ public class BackendStage implements JasminBackend {
                     .append(invocationType.toString())
                     .append(" ");
 
-                this.instrCurrStackSize -= (instr.getListOfOperands().size() + 2);
+                this.instrCurrStackSize -= (instr.getListOfOperands().size() + 1);
                 builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
 
                 return builder.toString();

@@ -3,12 +3,13 @@ import Shape;
 import Triangle;
 import Rectangle;
 
-class Shapes {
+class Test4 {
     public static void main(String[] args) {
         Triangle triangle1;
         Triangle triangle2;
         Rectangle rectangle1;
         Rectangle rectangle2;
+        int instrSel;
 
         triangle1 = new Triangle();
         triangle2 = new Triangle();
@@ -19,6 +20,19 @@ class Shapes {
         rectangle2.create(10*2-3, 5);
         triangle1.create(3, 5, 20, 0);
         triangle2.create(3, 5);
+
+        //instrSel = instrSel;
+        instrSel = 0 - 2;
+        instrSel = instrSel + 2;
+        instrSel = 0;
+        instrSel = 10;
+        instrSel = 200;
+        instrSel = 35000;
+        if(35000 < 0) {
+            instrSel = 0;
+        } else {
+            instrSel = 1;
+        }
 
         // rectangle pos shifted
         rectangle1.shiftPos(rectangle1.getX() * 2, rectangle1.getY() * 2);
