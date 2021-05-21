@@ -13,8 +13,6 @@ import pt.up.fe.specs.util.SpecsIo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.fail;
@@ -51,7 +49,7 @@ public class JMMTest {
         }
     }
 
-    private String test(Path resource, List<String> inputs, Stage failStage) {
+    private String test(Path resource, String inputs, Stage failStage) {
         try {
             String content = Utils.getResourceContent(resource.toString(), resource.getFileName().toString());
 
@@ -82,7 +80,7 @@ public class JMMTest {
         return "";
     }
 
-    private void test(Path resource, Path results, List<String> inputs) {
+    private void test(Path resource, Path results, String inputs) {
         try {
             String result = Files.readString(results);
             Assert.assertEquals(result, test(resource, inputs, Stage.OTHER));
@@ -93,8 +91,7 @@ public class JMMTest {
 
     private void test(Path resource, Path results, Path inputs) {
         try {
-            String[] input = Files.readString(inputs).replace("\r", "").split("\n");
-            test(resource, results, Arrays.asList(input));
+            test(resource, results, Files.readString(inputs));
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -125,48 +122,48 @@ public class JMMTest {
 
     @Test
     public void testFindMaximum() {
-        test(Path.of("test/fixtures/public/FindMaximum.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/public/FindMaximum.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testHelloWorld() {
-        test(Path.of("test/fixtures/public/HelloWorld.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/public/HelloWorld.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testLazysort() {
-        test(Path.of("test/fixtures/public/Lazysort.jmm"), new ArrayList<>(), Stage.OTHER);
+        compile(Path.of("test/fixtures/public/QuickSort.jmm"));
+        test(Path.of("test/fixtures/public/Lazysort.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testLife() {
-        test(Path.of("test/fixtures/public/Life.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/public/Life.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testMonteCarloPi() {
-        test(Path.of("test/fixtures/public/MonteCarloPi.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/public/MonteCarloPi.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testQuickSort() {
-        test(Path.of("test/fixtures/public/QuickSort.jmm"), Path.of("test/fixtures/public/QuickSort.txt"), new ArrayList<>());
+        test(Path.of("test/fixtures/public/QuickSort.jmm"), Path.of("test/fixtures/public/QuickSort.txt"), "");
     }
 
     @Test
     public void testSimple() {
-        test(Path.of("test/fixtures/public/Simple.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/public/Simple.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testTicTacToe() {
-        fail("[WIP] Input file");
-//        test(Path.of("test/fixtures/public/TicTacToe.jmm"), Path.of("test/fixtures/public/TicTacToe.txt"), Path.of("test/fixtures/public/TicTacToe.input"));
+        test(Path.of("test/fixtures/public/TicTacToe.jmm"), Path.of("test/fixtures/public/TicTacToe.txt"), Path.of("test/fixtures/public/TicTacToe.input"));
     }
 
     @Test
     public void testWhileAndIF() {
-        test(Path.of("test/fixtures/public/WhileAndIF.jmm"), Path.of("test/fixtures/public/WhileAndIF.txt"), new ArrayList<>());
+        test(Path.of("test/fixtures/public/WhileAndIF.jmm"), Path.of("test/fixtures/public/WhileAndIF.txt"), "");
     }
 
     /**
@@ -174,32 +171,32 @@ public class JMMTest {
      */
     @Test
     public void testBlowUp() {
-        test(Path.of("test/fixtures/public/fail/syntactical/BlowUp.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/BlowUp.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testCompleteWhileTest() {
-        test(Path.of("test/fixtures/public/fail/syntactical/CompleteWhileTest.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/CompleteWhileTest.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testLengthError() {
-        test(Path.of("test/fixtures/public/fail/syntactical/LengthError.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/LengthError.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testMissingRightPar() {
-        test(Path.of("test/fixtures/public/fail/syntactical/MissingRightPar.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/MissingRightPar.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testMultipleSequential() {
-        test(Path.of("test/fixtures/public/fail/syntactical/MultipleSequential.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/MultipleSequential.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testNestedLoop() {
-        test(Path.of("test/fixtures/public/fail/syntactical/NestedLoop.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/public/fail/syntactical/NestedLoop.jmm"), "", Stage.SYNTATIC);
     }
 
     /**
@@ -207,52 +204,52 @@ public class JMMTest {
      */
     @Test
     public void testArrIndexNotInt() {
-        test(Path.of("test/fixtures/public/fail/semantic/arr_index_not_int.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/arr_index_not_int.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testArrSizeNotInt() {
-        test(Path.of("test/fixtures/public/fail/semantic/arr_size_not_int.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/arr_size_not_int.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testBadArguments() {
-        test(Path.of("test/fixtures/public/fail/semantic/badArguments.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/badArguments.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testBinopIncomp() {
-        test(Path.of("test/fixtures/public/fail/semantic/binop_incomp.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/binop_incomp.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testFuncNotFound() {
-        test(Path.of("test/fixtures/public/fail/semantic/funcNotFound.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/funcNotFound.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testSimpleLength() {
-        test(Path.of("test/fixtures/public/fail/semantic/simple_length.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/simple_length.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testVarExpIncom() {
-        test(Path.of("test/fixtures/public/fail/semantic/var_exp_incomp.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/var_exp_incomp.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testVarLitIncomp() {
-        test(Path.of("test/fixtures/public/fail/semantic/var_lit_incomp.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/var_lit_incomp.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testVarUndef() {
-        test(Path.of("test/fixtures/public/fail/semantic/var_undef.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/var_undef.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testMissType() {
-        test(Path.of("test/fixtures/public/fail/semantic/extra/miss_type.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/public/fail/semantic/extra/miss_type.jmm"), "", Stage.SEMANTIC);
     }
 
     /**
@@ -260,27 +257,27 @@ public class JMMTest {
      */
     @Test
     public void testTuring() {
-        test(Path.of("test/fixtures/private/Turing.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/Turing.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testTuringV2() {
-        test(Path.of("test/fixtures/private/TuringV2.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/TuringV2.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testArrayAssign() {
-        test(Path.of("test/fixtures/private/ArrayAssign.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/ArrayAssign.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testTarget2() {
-        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target_with_super.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target_with_super.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testTargetWithImport() {
-        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_import.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_import.jmm"), "", Stage.OTHER);
     }
 
     /**
@@ -288,12 +285,12 @@ public class JMMTest {
      */
     @Test
     public void testArrayAssignFail() {
-        test(Path.of("test/fixtures/private/fail/ArrayAssignFail.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/private/fail/ArrayAssignFail.jmm"), "", Stage.SYNTATIC);
     }
 
     @Test
     public void testDirectIntegerArrayAccess() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access.jmm"), new ArrayList<>(), Stage.SYNTATIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access.jmm"), "", Stage.SYNTATIC);
     }
 
     /**
@@ -301,42 +298,42 @@ public class JMMTest {
      */
     @Test
     public void testDifferentOperandTypes() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_op_same_type.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_op_same_type.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testDirectArrayOperations() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_direct_array_ops.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_direct_array_ops.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testArrayIndex1() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access_index.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_array_access_index.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testAssigmentOk() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_ok.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_ok.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testAssigmentFail() {
-        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_fail.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/type_verification/test_assignment_fail.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testTarget1() {
-        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_target.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testMethodParameters() {
-        test(Path.of("test/fixtures/private/semantic/method_verification/test_parameters_number.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_parameters_number.jmm"), "", Stage.SEMANTIC);
     }
 
     @Test
     public void testNumberParameters() {
-        test(Path.of("test/fixtures/private/semantic/method_verification/test_number_parameters.jmm"), new ArrayList<>(), Stage.SEMANTIC);
+        test(Path.of("test/fixtures/private/semantic/method_verification/test_number_parameters.jmm"), "", Stage.SEMANTIC);
     }
 
     /**
@@ -382,17 +379,17 @@ public class JMMTest {
      */
     @Test
     public void testDemo1() {
-        test(Path.of("test/fixtures/private/demo/Test1.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test1.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testDemo2() {
-        test(Path.of("test/fixtures/private/demo/Test2.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test2.jmm"), "", Stage.OTHER);
     }
 
     @Test
     public void testDemo3() {
-        test(Path.of("test/fixtures/private/demo/Test3.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test3.jmm"), "", Stage.OTHER);
     }
 
     @Test
@@ -400,7 +397,7 @@ public class JMMTest {
         compile(Path.of("test/fixtures/private/demo/Shape.jmm"));
         compile(Path.of("test/fixtures/private/demo/Rectangle.jmm"));
         compile(Path.of("test/fixtures/private/demo/Triangle.jmm"));
-        test(Path.of("test/fixtures/private/demo/Test4.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test4.jmm"), "", Stage.OTHER);
     }
 
     @Test
@@ -408,6 +405,6 @@ public class JMMTest {
         compile(Path.of("test/fixtures/private/demo/Shape.jmm"));
         compile(Path.of("test/fixtures/private/demo/Rectangle.jmm"));
         compile(Path.of("test/fixtures/private/demo/Triangle.jmm"));
-        test(Path.of("test/fixtures/private/demo/Test5.jmm"), new ArrayList<>(), Stage.OTHER);
+        test(Path.of("test/fixtures/private/demo/Test5.jmm"), "", Stage.OTHER);
     }
 }
