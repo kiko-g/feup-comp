@@ -10,16 +10,17 @@ class Test4 {
         Rectangle rectangle1;
         Rectangle rectangle2;
         int instrSel;
+        int ret;
 
         triangle1 = new Triangle();
         triangle2 = new Triangle();
         rectangle1 = new Rectangle();
         rectangle2 = new Rectangle();
 
-        rectangle1.create(10, 5, 10, 10);
-        rectangle2.create(10*2-3, 5);
-        triangle1.create(3, 5, 20, 0);
-        triangle2.create(3, 5);
+        ret = rectangle1.create(10, 5, 10, 10);
+        ret = rectangle2.create(10*2-3, 5);
+        ret = triangle1.create(3, 5, 20, 0);
+        ret = triangle2.create(3, 5);
 
         //instrSel = instrSel;
         instrSel = 0 - 2;
@@ -35,21 +36,21 @@ class Test4 {
         }
 
         // rectangle pos shifted
-        rectangle1.shiftPos(rectangle1.getX() * 2, rectangle1.getY() * 2);
+        ret = rectangle1.shiftPos(rectangle1.getX() * 2, rectangle1.getY() * 2);
 
         // rectangles next to each other
-        rectangle2.changePos(rectangle1.getX() + rectangle1.getWidth(), rectangle1.getY() + rectangle1.getHeight());
+        ret = rectangle2.changePos(rectangle1.getX() + rectangle1.getWidth(), rectangle1.getY() + rectangle1.getHeight());
 
         // triangles inside each other
-        triangle2.changePos(triangle1.getX() + 0, triangle1.getY() + 0); //?????
+        ret = triangle2.changePos(triangle1.getX() + 0, triangle1.getY() + 0); //?????
 
         // triangle 2 is twice as big as triangle 1
-        triangle2.setWidth(triangle1.getWidth() * 2);   //?????
-        triangle2.setHeight(triangle1.getHeight() * 2); //?????
+        ret = triangle2.setWidth(triangle1.getWidth() * 2);   //?????
+        ret = triangle2.setHeight(triangle1.getHeight() * 2); //?????
 
-        triangle1.print();
-        triangle2.print();
-        rectangle1.print();
-        rectangle2.print();
+        ret = triangle1.print();
+        ret = triangle2.print();
+        ret = rectangle1.print();
+        ret = rectangle2.print();
     }
 }

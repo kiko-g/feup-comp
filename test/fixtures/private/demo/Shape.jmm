@@ -16,30 +16,62 @@ class Shape {
         return y;
     }
     
-    public void setX(int posX) {
+    public int setX(int posX) {
         x = posX;
+        return 0;
     }
 
-    public void setY(int posY) { 
+    public int setY(int posY) {
         y = posY;
+        return 0;
     }
 
-   public void changePos(int x, int y) {
+    public int getArea() {
+        return area;
+    }
+
+    public int setArea(int areaVal) {
+        area = areaVal;
+        return 0;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int setWidth(int w) {
+        width = w;
+        return 0;
+    }
+
+    public int setHeight(int h) {
+        height = h;
+        return 0;
+    }
+
+   public int changePos(int x, int y) {
       this.setX(x);
       this.setY(y);
+      return 0;
    }
 
-   public void shiftPos(int deltaX, int deltaY) {
+   public int shiftPos(int deltaX, int deltaY) {
       this.changePos(x + deltaX, y + deltaY);
+      return 0;
    }
 
-   public void print() {
+   public int print() {
        io.println(x);
        io.println(y);
        io.println(width);
        io.println(height);
        io.println(area);
        io.println(perimeter);
+       return 0;
    }
 
     /*

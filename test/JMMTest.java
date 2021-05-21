@@ -1,11 +1,9 @@
-import analysis.table.AnalysisTable;
 import org.junit.Assert;
 import org.junit.Test;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
@@ -24,6 +22,34 @@ import static org.junit.Assert.fail;
 
 public class JMMTest {
     protected static class CorrectStageError extends Exception { }
+
+    private void compile(Path resource) {
+        try {
+            String content = Utils.getResourceContent(resource.toString(), resource.getFileName().toString());
+
+            // Parse stage
+            JmmParserResult parserResult = TestUtils.parse(content);
+            Utils.saveFile(Utils.getFilename(resource.toString()), "generated/json", parserResult.toJson());
+            TestUtils.noErrors(parserResult.getReports());
+
+            // Semantic stage
+            JmmSemanticsResult semanticsResult = TestUtils.analyse(parserResult);
+            TestUtils.noErrors(semanticsResult.getReports());
+
+            // Optimization stage
+            OllirResult ollirResult = TestUtils.optimize(semanticsResult, true);
+            TestUtils.noErrors(ollirResult.getReports());
+
+            // Backend stage
+            JasminResult backendResult = TestUtils.backend(ollirResult);
+            TestUtils.noErrors(backendResult.getReports());
+
+            backendResult.getReports().forEach(System.err::println);
+            backendResult.compile();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 
     private String test(Path resource, List<String> inputs, Stage failStage) {
         try {
@@ -371,11 +397,17 @@ public class JMMTest {
 
     @Test
     public void testDemo4() {
+        compile(Path.of("test/fixtures/private/demo/Shape.jmm"));
+        compile(Path.of("test/fixtures/private/demo/Rectangle.jmm"));
+        compile(Path.of("test/fixtures/private/demo/Triangle.jmm"));
         test(Path.of("test/fixtures/private/demo/Test4.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 
     @Test
     public void testDemo5() {
+        compile(Path.of("test/fixtures/private/demo/Shape.jmm"));
+        compile(Path.of("test/fixtures/private/demo/Rectangle.jmm"));
+        compile(Path.of("test/fixtures/private/demo/Triangle.jmm"));
         test(Path.of("test/fixtures/private/demo/Test5.jmm"), new ArrayList<>(), Stage.OTHER);
     }
 }

@@ -33,6 +33,7 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
 
         instructions.add(new ClassInstruction(
                 this.symbolTable.getClassName(),
+                this.symbolTable.getSuper(),
                 this.symbolTable.getFields(),
                 this.defaultVisit(node, AnalysisTable.CLASS_SCOPE)
         ));

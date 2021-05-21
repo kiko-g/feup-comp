@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClassInstruction implements JmmInstruction {
-    private final String className;
+    private final String className, superClass;
     private final List<JmmInstruction> instructions;
     private final List<Symbol> fields;
 
-    public ClassInstruction(String className, List<Symbol> fields, List<JmmInstruction> instructions) {
+    public ClassInstruction(String className, String superClass, List<Symbol> fields, List<JmmInstruction> instructions) {
         this.className = className;
+        this.superClass = superClass;
         this.instructions = instructions;
         this.fields = fields;
     }
@@ -24,7 +25,7 @@ public class ClassInstruction implements JmmInstruction {
 
     @Override
     public String toString(String backspace) {
-        return className + " {\n" +
+        return className + (superClass != null ? (" extends " + superClass) : "") + " {\n" +
             fields.stream().map(this::symbolToField).collect(Collectors.joining()) + "\n" +
             "\t.construct " + className + "().V {\n" +
             "\t\tinvokespecial(this, \"<init>\").V;\n" +

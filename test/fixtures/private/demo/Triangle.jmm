@@ -1,41 +1,23 @@
 class Triangle extends Shape {
-    public int getArea() {
-        return area;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-    
-    public int getWidth() {
-        return width;
-    }
-
-    public int setWidth(int w) {
-        width = w;
-    }
-
-    public void setHeight(int h) {
-        height = h;
-    }
-
     public int create(int w, int h) {
-        this.setX(0);
-        this.setY(0);
-        width = w;
-        height = h;
-        area = (w * h) / 2;
+        int ret;
+        ret = this.setX(0);
+        ret = ret + this.setY(0);
+        ret = ret + this.setWidth(w);
+        ret = ret + this.setHeight(h);
+        ret = ret + this.setArea((w * h) / 2);
 
-        return 0;
+        return ret;
     }
 
     public int create(int x, int y, int w, int h) {
-        this.setX(x);
-        this.setY(y);
-        width = w;
-        height = h;
-        area = (w * h) / 2;
+        int ret;
+        ret = this.setX(x);
+        ret = ret + this.setY(y);
+        ret = ret + this.setWidth(w);
+        ret = ret + this.setHeight(h);
+        ret = ret + this.setArea((w * h) / 2);
 
-        return 0;
+        return ret;
     }
 }

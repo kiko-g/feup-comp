@@ -673,8 +673,8 @@ public class BackendStage implements JasminBackend {
 
         if(BackendStage.isElementTrue(instr.getLeftOperand())) {
             switch(operation.getOpType()) {
-                case NOTB, NOT, EQ -> { }
-                case ORB, ORI32 -> { return this.generatePops() + "\t\tgoto " + label + "\n"; }
+                case EQ -> { }
+                case NOTB, NOT, ORB, ORI32 -> { return this.generatePops() + "\t\tgoto " + label + "\n"; }
                 case ANDB, ANDI32 -> {
                     String load = this.generateLoad(instr.getRightOperand());
                     this.instrCurrStackSize --;

@@ -28,12 +28,12 @@ class ShapesExtra {
         i32 = triangle1.create($width, $height * 2);
         method = triangle2.create($width, $height * 2, 10, 10);
 
-        rectangle1.shiftPos(3, 5);
-        triangle2.shiftPos(6, 10);
+        ret = rectangle1.shiftPos(3, 5);
+        ret = triangle2.shiftPos(6, 10);
 
-        rectangle1.print();
-        rectangle2.print();
-        triangle1.print();
-        triangle2.print();
+        ret = rectangle1.print();
+        ret = rectangle2.print();
+        ret = triangle1.print();
+        ret = triangle2.print();
     }
 }
