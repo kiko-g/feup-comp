@@ -1,40 +1,41 @@
 import io;
 import Shape;
-import Vertex;
 import Triangle;
 import Rectangle;
 
 class Shapes {
     public static void main(String[] args) {
-        int ret;
-        int array;
-        int i32;
-        int method;
-        int $width;
-        int $height;
-        Rectangle rectangle1;
-        Rectangle rectangle2;
         Triangle triangle1;
         Triangle triangle2;
-        
-        $width = 10;
-        $height = 20;
-        rectangle1 = new Rectangle();
-        rectangle2 = new Rectangle();
+        Rectangle rectangle1;
+        Rectangle rectangle2;
+
         triangle1 = new Triangle();
         triangle2 = new Triangle();
+        rectangle1 = new Rectangle();
+        rectangle2 = new Rectangle();
 
-        ret = rectangle1.create($width + 5, $height);
-        array = rectangle2.create($width, $height * 2, 10, 10);
-        i32 = triangle1.create($width, $height * 2);
-        method = triangle2.create($width, $height * 2, 10, 10);
+        rectangle1.create(10, 5, 10, 10);
+        rectangle2.create(10*2-3, 5);
+        triangle1.create(3, 5, 20, 0);
+        triangle2.create(3, 5);
 
-        rectangle1.shiftPos(3, 5);
-        triangle2.shiftPos(6, 10);
+        // rectangle pos shifted
+        rectangle1.shiftPos(rectangle1.getX() * 2, rectangle1.getY() * 2);
 
-        rectangle1.print();
-        rectangle2.print();
+        // rectangles next to each other
+        rectangle2.changePos(rectangle1.getX() + rectangle1.getWidth(), rectangle1.getY() + rectangle1.getHeight());
+
+        // triangles inside each other
+        triangle2.changePos(triangle1.getX() + 0, triangle1.getY() + 0); //?????
+
+        // triangle 2 is twice as big as triangle 1
+        triangle2.setWidth(triangle1.getWidth() * 2);   //?????
+        triangle2.setHeight(triangle1.getHeight() * 2); //?????
+
         triangle1.print();
         triangle2.print();
+        rectangle1.print();
+        rectangle2.print();
     }
 }

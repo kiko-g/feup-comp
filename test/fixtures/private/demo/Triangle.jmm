@@ -11,6 +11,14 @@ class Triangle extends Shape {
         return width;
     }
 
+    public int setWidth(int w) {
+        width = w;
+    }
+
+    public void setHeight(int h) {
+        height = h;
+    }
+
     public int create(int w, int h) {
         this.setX(0);
         this.setY(0);
