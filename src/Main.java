@@ -1,5 +1,3 @@
-import org.specs.comp.ollir.ClassUnit;
-import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
@@ -21,32 +19,32 @@ public class Main {
 	public static void main(String[] args) throws ParseException {
 		parseArguments(args);
 
-		JmmParserResult parserResult = new JmmParserResult(null, new ArrayList<>());
-		JmmSemanticsResult semanticsResult = new JmmSemanticsResult((JmmNode) null, null, new ArrayList<>());
-		OllirResult ollirResult = new OllirResult(semanticsResult, "", new ArrayList<>());
-		JasminResult jasminResult = new JasminResult(ollirResult, "", new ArrayList<>());
+		JmmParserResult parserResult = null;
+		JmmSemanticsResult semanticsResult = null;
+		OllirResult ollirResult = null;
+		JasminResult jasminResult = null;
 
 		try {
 			parserResult = Parser.run(INPUT_FILE);
             semanticsResult = Analysis.run(parserResult);
 			ollirResult = OptimizationStage.run(semanticsResult);
 			jasminResult = BackendStage.run(ollirResult);
-			jasminResult.compile();
+			jasminResult.run();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) {
 		    ignored.printStackTrace();
         } finally {
 			List<Report> reports = new ArrayList<>(parserResult.getReports());
-            if(semanticsResult.getReports().size() > reports.size()) {
+            if(semanticsResult != null && semanticsResult.getReports().size() > reports.size()) {
                 reports = semanticsResult.getReports();
             }
 
-            if(ollirResult.getReports().size() > reports.size()) {
+            if(ollirResult != null && ollirResult.getReports().size() > reports.size()) {
                 reports = ollirResult.getReports();
             }
 
-            if(jasminResult.getReports().size() > reports.size()) {
+            if(jasminResult != null && jasminResult.getReports().size() > reports.size()) {
                 reports = jasminResult.getReports();
             }
 
