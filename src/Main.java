@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 	public static boolean OPTIMIZATIONS;
@@ -62,10 +64,14 @@ public class Main {
 		List<String> arguments = new ArrayList<>(Arrays.asList(args));
 
 		int optIndex;
-		if((optIndex = arguments.indexOf("-r")) != -1) {
+		Pattern p = Pattern.compile("-r=\\d");
+		Matcher m = p.matcher(arguments.get(0));
+		if(m.find())  {
 			try {
-				NUM_REGISTERS = Integer.parseInt(arguments.get(optIndex + 1));
-				if(NUM_REGISTERS <= 0 || NUM_REGISTERS>255) {
+				int numRegisters = Integer.parseInt(arguments.get(0).split("=")[1]);
+				if(numRegisters > 0 && numRegisters < 255) {
+					NUM_REGISTERS = numRegisters;
+				} else {
 					throw new IllegalArgumentException("Invalid argument provided for -r option: Must be positive integer smaller than 255.");
 				}
 			} catch (NumberFormatException e) {
