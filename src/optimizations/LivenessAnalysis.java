@@ -85,7 +85,7 @@ public class LivenessAnalysis {
     }
 
     private void calculateLifeTime(Method method, Map<VarNode, VarLifeTime> lifetimes, Element element, int index) {
-        if(!(element instanceof Operand)) {
+        if(!(element instanceof Operand) || element.getType().getTypeOfElement() == ElementType.THIS) {
             return;
         }
 
@@ -123,10 +123,10 @@ public class LivenessAnalysis {
         List<Map.Entry<VarNode, VarLifeTime>> nodesObjs = new ArrayList<>(lifetimes.entrySet());
         for (int i = 0; i < nodesObjs.size(); i++) {
             Map.Entry<VarNode, VarLifeTime> entry1 = nodesObjs.get(i);
+            VarLifeTime lifetime1 = entry1.getValue();
 
             for (int j = i + 1; j < nodesObjs.size(); j++) {
                 Map.Entry<VarNode, VarLifeTime> entry2 = nodesObjs.get(j);
-                VarLifeTime lifetime1 = entry1.getValue();
                 VarLifeTime lifetime2 = entry2.getValue();
 
                 if(lifetime1.getStart() <= lifetime2.getEnd() && lifetime1.getEnd() >= lifetime2.getStart()) {

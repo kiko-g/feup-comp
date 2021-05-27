@@ -4,12 +4,14 @@ import optimizations.LivenessAnalysis;
 import optimizations.MethodNode;
 import optimizations.VarNode;
 import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import report.StyleReport;
 
@@ -28,6 +30,14 @@ public class OptimizationStage implements JmmOptimization {
         }
 
         OllirResult ollirRes = optStage.toOllir(semanticsResult);
+
+        try {
+            ollirRes.getOllirClass().checkMethodLabels();
+            ollirRes.getOllirClass().buildCFGs();
+            ollirRes.getOllirClass().buildVarTables();
+        } catch (OllirErrorException e) {
+            ollirRes.getReports().add(new Report(ReportType.ERROR, Stage.LLIR, -1, e.getMessage()));
+        }
 
         if(Main.NUM_REGISTERS > 0) {
             optStage.allocateRegisters(ollirRes);

@@ -49,9 +49,9 @@ public class BackendStage implements JasminBackend {
         this.extendsDef = ollirClass.getSuperClass();
 
         try {
-            ollirClass.checkMethodLabels();
-            ollirClass.buildCFGs();
-            ollirClass.buildVarTables();
+//            ollirClass.checkMethodLabels();
+//            ollirClass.buildCFGs();
+//            ollirClass.buildVarTables();
 
             jasminCode.append(this.generateClassDecl(ollirClass));
             jasminCode.append(this.generateClassMethods(ollirClass));

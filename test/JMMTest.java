@@ -1,5 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
+import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
@@ -98,7 +99,17 @@ public class JMMTest {
     }
 
     public void testJasmin(Path resource, boolean mustFail) {
-        JasminResult result = TestUtils.backend(new OllirResult(SpecsIo.getResource(resource.toString())));
+        OllirResult ollirResult = new OllirResult(SpecsIo.getResource(resource.toString()));
+
+        try {
+            ollirResult.getOllirClass().checkMethodLabels();
+            ollirResult.getOllirClass().buildCFGs();
+            ollirResult.getOllirClass().buildVarTables();
+        } catch (OllirErrorException e) {
+            e.printStackTrace();
+        }
+
+        JasminResult result = TestUtils.backend(ollirResult);
         result.compile();
 
         if (mustFail) {
