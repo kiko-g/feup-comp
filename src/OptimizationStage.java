@@ -1,5 +1,8 @@
 import ollir.SethiUllmanGenerator;
 import ollir.SethiUllmanLabeler;
+import optimizations.LivenessAnalysis;
+import optimizations.MethodNode;
+import optimizations.VarNode;
 import org.specs.comp.ollir.ClassUnit;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -13,6 +16,7 @@ import report.StyleReport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OptimizationStage implements JmmOptimization {
@@ -20,7 +24,23 @@ public class OptimizationStage implements JmmOptimization {
         // Checks input
         TestUtils.noErrors(semanticsResult.getReports());
 
-        return new OptimizationStage().toOllir(semanticsResult);
+        OptimizationStage optStage = new OptimizationStage();
+
+        if(Main.OPTIMIZATIONS) {
+            optStage.optimize(semanticsResult);
+        }
+
+        OllirResult ollirRes = optStage.toOllir(semanticsResult);
+
+        if(Main.NUM_REGISTERS > 0) {
+            optStage.allocateRegisters(ollirRes);
+        }
+
+        if(Main.OPTIMIZATIONS) {
+            optStage.optimize(ollirRes);
+        }
+
+        return ollirRes;
     }
 
     @Override
@@ -44,6 +64,11 @@ public class OptimizationStage implements JmmOptimization {
         }
 
         return new OllirResult(semanticsResult, ollirCode, reports);
+    }
+
+    public OllirResult allocateRegisters(OllirResult ollirResult) {
+        ClassUnit classUnit = ollirResult.getOllirClass();
+        Map<MethodNode, Map<VarNode, List<VarNode>>> graph = new LivenessAnalysis(classUnit).analyze();
     }
 
     @Override

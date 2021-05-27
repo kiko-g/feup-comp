@@ -18,12 +18,10 @@ dependencies {
     testImplementation "junit:junit:4.11" 
 }
 
-
 // Execute JJTree
 compileJjtree {
     inputDirectory = file('javacc')
     outputDirectory = file('generated/')
-	include '**/*.java'
 }
 
 
