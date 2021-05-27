@@ -11,8 +11,8 @@ public class LivenessAnalysis {
         this.ollirClass = ollirClass;
     }
 
-    public Map<MethodNode, Map<VarNode, List<VarNode>>> analyze() {
-        Map<MethodNode, Map<VarNode, List<VarNode>>> methodGraph = new HashMap<>();
+    public Map<MethodNode, Map<VarNode, Set<VarNode>>> analyze() {
+        Map<MethodNode, Map<VarNode, Set<VarNode>>> methodGraph = new HashMap<>();
         
         for(Method method: this.ollirClass.getMethods()) {
             Map<VarNode, VarLifeTime> lifetimes = new HashMap<>();
@@ -112,25 +112,29 @@ public class LivenessAnalysis {
         lifetimes.put(node, new VarLifeTime(index, index));
     }
 
-    private Map<VarNode, List<VarNode>> createInterferenceGraph(Method method, Map<VarNode, VarLifeTime> lifetimes) {
-        Map<VarNode, List<VarNode>> nodes = new HashMap<>();
+    private Map<VarNode, Set<VarNode>> createInterferenceGraph(Method method, Map<VarNode, VarLifeTime> lifetimes) {
+        Map<VarNode, Set<VarNode>> nodes = new HashMap<>();
 
         var varTable = method.getVarTable();
         varTable.forEach((var, descriptor) -> {
-            nodes.put(new VarNode(var, descriptor), new ArrayList<>());
+            nodes.put(new VarNode(var, descriptor), new HashSet<>());
         });
 
-        lifetimes.forEach((node, lifetime) -> {
-
-        });
-
-        /*List<Map.Entry<VarNode, List<VarNode>>> nodesObjs = new ArrayList<>(lifetimes.entrySet());
+        List<Map.Entry<VarNode, VarLifeTime>> nodesObjs = new ArrayList<>(lifetimes.entrySet());
         for (int i = 0; i < nodesObjs.size(); i++) {
-            Map.Entry<VarNode, List<VarNode>> entry1 = nodesObjs.get(i);
+            Map.Entry<VarNode, VarLifeTime> entry1 = nodesObjs.get(i);
+
             for (int j = i + 1; j < nodesObjs.size(); j++) {
-                Map.Entry<VarNode, List<VarNode>> entry2 = nodesObjs.get(j);
+                Map.Entry<VarNode, VarLifeTime> entry2 = nodesObjs.get(j);
+                VarLifeTime lifetime1 = entry1.getValue();
+                VarLifeTime lifetime2 = entry2.getValue();
+
+                if(lifetime1.getStart() <= lifetime2.getEnd() && lifetime1.getEnd() >= lifetime2.getStart()) {
+                    nodes.get(entry1.getKey()).add(entry2.getKey());
+                    nodes.get(entry2.getKey()).add(entry1.getKey());
+                }
             }
-        }*/
+        }
 
 
         return nodes;

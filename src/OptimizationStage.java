@@ -13,10 +13,7 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
 import report.StyleReport;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OptimizationStage implements JmmOptimization {
@@ -66,9 +63,10 @@ public class OptimizationStage implements JmmOptimization {
         return new OllirResult(semanticsResult, ollirCode, reports);
     }
 
-    public OllirResult allocateRegisters(OllirResult ollirResult) {
+    public void allocateRegisters(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
-        Map<MethodNode, Map<VarNode, List<VarNode>>> graph = new LivenessAnalysis(classUnit).analyze();
+        Map<MethodNode, Map<VarNode, Set<VarNode>>> graph = new LivenessAnalysis(classUnit).analyze();
+
     }
 
     @Override
