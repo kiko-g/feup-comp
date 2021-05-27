@@ -2,10 +2,7 @@ package optimizations;
 
 import org.specs.comp.ollir.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LivenessAnalysis {
     private ClassUnit ollirClass;
@@ -18,19 +15,14 @@ public class LivenessAnalysis {
         Map<MethodNode, Map<VarNode, List<VarNode>>> methodGraph = new HashMap<>();
         
         for(Method method: this.ollirClass.getMethods()) {
-            Map<VarNode, List<VarNode>> nodes = new HashMap<>();
             Map<VarNode, VarLifeTime> lifetimes = new HashMap<>();
-            
-            var varTable = method.getVarTable();
-            varTable.forEach((var, descriptor) -> {
-                nodes.put(new VarNode(var, descriptor), new ArrayList<>());
-            });
 
             for (int i = 0; i < method.getInstructions().size(); i++) {
                 this.checkInstruction(method, lifetimes, method.getInstructions().get(i), i);
             }
-            
-            methodGraph.put(new MethodNode(method.getMethodName(), method.getParams()), nodes);
+
+            methodGraph.put(new MethodNode(method.getMethodName(), method.getParams()),
+                this.createInterferenceGraph(method, lifetimes));
         }
 
         return methodGraph;
@@ -118,5 +110,29 @@ public class LivenessAnalysis {
         }
 
         lifetimes.put(node, new VarLifeTime(index, index));
+    }
+
+    private Map<VarNode, List<VarNode>> createInterferenceGraph(Method method, Map<VarNode, VarLifeTime> lifetimes) {
+        Map<VarNode, List<VarNode>> nodes = new HashMap<>();
+
+        var varTable = method.getVarTable();
+        varTable.forEach((var, descriptor) -> {
+            nodes.put(new VarNode(var, descriptor), new ArrayList<>());
+        });
+
+        lifetimes.forEach((node, lifetime) -> {
+
+        });
+
+        /*List<Map.Entry<VarNode, List<VarNode>>> nodesObjs = new ArrayList<>(lifetimes.entrySet());
+        for (int i = 0; i < nodesObjs.size(); i++) {
+            Map.Entry<VarNode, List<VarNode>> entry1 = nodesObjs.get(i);
+            for (int j = i + 1; j < nodesObjs.size(); j++) {
+                Map.Entry<VarNode, List<VarNode>> entry2 = nodesObjs.get(j);
+            }
+        }*/
+
+
+        return nodes;
     }
 }
