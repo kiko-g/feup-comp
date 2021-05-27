@@ -1,6 +1,7 @@
 import ollir.SethiUllmanGenerator;
 import ollir.SethiUllmanLabeler;
-import optimizations.LivenessAnalysis;
+import optimizations.GraphPainter;
+import optimizations.InterferenceGraphMaker;
 import optimizations.MethodNode;
 import optimizations.VarNode;
 import org.specs.comp.ollir.ClassUnit;
@@ -40,11 +41,11 @@ public class OptimizationStage implements JmmOptimization {
         }
 
         if(Main.NUM_REGISTERS > 0) {
-            optStage.allocateRegisters(ollirRes);
+            ollirRes = optStage.allocateRegisters(ollirRes);
         }
 
         if(Main.OPTIMIZATIONS) {
-            optStage.optimize(ollirRes);
+            ollirRes = optStage.optimize(ollirRes);
         }
 
         return ollirRes;
@@ -73,10 +74,17 @@ public class OptimizationStage implements JmmOptimization {
         return new OllirResult(semanticsResult, ollirCode, reports);
     }
 
-    public void allocateRegisters(OllirResult ollirResult) {
+    public OllirResult allocateRegisters(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
-        Map<MethodNode, Map<VarNode, Set<VarNode>>> graph = new LivenessAnalysis(classUnit).analyze();
+        Map<MethodNode, Map<VarNode, Set<VarNode>>> graph = new InterferenceGraphMaker(classUnit).create();
+        try {
+            new GraphPainter(graph).paint(Main.NUM_REGISTERS);
+        } catch (GraphPainter.GraphPainterException e) {
+            e.printStackTrace();
+        }
 
+        //TODO: register allocation
+        return ollirResult;
     }
 
     @Override

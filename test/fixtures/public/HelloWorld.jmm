@@ -4,39 +4,13 @@ class HelloWorld {
         int c;
         int a;
         int b;
-        boolean d;
-        boolean f;
+        int d;
+        int f;
 
         a = 10;
-        b = 20;
-        d = true;
-        f = false;
-
-        a = b / 4;
-        a = 0 - 2;
-
-        if (a < 0) {
-            c = a;
-        } else {
-            c = b;
-        }
-
-        if (a < 15) {
-            c = a;
-        } else {
-            c = b;
-        }
-
-        if (true) {
-            c = 5;
-        } else {
-            c = 6;
-        }
-
-        if (d && f) {
-            c = 0;
-        } else {
-            c = 2;
-        }
+        c = 1;
+        a = c;
+        b = 20 + a;
+        d = b;
     }
 }

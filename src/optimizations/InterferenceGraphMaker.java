@@ -4,14 +4,14 @@ import org.specs.comp.ollir.*;
 
 import java.util.*;
 
-public class LivenessAnalysis {
+public class InterferenceGraphMaker {
     private ClassUnit ollirClass;
 
-    public LivenessAnalysis(ClassUnit ollirClass) {
+    public InterferenceGraphMaker(ClassUnit ollirClass) {
         this.ollirClass = ollirClass;
     }
 
-    public Map<MethodNode, Map<VarNode, Set<VarNode>>> analyze() {
+    public Map<MethodNode, Map<VarNode, Set<VarNode>>> create() {
         Map<MethodNode, Map<VarNode, Set<VarNode>>> methodGraph = new HashMap<>();
         
         for(Method method: this.ollirClass.getMethods()) {
@@ -28,6 +28,7 @@ public class LivenessAnalysis {
         return methodGraph;
     }
 
+    // TODO: check which instructions need to be accounted for
     private void checkInstruction(Method method, Map<VarNode, VarLifeTime> lifetimes, Instruction instr, int index) {
         switch (instr.getInstType()) {
             case NOPER -> this.checkSingleOp(method, lifetimes, (SingleOpInstruction) instr, index);
@@ -47,7 +48,6 @@ public class LivenessAnalysis {
 
     private void checkAssignOp(Method method, Map<VarNode, VarLifeTime> lifetimes, AssignInstruction instr, int index) {
         this.calculateLifeTime(method, lifetimes, instr.getDest(), index);
-        this.checkInstruction(method, lifetimes, instr.getRhs(), index);
     }
 
     private void checkBinaryOp(Method method, Map<VarNode, VarLifeTime> lifetimes, BinaryOpInstruction instr, int index) {
@@ -115,9 +115,12 @@ public class LivenessAnalysis {
     private Map<VarNode, Set<VarNode>> createInterferenceGraph(Method method, Map<VarNode, VarLifeTime> lifetimes) {
         Map<VarNode, Set<VarNode>> nodes = new HashMap<>();
 
-        var varTable = method.getVarTable();
+        lifetimes.keySet().forEach(varNode -> nodes.put(varNode, new HashSet<>()));
+
+        HashMap<String, Descriptor> varTable = method.getVarTable();
         varTable.forEach((var, descriptor) -> {
-            nodes.put(new VarNode(var, descriptor), new HashSet<>());
+            if (descriptor.getScope() != VarScope.LOCAL) return;
+            nodes.putIfAbsent(new VarNode(var, descriptor), new HashSet<>());
         });
 
         List<Map.Entry<VarNode, VarLifeTime>> nodesObjs = new ArrayList<>(lifetimes.entrySet());
@@ -135,7 +138,6 @@ public class LivenessAnalysis {
                 }
             }
         }
-
 
         return nodes;
     }
