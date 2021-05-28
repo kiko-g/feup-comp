@@ -29,14 +29,6 @@ public class OptimizationStage implements JmmOptimization {
 
         OllirResult ollirRes = optStage.toOllir(semanticsResult);
 
-        try {
-            ollirRes.getOllirClass().checkMethodLabels();
-            ollirRes.getOllirClass().buildCFGs();
-            ollirRes.getOllirClass().buildVarTables();
-        } catch (OllirErrorException e) {
-            ollirRes.getReports().add(new Report(ReportType.ERROR, Stage.LLIR, -1, e.getMessage()));
-        }
-
         if(Main.NUM_REGISTERS > 0) {
             ollirRes = optStage.allocateRegisters(ollirRes);
         }
@@ -51,7 +43,6 @@ public class OptimizationStage implements JmmOptimization {
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
         JmmNode root = semanticsResult.getRootNode();
-        // More reports from this stage
         List<Report> reports = new ArrayList<>();
 
         SethiUllmanLabeler labeler = new SethiUllmanLabeler();
@@ -64,11 +55,20 @@ public class OptimizationStage implements JmmOptimization {
         try {
             Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".ollir", "ollir", ollirCode);
         } catch (Exception e) {
-            return new OllirResult(semanticsResult, "",
-                Arrays.asList(StyleReport.newError(Stage.OPTIMIZATION, "Exception during Ollir code generation", e)));
+            reports.add(StyleReport.newError(Stage.LLIR, "Exception during Ollir code generation", e));
         }
 
-        return new OllirResult(semanticsResult, ollirCode, reports);
+        OllirResult ollirRes = new OllirResult(semanticsResult, ollirCode, reports);
+
+        try {
+            ollirRes.getOllirClass().checkMethodLabels();
+            ollirRes.getOllirClass().buildCFGs();
+            ollirRes.getOllirClass().buildVarTables();
+        } catch (OllirErrorException e) {
+            reports.add(StyleReport.newError(Stage.LLIR, "Exception during Ollir code generation", e));
+        }
+
+        return ollirRes;
     }
 
     public OllirResult allocateRegisters(OllirResult ollirResult) {
