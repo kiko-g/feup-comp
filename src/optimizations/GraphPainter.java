@@ -32,8 +32,9 @@ public class GraphPainter {
         int stackSize = 0;
 
         while (stack.size() != graph.size()) {
+            int tempNColours = nColours;
             graph.forEach((node, edges) -> {
-                if (node.isDeleted() || edges.stream().filter(VarNode::isDeleted).count() >= nColours) {
+                if (node.isDeleted() || edges.stream().filter(VarNode::isDeleted).count() >= tempNColours) {
                     return;
                 }
 
@@ -41,10 +42,10 @@ public class GraphPainter {
                 stack.push(node);
             });
 
-            //TODO: possibly increase nColours available
             if(stackSize == stack.size()) {
-                return false;
+                nColours++;
             }
+
             stackSize = stack.size();
         }
 
@@ -56,13 +57,16 @@ public class GraphPainter {
             Set<VarNode> edges = graph.get(node);
 
             edges.forEach(varNode -> {
-                if (varNode.isDeleted()) return;
+                if (varNode.isDeleted()) {
+                    return;
+                };
 
                 coloursUsed.add(varNode.getId());
             });
 
             //TODO: possibly increase nColours available
             if (coloursUsed.size() >= nColours) {
+                //VarNode spillingNode = this.chooseSpillingNode();
                 return false;
             }
 
@@ -80,4 +84,8 @@ public class GraphPainter {
 
         return true;
     }
+
+    /*private VarNode chooseSpillingNode() {
+
+    }*/
 }
