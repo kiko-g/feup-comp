@@ -4,6 +4,7 @@ import ollir.instruction.complex.binary.BinaryOperationInstruction;
 import ollir.instruction.complex.binary.DotMethodInstruction;
 import ollir.instruction.complex.binary.DotStaticMethodInstruction;
 import ollir.instruction.complex.binary.NotInstruction;
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class WhileInstruction implements JmmInstruction {
     private static int loopCounter = 0;
     protected List<JmmInstruction> condition, whileBody;
     protected JmmInstruction conditionInstruction;
+    protected JmmInstruction invertedConditionInstruction;
     protected int loopNum;
 
     public WhileInstruction(List<JmmInstruction> condition, List<JmmInstruction> whileBody) {
@@ -25,13 +27,14 @@ public class WhileInstruction implements JmmInstruction {
         }
 
         if (this.conditionInstruction instanceof TerminalInstruction) {
-            this.conditionInstruction = new BinaryOperationInstruction(this.conditionInstruction, this.conditionInstruction, new Operation(OperationType.IS_EQUAL, new Type("bool", false)));
+            this.conditionInstruction = new BinaryOperationInstruction(this.conditionInstruction, new TerminalInstruction(new Symbol(new Type("boolean", false), "false")), new Operation(OperationType.NOT_EQUAL, new Type("bool", false)));
         }
 
         if (this.conditionInstruction instanceof BinaryOperationInstruction) {
             BinaryOperationInstruction ifCondition = (BinaryOperationInstruction) this.conditionInstruction;
+            this.invertedConditionInstruction = new BinaryOperationInstruction(ifCondition);
             if (ifCondition.getOperation() != null) {
-                if(ifCondition.getOperation().getOperationType() != OperationType.LESS_THAN) {
+                if(ifCondition.getOperation().getOperationType() != OperationType.LESS_THAN && ifCondition.getOperation().getOperationType() != OperationType.NOT_EQUAL) {
                     JmmInstruction newLeftInstruction = new NotInstruction(ifCondition.getLhs());
                     condition.add(newLeftInstruction);
                     JmmInstruction newRightInstruction = new NotInstruction(ifCondition.getRhs());

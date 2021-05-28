@@ -10,6 +10,7 @@ public enum OperationType {
     AND,
     NOT,
     IS_EQUAL,
+    NOT_EQUAL,
     OR,
     GREATER_OR_EQUAL,
     ARRAY_ACCESS,

@@ -12,6 +12,11 @@ public class Operation {
         this.resultType = resultType;
     }
 
+    public Operation(Operation operation) {
+        this.operationType = operation.operationType;
+        this.resultType = new Type(operation.resultType.getName(), operation.resultType.isArray());
+    }
+
     public OperationType getOperationType() {
         return operationType;
     }
@@ -29,8 +34,8 @@ public class Operation {
             case AND -> new Operation(OperationType.OR, this.resultType);
             case LESS_THAN -> new Operation(OperationType.GREATER_OR_EQUAL, this.resultType);
             case GREATER_OR_EQUAL -> new Operation(OperationType.LESS_THAN, this.resultType);
-            case NOT -> new Operation(OperationType.IS_EQUAL, this.resultType);
-            case IS_EQUAL -> new Operation(OperationType.NOT, this.resultType);
+            case NOT, NOT_EQUAL -> new Operation(OperationType.IS_EQUAL, this.resultType);
+            case IS_EQUAL -> new Operation(OperationType.NOT_EQUAL, this.resultType);
             default -> this;
         };
     }
@@ -51,6 +56,7 @@ public class Operation {
             case EQUALS -> operation = ":=";
             case NOT -> operation = "!";
             case IS_EQUAL -> operation = "==";
+            case NOT_EQUAL -> operation = "!=";
         }
 
         return operation + "." + OllirUtils.typeToOllir(resultType);

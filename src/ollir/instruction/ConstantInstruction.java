@@ -1,6 +1,5 @@
-package ollir.instruction.complex.binary;
+package ollir.instruction;
 
-import ollir.instruction.TerminalInstruction;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 
 public class ConstantInstruction extends TerminalInstruction {

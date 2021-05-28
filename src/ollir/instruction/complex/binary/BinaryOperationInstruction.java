@@ -18,10 +18,10 @@ public class BinaryOperationInstruction extends ComplexInstruction {
         this.operation = operation;
     }
 
-    protected BinaryOperationInstruction(BinaryOperationInstruction instruction) {
+    public BinaryOperationInstruction(BinaryOperationInstruction instruction) {
         this.lhs = instruction.lhs;
         this.rhs = instruction.rhs;
-        this.operation = instruction.operation;
+        this.operation = new Operation(operation);
     }
 
     public JmmInstruction getRhs() {

@@ -1,4 +1,4 @@
-package optimizations;
+package optimizations.ollir.data;
 
 import org.specs.comp.ollir.Descriptor;
 

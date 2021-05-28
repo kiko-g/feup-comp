@@ -1,5 +1,8 @@
-package optimizations;
+package optimizations.ollir;
 
+import optimizations.ollir.data.MethodNode;
+import optimizations.ollir.data.VarLifeTime;
+import optimizations.ollir.data.VarNode;
 import org.specs.comp.ollir.*;
 
 import java.util.*;

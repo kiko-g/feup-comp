@@ -353,20 +353,19 @@ public class BackendStage implements JasminBackend {
             case NOT, NOTB -> {
                 String pop = this.generatePops();
                 String left = this.generateLoad(leftElem);
-                String right = this.generateLoad(rightElem);
                 this.instrCurrStackSize--;
                 
                 StringBuilder builder = new StringBuilder();
                 String labelTrue = "LABEL_" + this.opLabel++;
                 String labelContinue = "LABEL_" + this.opLabel++;
 
-                return pop + left + right + builder.append("\t\tif_icmpne ")
+                return pop + left + builder.append("\t\tifgt ")
                     .append(labelTrue)
-                    .append("\n\t\ticonst_0\n")
+                    .append("\n\t\ticonst_1\n")
                     .append("\t\tgoto ")
                     .append(labelContinue).append("\n\t")
                     .append(labelTrue).append(":\n")
-                    .append("\t\ticonst_1\n\t")
+                    .append("\t\ticonst_0\n\t")
                     .append(labelContinue).append(":\n").toString();
             }
 
@@ -650,9 +649,9 @@ public class BackendStage implements JasminBackend {
             this.instrCurrStackSize --;
 
             return switch(operation.getOpType()) {
-                case LTH, LTHI32 -> this.generatePops() + load + "\t\tiflt " + label + "\n";
-                case GTE, GTEI32 -> this.generatePops() + load + "\t\tifge " + label + "\n";
-                case ORB, ORI32 -> this.generatePops() + load + "\t\tior\n" + "\t\tifgt " + label + "\n";
+                case LTH, LTHI32 -> this.generatePops() + load + "\t\tifgt " + label + "\n";
+                case GTE, GTEI32 -> this.generatePops() + load + "\t\tifle " + label + "\n";
+                case ORB, ORI32 -> this.generatePops() + load + "\t\tifgt " + label + "\n";
                 case ANDB, ANDI32 -> "";
                 case EQ -> this.generatePops() + load + "\t\tifeq " + label + "\n";
                 default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
@@ -664,8 +663,8 @@ public class BackendStage implements JasminBackend {
             this.instrCurrStackSize --;
 
             return switch(operation.getOpType()) {
-                case LTH, LTHI32 -> this.generatePops() + load + "\t\tifgt " + label + "\n";
-                case GTE, GTEI32 -> this.generatePops() + load + "\t\tifle " + label + "\n";
+                case LTH, LTHI32 -> this.generatePops() + load + "\t\tiflt " + label + "\n";
+                case GTE, GTEI32 -> this.generatePops() + load + "\t\tifge " + label + "\n";
                 case ORB, ORI32 -> this.generatePops() + load + "\t\tifgt " + label + "\n";
                 case ANDB, ANDI32 -> "";
                 case EQ -> this.generatePops() + load + "\t\tifeq " + label + "\n";
@@ -675,13 +674,19 @@ public class BackendStage implements JasminBackend {
 
         if(BackendStage.isElementTrue(instr.getLeftOperand())) {
             switch(operation.getOpType()) {
-                case EQ -> { }
-                case NOTB, NOT, ORB, ORI32 -> { return this.generatePops() + "\t\tgoto " + label + "\n"; }
+                case EQ, NEQ, NEQI32 -> { }
+                case NOTB, NOT -> { return ""; }
+                case ORB, ORI32 -> {
+                    String load = this.generateLoad(instr.getRightOperand());
+                    this.instrCurrStackSize --;
+                    return this.generatePops() + load + "\t\tgoto " + label + "\n";
+                }
                 case ANDB, ANDI32 -> {
                     String load = this.generateLoad(instr.getRightOperand());
                     this.instrCurrStackSize --;
                     return this.generatePops() + load + "\t\tifgt " + label + "\n";
                 }
+
                 default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
             };
         }
@@ -691,7 +696,7 @@ public class BackendStage implements JasminBackend {
                 case NOTB, NOT -> {
                     String load = this.generateLoad(instr.getRightOperand());
                     this.instrCurrStackSize --;
-                    return this.generatePops() + load + "\t\tifne " + label + "\n";
+                    return this.generatePops() + load + "\t\tgoto " + label + "\n";
                 }
                 case ORB, ORI32 -> {
                     String load = this.generateLoad(instr.getRightOperand());
@@ -704,13 +709,19 @@ public class BackendStage implements JasminBackend {
                     this.instrCurrStackSize --;
                     return this.generatePops() + load + "\t\tifeq " + label + "\n";
                 }
+                case NEQ, NEQI32 -> {
+                    String load = this.generateLoad(instr.getRightOperand());
+                    this.instrCurrStackSize --;
+                    return this.generatePops() + load + "\t\tifne " + label + "\n";
+                }
                 default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
             }
         }
 
         if(BackendStage.isElementTrue(instr.getRightOperand())) {
             switch(operation.getOpType()) {
-                case NOTB, NOT, EQ -> { }
+                case EQ, NEQ, NEQI32 -> { }
+                case NOTB, NOT -> { return ""; }
                 case ORB, ORI32 -> { return this.generatePops() + "\t\tgoto " + label + "\n"; }
                 case ANDB, ANDI32 -> {
                     String load = this.generateLoad(instr.getLeftOperand());
@@ -726,7 +737,7 @@ public class BackendStage implements JasminBackend {
                 case NOTB, NOT -> {
                     String load = this.generateLoad(instr.getLeftOperand());
                     this.instrCurrStackSize --;
-                    return this.generatePops() + load + "\t\tifne " + label + "\n";
+                    return this.generatePops() + load + "\t\tgoto " + label + "\n";
                 }
                 case ORB, ORI32 -> {
                     String load = this.generateLoad(instr.getLeftOperand());
@@ -739,22 +750,61 @@ public class BackendStage implements JasminBackend {
                     this.instrCurrStackSize --;
                     return this.generatePops() + load + "\t\tifeq " + label + "\n";
                 }
+                case NEQ, NEQI32 -> {
+                    String load = this.generateLoad(instr.getLeftOperand());
+                    this.instrCurrStackSize --;
+                    return this.generatePops() + load + "\t\tifne " + label + "\n";
+                }
                 default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
             }
         }
 
-        String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
-        this.instrCurrStackSize -= 2;
 
-        return this.generatePops() + operatorsLoads + switch(operation.getOpType()) {
-            case NOTB, NOT -> "\t\tif_icmpne " + label + "\n";
-            case LTH, LTHI32 -> "\t\tif_icmplt " + label + "\n";
-            case GTE, GTEI32 -> "\t\tif_icmpge " + label + "\n";
-            case ORB, ORI32 -> "\t\tior\n" + "\t\tifgt " + label + "\n";
-            case ANDB, ANDI32 -> "\t\tiand\n" + "\t\tifgt " + label + "\n";
-            case EQ -> "\t\tif_icmpeq " + label + "\n";
+        switch(operation.getOpType()) {
+            case NOTB, NOT -> {
+                String operator = this.generateLoad(instr.getLeftOperand());
+                this.instrCurrStackSize--;
+
+                return this.generatePops() + operator + "\t\tifeq " + label + "\n";
+            }
+            case LTH, LTHI32 -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tif_icmplt " + label + "\n";
+            }
+            case GTE, GTEI32 -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tif_icmpge " + label + "\n";
+            }
+            case ORB, ORI32 -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tior\n" + "\t\tifgt " + label + "\n";
+            }
+            case ANDB, ANDI32 -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tiand\n" + "\t\tifgt " + label + "\n";
+            }
+            case EQ -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tif_icmpeq " + label + "\n";
+            }
+            case NEQ, NEQI32 -> {
+                String operatorsLoads = this.generateLoad(instr.getLeftOperand()) + this.generateLoad(instr.getRightOperand());
+                this.instrCurrStackSize -= 2;
+
+                return this.generatePops() + operatorsLoads + "\t\tif_icmpne " + label + "\n";
+            }
             default -> throw new IllegalStateException("Unexpected value: " + operation.getOpType());
-        };
+        }
     }
 
     private String generatePops() {

@@ -1,6 +1,10 @@
 import ollir.SethiUllmanGenerator;
 import ollir.SethiUllmanLabeler;
-import optimizations.*;
+import optimizations.ollir.data.MethodNode;
+import optimizations.ollir.data.VarNode;
+import optimizations.ollir.GraphPainter;
+import optimizations.ollir.InterferenceGraphMaker;
+import optimizations.ollir.RegisterAllocater;
 import org.specs.comp.ollir.ClassUnit;
 import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.TestUtils;
@@ -9,7 +13,6 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import report.StyleReport;
 
@@ -41,7 +44,7 @@ public class OptimizationStage implements JmmOptimization {
     }
 
     @Override
-    public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
+    public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize) {
         JmmNode root = semanticsResult.getRootNode();
         List<Report> reports = new ArrayList<>();
 
@@ -68,6 +71,10 @@ public class OptimizationStage implements JmmOptimization {
             reports.add(StyleReport.newError(Stage.LLIR, "Exception during Ollir code generation", e));
         }
 
+        if (optimize) {
+            allocateRegisters(ollirRes);
+        }
+
         return ollirRes;
     }
 
@@ -76,11 +83,10 @@ public class OptimizationStage implements JmmOptimization {
         Map<MethodNode, Map<VarNode, Set<VarNode>>> graph = new InterferenceGraphMaker(classUnit).create();
         try {
             new GraphPainter(graph).paint(Main.NUM_REGISTERS);
+            new RegisterAllocater().allocate(graph);
         } catch (GraphPainter.GraphPainterException e) {
-            e.printStackTrace();
+            ollirResult.getReports().add(StyleReport.newError(Stage.OPTIMIZATION, "Exception during allocation of registers", e));
         }
-
-        new RegisterAllocater().allocate(graph);
 
         return ollirResult;
     }
@@ -88,10 +94,12 @@ public class OptimizationStage implements JmmOptimization {
     @Override
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
 
-
-
-
         return semanticsResult;
+    }
+
+    @Override
+    public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
+        return toOllir(semanticsResult, false);
     }
 
     @Override

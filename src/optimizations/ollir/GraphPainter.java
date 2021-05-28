@@ -1,4 +1,7 @@
-package optimizations;
+package optimizations.ollir;
+
+import optimizations.ollir.data.MethodNode;
+import optimizations.ollir.data.VarNode;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -32,9 +35,8 @@ public class GraphPainter {
         int stackSize = 0;
 
         while (stack.size() != graph.size()) {
-            int tempNColours = nColours;
             graph.forEach((node, edges) -> {
-                if (node.isDeleted() || edges.stream().filter(VarNode::isDeleted).count() >= tempNColours) {
+                if (node.isDeleted() || edges.stream().filter(VarNode::isDeleted).count() >= nColours) {
                     return;
                 }
 
@@ -43,7 +45,7 @@ public class GraphPainter {
             });
 
             if(stackSize == stack.size()) {
-                nColours++;
+                return false;
             }
 
             stackSize = stack.size();
@@ -63,12 +65,6 @@ public class GraphPainter {
 
                 coloursUsed.add(varNode.getId());
             });
-
-            //TODO: possibly increase nColours available
-            if (coloursUsed.size() >= nColours) {
-                //VarNode spillingNode = this.chooseSpillingNode();
-                return false;
-            }
 
             for (int i = 0; i < nColours; i++) {
                 if(!coloursUsed.contains(i)) {

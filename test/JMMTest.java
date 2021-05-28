@@ -36,7 +36,7 @@ public class JMMTest {
             TestUtils.noErrors(semanticsResult.getReports());
 
             // Optimization stage
-            OllirResult ollirResult = TestUtils.optimize(semanticsResult, true);
+            OllirResult ollirResult = TestUtils.optimize(semanticsResult, false);
             TestUtils.noErrors(ollirResult.getReports());
 
             // Backend stage
@@ -64,7 +64,7 @@ public class JMMTest {
             checkErrors(semanticsResult.getReports(), failStage);
 
             // Optimization stage
-            OllirResult ollirResult = TestUtils.optimize(semanticsResult, true);
+            OllirResult ollirResult = TestUtils.optimize(semanticsResult, false);
             checkErrors(ollirResult.getReports(), failStage);
 
             // Backend stage
