@@ -21,7 +21,7 @@ public class InterferenceGraphMaker {
                 this.checkInstruction(method, lifetimes, method.getInstructions().get(i), i);
             }
 
-            methodGraph.put(new MethodNode(method.getMethodName(), method.getParams()),
+            methodGraph.put(new MethodNode(method.getMethodName(), method.getParams(), method.isStaticMethod()),
                 this.createInterferenceGraph(method, lifetimes));
         }
 

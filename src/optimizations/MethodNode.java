@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 public class MethodNode {
     private final String name;
     private final List<Element> paramList;
+    private final boolean isStatic;
 
-    public MethodNode(String name, List<Element> paramList) {
+    public MethodNode(String name, List<Element> paramList, boolean isStatic) {
         this.name = name;
         this.paramList = paramList;
+        this.isStatic = isStatic;
     }
 
     public String getName() {
@@ -20,6 +22,10 @@ public class MethodNode {
 
     public List<Element> getParamList() {
         return paramList;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
     }
 
     @Override

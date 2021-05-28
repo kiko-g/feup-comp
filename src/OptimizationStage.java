@@ -1,9 +1,6 @@
 import ollir.SethiUllmanGenerator;
 import ollir.SethiUllmanLabeler;
-import optimizations.GraphPainter;
-import optimizations.InterferenceGraphMaker;
-import optimizations.MethodNode;
-import optimizations.VarNode;
+import optimizations.*;
 import org.specs.comp.ollir.ClassUnit;
 import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.TestUtils;
@@ -83,7 +80,8 @@ public class OptimizationStage implements JmmOptimization {
             e.printStackTrace();
         }
 
-        //TODO: register allocation
+        new RegisterAllocater().allocate(graph);
+
         return ollirResult;
     }
 

@@ -164,7 +164,13 @@ public class BackendStage implements JasminBackend {
             return "";
         }
 
-        int locals = this.currMethod.getVarTable().size();
+        int locals = (int) this.currMethod.getVarTable()
+            .values()
+            .stream()
+            .map(Descriptor::getVirtualReg)
+            .distinct()
+            .count();
+
         if(!this.currMethod.isStaticMethod()) {
             locals++;
         }
