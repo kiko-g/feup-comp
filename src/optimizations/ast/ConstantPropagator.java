@@ -13,18 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.Value> {
-    private Map<String, Value> constants = new HashMap<>();
+public class ConstantPropagator  extends AJmmVisitor<String, Symbol> {
+    private final static Type INT = new Type("int", false);
+    private final static Type BOOL = new Type("boolean", false);
 
-    protected static class Value {
-        private final Type type;
-        private final String value;
-
-        public Value(Type type, String value) {
-            this.type = type;
-            this.value = value;
-        }
-    }
+    private Map<String, Symbol> constants = new HashMap<>();
 
     public ConstantPropagator() {
         addVisit("Method", this::visitMethod);
@@ -32,13 +25,13 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
 
         addVisit("Var", this::visitVar);
         addVisit("Assign", this::visitAssign);
-        addVisit("IntegerVal", this::visitAssign);
-        addVisit("Bool", this::visitAssign);
+        addVisit("IntegerVal", (node, scope) -> new Symbol(INT, node.get("VALUE")));
+        addVisit("Bool", (node, scope) -> new Symbol(BOOL, node.get("VALUE")));
 
         setDefaultVisit(this::defaultVisit);
     }
 
-    private Value visitVar(JmmNode node, String scope) {
+    private Symbol visitVar(JmmNode node, String scope) {
         if (!constants.containsKey(node.get("VALUE"))) {
             return null;
         }
@@ -54,29 +47,29 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
 
         node.delete();
 
-        Value constant = constants.get(node.get("VALUE"));
+        Symbol constant = constants.get(node.get("VALUE"));
 
         JmmNode newNode = new JmmNodeImpl(this.valueToKind(constant));
         newNode.put("COLUMN", node.get("COLUMN"));
         newNode.put("LINE", node.get("LINE"));
-        newNode.put("VALUE", constant.value);
+        newNode.put("VALUE", constant.getName());
 
         parent.add(node, index);
 
         return constant;
     }
 
-    private String valueToKind(Value value) {
-        return switch (value.type.getName()) {
+    private String valueToKind(Symbol value) {
+        return switch (value.getType().getName()) {
             case "int" -> "IntegerVal";
             case "boolean" -> "Bool";
-            default -> throw new IllegalStateException("Unexpected value: " + value.type.getName());
+            default -> throw new IllegalStateException("Unexpected value: " + value.getType().getName());
         };
     }
 
-    private Value visitAssign(JmmNode node, String scope) {
+    private Symbol visitAssign(JmmNode node, String scope) {
         JmmNode leftNode = node.getChildren().get(0);
-        Value rightValue = visit(node, scope);
+        Symbol rightValue = visit(node, scope);
 
         if (leftNode.getKind().equals("ArrayAccess")) {
             return null;
@@ -85,12 +78,14 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
         if (rightValue != null) {
             constants.put(leftNode.get("VALUE"), rightValue);
             node.delete();
+        } else {
+            constants.remove(leftNode.get("VALUE"));
         }
 
         return null;
     }
 
-    private Value visitMain(JmmNode node, String scope) {
+    private Symbol visitMain(JmmNode node, String scope) {
         List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
         Symbol methodSymbol = methodSymbols.remove(0);
 
@@ -109,7 +104,7 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
         return null;
     }
 
-    private Value visitMethod(JmmNode node, String e) {
+    private Symbol visitMethod(JmmNode node, String e) {
         List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
         Symbol methodSymbol = methodSymbols.remove(0);
 
@@ -128,7 +123,7 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
         return null;
     }
 
-    private Value defaultVisit(JmmNode node, String scope) {
+    private Symbol defaultVisit(JmmNode node, String scope) {
         for (JmmNode child : node.getChildren()) {
             visit(child, scope);
         }

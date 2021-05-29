@@ -1,5 +1,6 @@
 import ollir.SethiUllmanGenerator;
 import ollir.SethiUllmanLabeler;
+import optimizations.ast.ConstantPropagator;
 import optimizations.ollir.data.MethodNode;
 import optimizations.ollir.data.VarNode;
 import optimizations.ollir.GraphPainter;
@@ -93,7 +94,7 @@ public class OptimizationStage implements JmmOptimization {
 
     @Override
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
-
+        new ConstantPropagator().visit(semanticsResult.getRootNode());
         return semanticsResult;
     }
 
