@@ -2,11 +2,11 @@
 
 ## Group 1A
 
-| Name                | Student Number |
-| ------------------- | -------------- |
-| Francisco Gonçalves | up201704790    |
-| Luís Ramos          | up201706253    |
-| Martim Silva        | up201705205    |
+| Name                | Student Number | Contribution |
+| ------------------- | -------------- | ------------ |
+| Francisco Gonçalves | up201704790    |              |
+| Luís Ramos          | up201706253    |              |
+| Martim Silva        | up201705205    |              |
 
 ## Purpose
 
@@ -81,13 +81,22 @@ TODO
 
 ## Semantic Analysis (checkpoint 2)
 
-### Symbol Table
+1. Build Analysis Table (symbol table)
+2. Type Analysis
+3. Initialization Analysis
 
-TODO
+### Build Analysis Table
+
+Reports are added when there are:
+
+- Duplicated imports
+- Redeclarations of variables
+- Redeclarations of methods
+- Redeclarations of function parameters
 
 ### Type Analysis
 
-Reports are added when:
+Reports are added when
 
 - Import is missing
 - Invalid Type is found
@@ -98,6 +107,8 @@ Reports are added when:
 - Array assignment to a non array variable
 - Array initialization with a Type different than int
 - Variable not initialized
+
+### Initialization Analysis
 
 ### OLLIR
 
@@ -143,11 +154,11 @@ TODO
 
 ### Custom Tests
 
-- Person (Test1)
-- Factorial (Test2)
-- Calendar (Test3)
-- Shapes (Test4)
-- ShapesExtra (Test5)
+- Person (**Test1**)
+- Factorial (**Test2**)
+- Calendar (**Test3**)
+- Shapes (**Test4**)
+- ShapesExtra (**Test5**)
 
 ---
 
