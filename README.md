@@ -2,139 +2,121 @@
 
 ## Group 1A
 
-| Name                | Student Number | Contribution |
-| ------------------- | -------------- | ------------ |
-| Francisco Gonçalves | up201704790    |              |
-| Luís Ramos          | up201706253    |              |
-| Martim Silva        | up201705205    |              |
+| Name                | Student Number | Grade | Contribution |
+| ------------------- | -------------- | ----- | ------------ |
+| Francisco Gonçalves | up201704790    |  20   |     33.3 %   |
+| Luís Ramos          | up201706253    |  20   |     33.3 %   |
+| Martim Silva        | up201705205    |  20   |     33.3 %   |
 
-## Purpose
-
-To build a compiler for programs written in the [Mini-Java language](https://cs.fit.edu/~ryan/cse4251/mini_java_grammar.html).
-
----
+Global grade of the project: 20
 
 ## Project Requirements
 
-- [javacc](https://git.fe.up.pt/compilers2021/comp2021-1a/-/tree/javacc)
-- [gradle](https://gradle.org/install/)
+- Java 15
+- Javacc
+- Gradle
 
 ## Compile
 
 To compile the program, run `gradle build`. This will compile your classes to `classes/main/java` and copy the JAR file to the root directory. The JAR file will have the same name as the repository folder.
 
-### Run
-
-To run you have two options: Run the `.class` files or run the JAR.
-
-### Run `.class`
-
-To run the `.class` files, do the following:
+## Run
+To run the JAR in Windows, do the following command:
 
 ```cmd
-java -cp "./build/classes/java/main/" <class_name> <arguments>
+.\comp2021-1a.bat Main [-r=N] [-o] <input_file.jmm>
 ```
 
-Where `<class_name>` is the name of the class you want to run and `<arguments>` are the arguments to be passed to `main()`.
-
-### Run `.jar`
-
-To run the JAR, do the following command:
-
-```cmd
-java -jar <jar filename> <arguments>
+To run the JAR in Linux, do the following command:
+```shell
+bash comp2021-1a Main [-r=N] [-o] <input_file.jmm>
 ```
 
-Where `<jar filename>` is the name of the JAR file that has been copied to the root folder, and `<arguments>` are the arguments to be passed to `main()`.
-
-Program arguments:
-
-- `-r=N` to limit the number of registers (N) available **(optional)**
-- `-o` to use the optimizations implemented **(optional)**
-- `<filepath>` to test a specific file
+The possible flags that can be used are the following:
+- -r=N | Activate the -r optimization, relative to the liveness analysis and register allocation for local variables. Must be a positive integer, equal or higher than 1 (representing the maximum number of registers that each function can use for local variables). In case it's not possible to allocate N registers to local variables, the compiler will create a report.
+- -o | Activates the -o optimizations. This optimization performs constant propagation, constant folding and dead code removal.
 
 ## Test
 
-To test the program, run `gradle test`. This will execute the build, and run the JUnit tests in the `test` folder. If you want to see output printed during the tests, use the flag `-i` (i.e., `gradle test -i`).
-You can also see a test report by opening `build/reports/tests/test/index.html`.
+To run all tests, enter the following command. All the tests are located in `test/JMMTest.java`
 
-## Checkpoints
+```cmd
+gradle test
+```
 
-1. [Checkpoint 1](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-1)
-2. [Checkpoint 2](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-2)
-3. [Checkpoint 3](https://git.fe.up.pt/compilers2021/comp2021-1a/-/wikis/Checkpoint-3)
+## Summary
 
----
+- Development of a compiler for .jmm files written in [Java--](https://www.cs.purdue.edu/homes/hosking/502/project/grammar.html), a subset of the Java language.
+- The compiler goes through 4 main steps:
+  1. The program parses a Java-- class file by performing **Lexical and Syntatic Analysis** and generates a JSON file with its representation.
+  2. Performs a **Semantic Analysis** to check any potential semantic errors.
+  3. Converts the Java-- class into a **Low Level Intermediate Representation**.
+  4. Performs **Code Generation** step using JVM instructions accepted by Jasmin, generating .class files.
 
-## Syntatic Analysis (checkpoint 1)
+## Syntatic Errors
 
-If the compiler detects an error in a while condition it will stop at the end of the condidtion
+- If the compiler finds a syntatic error inside a while statement it does not halt the execution and is able to recover from it, adding a Report with the error messages. 
+- When detecting a syntatic error inside a while statement the compiler ignores every token until the next "{" or the next ")"
+- The generated `.json` file (in `/generated/json`) saves the AST if the program doesn't have errors otherwise it will save the list of reports.
+- All syntatic error messages include the line, column and expected token. One possible error message in the while statement is the following:
+```cmd
+ERROR@SYNTATIC, line 4, col 4: Error(1) detected during parsing process. Unexpected token ')' ....
+    Error Details:
+        Line: 4          Column: 24
+    Was expecting:
+        "true" | "false" | "this" | "new" | "(" | "!" | <IDENTIFIER> | <INTEGER_LITERAL>
+```
 
-TODO
+## Semantic Analysis
 
-### Checklist
+### Main steps
 
-- [x] Global lookahead of 1
-- [x] Local lookahead of 2 only used once
-
----
-
-## Semantic Analysis (checkpoint 2)
-
-1. Build Analysis Table (symbol table)
+1. Build Analysis Table (Symbol Table)
 2. Type Analysis
 3. Initialization Analysis
 
-### Build Analysis Table
+### Scenarios covered with reports
 
-Reports are added when there are:
+The compiler detects the following semantic errors:
 
 - Duplicated imports
 - Redeclarations of variables
 - Redeclarations of methods
 - Redeclarations of function parameters
-
-### Type Analysis
-
-Reports are added when
-
-- Import is missing
-- Invalid Type is found
-- Accessing the length of a non array
-- A method could not be found
+- Missing imports
+- Invalid Types used
+- Accessing length of a non array
+- A method not be found
 - Invalid parameters to method
 - Types don't match
 - Array assignment to a non array variable
 - Array initialization with a Type different than int
 - Variable not initialized
+- Variables were not initialized
 
-### Initialization Analysis
+## Intermediate Representation & Code Generation
 
-### OLLIR
+### Intermediate Representation
+""Liveness analysis, graph coloring and register allocation is done using the OLLIR code.""
 
-TODO
+We created classes that translate 
 
----
-
-## Code generation (checkpoint 3)
-
-### Code Generation Features
-
-- [x] **Class**
-- [x] **Fields**
-- [x] **Methods**
-- [x] **Instructions**
-- [x] **Conditionals** (`if` and `if-else`)
-- [x] **Loops** (`while`)
-- [x] **Arrays**
+### Intermediate Representation  & Code Generation  Features
+- [x] Class
+- [x] Fields
+- [x] Methods
+- [x] Instructions
+- [x] Conditionals (`if` and `if-else`)
+- [x] Loops (`while`)
+- [x] Arrays
   - [x] Array initialization (`newarray int`)
   - [x] Array Store (`astore`)
   - [x] Array Access (`aload`)
   - [x] Array Position Store (`iastore`)
   - [x] Array Position Access (`iaload`)
-- [x] **Limits** (`.limit stack` and `.limit locals`)
+- [x] Limits (`.limit stack` and `.limit locals`)
 
-### Code Generation Instruction Selection
+#### Code Generation Instruction Selection (default)
 
 - [x] `iconst_`, `bipush`, `sipush`, `ldc`, for pushing integer to the stack with the lowest cost.
 - [x] `iinc` for incrementing/decrementing local variables by a constant value.
@@ -142,51 +124,45 @@ TODO
 - [x] `ineg` for subtracting a variable to 0.
 - [x] `iflt`, `iflt`, `ifge`, `ifgt`, `ifeq`, `ifneq` for if statements comparing with 0
 
-### Extra features
+### Optimizations
+All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+#### Optimizations (-o)
+- [x] Constant propagation
+- [x] Constant folding
+- [x] Dead code removal (with unnused assignments)
 
-- [ ] Declaration of objects with constructor and parameters
-- [ ] Use do-while template when possible
+#### Optimizations (default)
+- [x] While conditions using do while template
+
+### Extra features
+All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+- [x] Functions overload
 - [x] Variables with keyword names: array, i32, ret, bool, field, method and void
 - [x] Variables starting with $
 - [x] Checks if a variable is initialized
-- [x] Functions overload
 - [x] Pop instructions to avoid the accumulation of stack size
 
-### Custom Tests
-
-- Person (**Test1**)
-- Factorial (**Test2**)
-- Calendar (**Test3**)
-- Shapes (**Test4**)
-- ShapesExtra (**Test5**)
-
----
-
-## Final Delivery
-
-### Optimizations
-
-- Constant Propagation
-- Transform while into only one jump
-
-### Register allocation
-
-InterferenceGraphMaker creates the graph and calculates the lifetimes. After that GraphPainter is called and attempts to color the graph with N registers (-r=N). This is done byt using Maps with a Node associated to Sets of Nodes, a stack for the registers and a set for the used colors.
+## Task Distribution
+The development of the project was done in a collaborative manner using platforms such as Discord and VSCode live share. There was constant interchanging in tasks and the code many times was implemented in a pair-programming environment and constant discussions about algorithms efficiency, data structures where all members participated.
 
 ## Pros
-
-- Function overloading
-- Meaningful error reports at the syntatic and semantic level
-- Optimizations implemented (-o)
-- Register allocation (graph coloring)
+- [x] Function overloading
+- [x] Efficient instructions in Jasmin
+- [x] Checks if variable is initialized
+- [x] Pop instructions to avoid the accumulation of stack size
+- [x] Do-while template optimization
+- [x] Constant folding optimization
+- [x] Constant propagation optimization
+- [x] Dead code removal (in certain cases)
+- [x] Meaningful error/warning reports
+- [x] Register allocation (graph coloring)
+- [x] Code structure
+- [x] Robustness of the compiler
+- [x] Compreenshive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)  
+- [x] Storage of all steps
+    - Saves .json file (`/generated/json`) while doing syntatic analysis.
+    - Saves .ollir file (`/ollir`) while doing intermediate representation step.
+    - Saves .j file in (`/jasmin`) while doing code generation step.
 
 ## Cons
-
-- None because we're perfect TODO
-
-## TODO
-
-- [x] Liveness analysis
-- [x] Graph coloring
-- [ ] Dead code removal
-- [ ] Constant folding
+- [x] Grammar uses one local lookahead of 2
