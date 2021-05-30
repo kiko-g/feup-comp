@@ -45,8 +45,7 @@ class MonteCarloPi {
 		int pi_estimate_times_100;
 		int num_samples;
 
-		//num_samples = ioPlus.requestNumber();
-		num_samples = 1;
+		num_samples = ioPlus.requestNumber();
 		pi_estimate_times_100 = new MonteCarloPi().estimatePi100(num_samples);
 
 		ioPlus.printResult(pi_estimate_times_100);

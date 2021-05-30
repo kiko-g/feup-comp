@@ -35,6 +35,9 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
         addVisit("Method", this::visitMethod);
         addVisit("Main", this::visitMain);
 
+        addVisit("While", (node, scope) -> {this.constants.clear(); return this.defaultVisit(node, scope);});
+        addVisit("If", (node, scope) -> {this.constants.clear(); return this.defaultVisit(node, scope);});
+
         // Constant Propagation
         addVisit("Var", this::visitVar);
         addVisit("Assign", this::visitAssign);
@@ -135,7 +138,6 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
     private DeletedNSymbol visitAssign(JmmNode node, String scope) {
         JmmNode leftNode = node.getChildren().get(0);
         DeletedNSymbol rightValue = visit(node.getChildren().get(1), scope);
-        boolean deleted = false;
 
         if (leftNode.getKind().equals("ArrayAccess")) {
             return new DeletedNSymbol(null, false);
@@ -143,23 +145,15 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
 
         if (rightValue != null && rightValue.symbol != null) {
             constants.put(leftNode.get("VALUE"), rightValue.symbol);
-            node.delete();
-            deleted = true;
         } else {
             constants.remove(leftNode.get("VALUE"));
         }
 
-        return new DeletedNSymbol(null, deleted);
+        return new DeletedNSymbol(null, false);
     }
 
     private DeletedNSymbol visitMain(JmmNode node, String scope) {
-        List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
-        Symbol methodSymbol = methodSymbols.remove(0);
-
-        String methodScope = AnalysisTable.getMethodString(methodSymbol.getName(), methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList()));
-
-        this.constants.clear();
-
+        String methodScope = initializeMethod(node);
         DeletedNSymbol deletedNSymbol;
         for (int i = 1; i < node.getNumChildren(); i++){
             if (node.getChildren().get(i).getKind().equals("MethodParameters")) {
@@ -177,27 +171,40 @@ public class ConstantPropagator  extends AJmmVisitor<String, ConstantPropagator.
     }
 
     private DeletedNSymbol visitMethod(JmmNode node, String e) {
-        List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
-        Symbol methodSymbol = methodSymbols.remove(0);
-
-        String methodScope = AnalysisTable.getMethodString(methodSymbol.getName(), methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList()));
-
-        this.constants.clear();
-
+        String methodScope = initializeMethod(node);
+        DeletedNSymbol deletedNSymbol;
         for (int i = 2; i < node.getNumChildren(); i++){
             if (node.getChildren().get(i).getKind().equals("MethodParameters")) {
                 continue;
             }
 
-            visit(node.getChildren().get(i), methodScope);
+            deletedNSymbol = visit(node.getChildren().get(i), methodScope);
+
+            if (deletedNSymbol != null && deletedNSymbol.deleted) {
+                i--;
+            }
         }
 
         return null;
     }
 
+    private String initializeMethod(JmmNode node) {
+        List<Symbol> methodSymbols = new ASTMethodGenerator().visit(node);
+        Symbol methodSymbol = methodSymbols.remove(0);
+
+        this.constants.clear();
+
+        return AnalysisTable.getMethodString(methodSymbol.getName(), methodSymbols.stream().map(Symbol::getType).collect(Collectors.toList()));
+    }
+
     private DeletedNSymbol defaultVisit(JmmNode node, String scope) {
-        for (JmmNode child : node.getChildren()) {
-            visit(child, scope);
+        DeletedNSymbol deletedNSymbol;
+        for (int i = 0; i < node.getNumChildren(); i++) {
+            deletedNSymbol = visit(node.getChildren().get(i), scope);
+
+            if (deletedNSymbol != null && deletedNSymbol.deleted) {
+                i--;
+            }
         }
 
         return null;

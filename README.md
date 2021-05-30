@@ -24,12 +24,12 @@ To compile the program, run `gradle build`. This will compile your classes to `c
 To run the JAR in Windows, do the following command:
 
 ```cmd
-.\comp2021-1a.bat Main [-r=N] [-o] <input_file.jmm>
+.\comp2021-1a.bat Main [-r=<num>] [-o] <input_file.jmm>
 ```
 
 To run the JAR in Linux, do the following command:
-```shell
-bash comp2021-1a Main [-r=N] [-o] <input_file.jmm>
+```bash
+./comp2021-1a Main [-r=<num>] [-o] <input_file.jmm>
 ```
 
 The possible flags that can be used are the following:
@@ -129,7 +129,9 @@ All the optimizations are done at the OLLIR level either after the Semantic Anal
 #### Optimizations (-o)
 - [x] Constant propagation
 - [x] Constant folding
-- [x] Dead code removal (with unnused assignments)
+
+#### Optimizations (-r=<num>)
+- [x] Register Allocation to <num> registers
 
 #### Optimizations (default)
 - [x] While conditions using do while template
@@ -153,14 +155,13 @@ The development of the project was done in a collaborative manner using platform
 - [x] Do-while template optimization
 - [x] Constant folding optimization
 - [x] Constant propagation optimization
-- [x] Dead code removal (in certain cases)
 - [x] Meaningful error/warning reports
 - [x] Register allocation (graph coloring)
 - [x] Code structure
 - [x] Robustness of the compiler
-- [x] Compreenshive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)  
+- [x] Comprehensive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)  
 - [x] Storage of all steps
-    - Saves .json file (`/generated/json`) while doing syntatic analysis.
+    - Saves .json file (`/generated/json`) while doing syntactic analysis.
     - Saves .ollir file (`/ollir`) while doing intermediate representation step.
     - Saves .j file in (`/jasmin`) while doing code generation step.
 

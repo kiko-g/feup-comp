@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,10 +31,9 @@ public class Main {
 			ollirResult = OptimizationStage.run(semanticsResult, OPTIMIZATIONS, NUM_REGISTERS);
 			jasminResult = BackendStage.run(ollirResult);
 			jasminResult.run();
-		} catch (IOException e) {
+		} catch (IOException | RuntimeException e) {
 			System.err.println("Exception: " + e.getMessage());
-		} catch (RuntimeException ignored) {
-        } finally {
+		} finally {
 			List<Report> reports = new ArrayList<>(parserResult.getReports());
             if(semanticsResult != null && semanticsResult.getReports().size() > reports.size()) {
                 reports = semanticsResult.getReports();
@@ -80,6 +80,6 @@ public class Main {
 			OPTIMIZATIONS = true;
 		}
 
-		INPUT_FILE = arguments.get(arguments.size() - 1);
+		INPUT_FILE = Path.of(arguments.get(arguments.size() - 1)).toAbsolutePath().toString();
 	}
 }

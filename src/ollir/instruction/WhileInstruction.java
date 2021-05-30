@@ -37,7 +37,11 @@ public class WhileInstruction implements JmmInstruction {
             BinaryOperationInstruction ifCondition = (BinaryOperationInstruction) this.conditionInstruction;
             this.invertedConditionInstruction = new BinaryOperationInstruction(ifCondition);
             if (ifCondition.getOperation() != null) {
-                if(ifCondition.getOperation().getOperationType() != OperationType.LESS_THAN && ifCondition.getOperation().getOperationType() != OperationType.NOT_EQUAL) {
+                if (ifCondition.getOperation().getOperationType() == OperationType.NOT) {
+                    JmmInstruction newLeftInstruction = new NotInstruction(ifCondition.getLhs());
+                    condition.add(newLeftInstruction);
+                    this.conditionInstruction = new BinaryOperationInstruction(newLeftInstruction.getVariable(), ifCondition.getRhs().getVariable(), ifCondition.getOperation().inverseOperation());
+                } else if (ifCondition.getOperation().getOperationType() != OperationType.LESS_THAN && ifCondition.getOperation().getOperationType() != OperationType.NOT_EQUAL) {
                     JmmInstruction newLeftInstruction = new NotInstruction(ifCondition.getLhs());
                     condition.add(newLeftInstruction);
                     JmmInstruction newRightInstruction = new NotInstruction(ifCondition.getRhs());
