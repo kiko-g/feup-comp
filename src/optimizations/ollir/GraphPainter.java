@@ -1,35 +1,30 @@
 package optimizations.ollir;
 
-import optimizations.ollir.data.MethodNode;
 import optimizations.ollir.data.VarNode;
+import org.specs.comp.ollir.*;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class GraphPainter {
-    private final Map<MethodNode, Map<VarNode, Set<VarNode>>> interferenceGraph;
+    private final Map<Method, Map<VarNode, Set<VarNode>>> interferenceGraph;
 
-    public static class GraphPainterException extends Exception {
-        public GraphPainterException(String message) {
-            super(message);
-        }
-    }
-
-    public GraphPainter(Map<MethodNode, Map<VarNode, Set<VarNode>>> interferenceGraph) {
+    public GraphPainter(Map<Method, Map<VarNode, Set<VarNode>>> interferenceGraph) {
         this.interferenceGraph = interferenceGraph;
     }
 
     public void paint(int nColours) throws GraphPainterException {
-        for (Map.Entry<MethodNode, Map<VarNode, Set<VarNode>>> methodEntry : this.interferenceGraph.entrySet()) {
-            if (!paint(methodEntry.getKey(), methodEntry.getValue(), nColours)) {
-                throw new GraphPainterException("There are not enough registers to allocate to local variables in method \"" + methodEntry.getKey().toString());
+        for (Map.Entry<Method, Map<VarNode, Set<VarNode>>> methodEntry : this.interferenceGraph.entrySet()) {
+            if (!paint(methodEntry.getValue(), nColours)) {
+                throw new GraphPainterException("There are not enough registers to allocate to local variables in method \"" + this.methodToString(methodEntry.getKey()));
             }
         }
     }
 
-    private boolean paint(MethodNode methodNode, Map<VarNode, Set<VarNode>> graph, int nColours) {
+    private boolean paint(Map<VarNode, Set<VarNode>> graph, int nColours) {
         Stack<VarNode> stack = new Stack<>();
         Set<Integer> coloursUsed = new HashSet<>();
         int stackSize = 0;
@@ -61,7 +56,7 @@ public class GraphPainter {
             edges.forEach(varNode -> {
                 if (varNode.isDeleted()) {
                     return;
-                };
+                }
 
                 coloursUsed.add(varNode.getId());
             });
@@ -81,7 +76,21 @@ public class GraphPainter {
         return true;
     }
 
-    /*private VarNode chooseSpillingNode() {
+    public String methodToString(Method method) {
+        return method.getMethodName() + '(' +
+            method.getParams().stream().map(element ->
+                this.typeToString(element.getType()) + " " +
+                    ((Operand) element).getName()).collect(Collectors.joining(", ")) + ')';
+    }
 
-    }*/
+    private String typeToString(Type type) {
+        return switch (type.getTypeOfElement()){
+            case INT32 -> "int";
+            case STRING -> "String";
+            case BOOLEAN -> "boolean";
+            case OBJECTREF, THIS, VOID -> "";
+            case CLASS -> ((ClassType) type).getName();
+            case ARRAYREF -> ((ArrayType) type).getTypeOfElements() == ElementType.INT32 ? "int[]" : "String[]";
+        };
+    }
 }
