@@ -4,9 +4,9 @@
 
 | Name                | Student Number | Grade | Contribution |
 | ------------------- | -------------- | ----- | ------------ |
-| Francisco Gonçalves | up201704790    |  19   |     33.3 %   |
-| Luís Ramos          | up201706253    |  19   |     33.3 %   |
-| Martim Silva        | up201705205    |  19   |     33.3 %   |
+| Francisco Gonçalves | up201704790    | 19    | 33.3 %       |
+| Luís Ramos          | up201706253    | 19    | 33.3 %       |
+| Martim Silva        | up201705205    | 19    | 33.3 %       |
 
 Global grade of the project: 19
 
@@ -21,6 +21,7 @@ Global grade of the project: 19
 To compile the program, run `gradle build`. This will compile your classes to `classes/main/java` and copy the JAR file to the root directory. The JAR file will have the same name as the repository folder.
 
 ## Run
+
 To run the JAR in Windows, do the following command:
 
 ```cmd
@@ -28,11 +29,13 @@ To run the JAR in Windows, do the following command:
 ```
 
 To run the JAR in Linux, do the following command:
+
 ```bash
 ./comp2021-1a Main [-r=<num>] [-o] <input_file.jmm>
 ```
 
 The possible flags that can be used are the following:
+
 - -r=N | Activate the -r optimization, relative to the liveness analysis and register allocation for local variables. Must be a positive integer, equal or higher than 1 (representing the maximum number of registers that each function can use for local variables). In case it's not possible to allocate N registers to local variables, the compiler will create a report.
 - -o | Activates the -o optimizations. This optimization performs constant propagation, constant folding and dead code removal.
 
@@ -41,7 +44,7 @@ The possible flags that can be used are the following:
 To run all tests, enter the following command. All the tests are located in `test/JMMTest.java`
 
 ```cmd
-gradle test
+gradle test --tests "JMMTest"
 ```
 
 ## Summary
@@ -55,10 +58,11 @@ gradle test
 
 ## Syntatic Errors
 
-- If the compiler finds a syntatic error inside a while statement it does not halt the execution and is able to recover from it, adding a Report with the error messages. 
+- If the compiler finds a syntatic error inside a while statement it does not halt the execution and is able to recover from it, adding a Report with the error messages.
 - When detecting a syntatic error inside a while statement the compiler ignores every token until the next "{" or the next ")"
 - The generated `.json` file (in `/generated/json`) saves the AST if the program doesn't have errors otherwise it will save the list of reports.
 - All syntatic error messages include the line, column and expected token. One possible error message in the while statement is the following:
+
 ```cmd
 ERROR@SYNTATIC, line 4, col 4: Error(1) detected during parsing process. Unexpected token ')' ....
     Error Details:
@@ -98,7 +102,8 @@ The compiler detects the following semantic errors:
 
 ### Intermediate Representation
 
-### Intermediate Representation  & Code Generation  Features
+### Intermediate Representation & Code Generation Features
+
 - [x] Class
 - [x] Fields
 - [x] Methods
@@ -122,19 +127,26 @@ The compiler detects the following semantic errors:
 - [x] `iflt`, `iflt`, `ifge`, `ifgt`, `ifeq`, `ifneq` for if statements comparing with 0
 
 ### Optimizations
+
 All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+
 #### Optimizations (-o)
+
 - [x] Constant propagation
 - [x] Constant folding
 
 #### Optimizations (-r=<num>)
-- [x] Register Allocation to <num> registers
+
+- [x] Register Allocation to `num` registers
 
 #### Optimizations (default)
+
 - [x] While conditions using do while template
 
 ### Extra features
+
 All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+
 - [x] Functions overload
 - [x] Variables with keyword names: array, i32, ret, bool, field, method and void
 - [x] Variables starting with $
@@ -142,9 +154,11 @@ All the optimizations are done at the OLLIR level either after the Semantic Anal
 - [x] Pop instructions to avoid the accumulation of stack size
 
 ## Task Distribution
+
 The development of the project was done in a collaborative manner using platforms such as Discord and VSCode live share. There was constant interchanging in tasks and the code many times was implemented in a pair-programming environment and constant discussions about algorithms efficiency, data structures where all members participated.
 
 ## Pros
+
 - [x] Function overloading
 - [x] Efficient instructions in Jasmin
 - [x] Checks if variable is initialized
@@ -156,11 +170,12 @@ The development of the project was done in a collaborative manner using platform
 - [x] Register allocation (graph coloring)
 - [x] Code structure
 - [x] Robustness of the compiler
-- [x] Comprehensive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)  
+- [x] Comprehensive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)
 - [x] Storage of all steps
-    - Saves .json file (`/generated/json`) while doing syntactic analysis.
-    - Saves .ollir file (`/ollir`) while doing intermediate representation step.
-    - Saves .j file in (`/jasmin`) while doing code generation step.
+  - Saves .json file (`/generated/json`) while doing syntactic analysis.
+  - Saves .ollir file (`/ollir`) while doing intermediate representation step.
+  - Saves .j file in (`/jasmin`) while doing code generation step.
 
 ## Cons
+
 - [x] Grammar uses one local lookahead of 2
