@@ -8,7 +8,7 @@
 | Luís Ramos          | up201706253    |  20   |     33.3 %   |
 | Martim Silva        | up201705205    |  20   |     33.3 %   |
 
-Global grade of the project: 20
+Global grade of the project: 19
 
 ## Project Requirements
 
