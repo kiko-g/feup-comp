@@ -21,7 +21,9 @@ public class BinaryOperationInstruction extends ComplexInstruction {
     public BinaryOperationInstruction(BinaryOperationInstruction instruction) {
         this.lhs = instruction.lhs;
         this.rhs = instruction.rhs;
-        this.operation = new Operation(operation);
+        if(instruction.operation != null) {
+            this.operation = new Operation(instruction.operation);
+        }
     }
 
     public JmmInstruction getRhs() {
