@@ -97,9 +97,6 @@ The compiler detects the following semantic errors:
 ## Intermediate Representation & Code Generation
 
 ### Intermediate Representation
-""Liveness analysis, graph coloring and register allocation is done using the OLLIR code.""
-
-We created classes that translate 
 
 ### Intermediate Representation  & Code Generation  Features
 - [x] Class
