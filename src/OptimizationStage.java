@@ -21,23 +21,23 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class OptimizationStage implements JmmOptimization {
-    public static OllirResult run(JmmSemanticsResult semanticsResult) {
+    public static OllirResult run(JmmSemanticsResult semanticsResult, boolean optimize, int nRegisters) {
         // Checks input
         TestUtils.noErrors(semanticsResult.getReports());
 
         OptimizationStage optStage = new OptimizationStage();
 
-        if(Main.OPTIMIZATIONS) {
+        if(optimize) {
             optStage.optimize(semanticsResult);
         }
 
-        OllirResult ollirRes = optStage.toOllir(semanticsResult);
+        OllirResult ollirRes = optStage.toOllir(semanticsResult, optimize);
 
-        if(Main.NUM_REGISTERS > 0) {
+        if(nRegisters > 0) {
             ollirRes = optStage.allocateRegisters(ollirRes);
         }
 
-        if(Main.OPTIMIZATIONS) {
+        if(optimize) {
             ollirRes = optStage.optimize(ollirRes);
         }
 

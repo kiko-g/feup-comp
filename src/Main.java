@@ -27,13 +27,12 @@ public class Main {
 		try {
 			parserResult = Parser.run(INPUT_FILE);
             semanticsResult = Analysis.run(parserResult);
-			ollirResult = OptimizationStage.run(semanticsResult);
+			ollirResult = OptimizationStage.run(semanticsResult, OPTIMIZATIONS, NUM_REGISTERS);
 			jasminResult = BackendStage.run(ollirResult);
 			jasminResult.run();
 		} catch (IOException e) {
 			System.err.println("Exception: " + e.getMessage());
 		} catch (RuntimeException ignored) {
-		    ignored.printStackTrace();
         } finally {
 			List<Report> reports = new ArrayList<>(parserResult.getReports());
             if(semanticsResult != null && semanticsResult.getReports().size() > reports.size()) {
