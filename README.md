@@ -4,9 +4,9 @@
 
 | Name                | Student Number | Grade | Contribution |
 | ------------------- | -------------- | ----- | ------------ |
-| Francisco Gonçalves | up201704790    |  20   |     33.3 %   |
-| Luís Ramos          | up201706253    |  20   |     33.3 %   |
-| Martim Silva        | up201705205    |  20   |     33.3 %   |
+| Francisco Gonçalves | up201704790    |  19   |     33.3 %   |
+| Luís Ramos          | up201706253    |  19   |     33.3 %   |
+| Martim Silva        | up201705205    |  19   |     33.3 %   |
 
 Global grade of the project: 19
 
