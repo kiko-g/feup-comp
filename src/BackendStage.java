@@ -2,12 +2,16 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.jasmin.JasminUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import report.StyleReport;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +56,10 @@ public class BackendStage implements JasminBackend {
             jasminCode.append(this.generateClassDecl(ollirClass));
             jasminCode.append(this.generateClassMethods(ollirClass));
 
-            Utils.saveFile(this.className + ".j", "jasmin", jasminCode.toString());
+            Utils.saveFile(this.className + ".j", "generated/jasmin", jasminCode.toString());
+
+            if (!Files.exists(Paths.get("generated/class"))) new File("generated/class").mkdir();
+            JasminUtils.assemble(new File("generated/jasmin/" + this.className + ".j"), new File("generated/class"));
 
             return new JasminResult(ollirResult, jasminCode.toString(), reports);
         } catch (Exception e) {

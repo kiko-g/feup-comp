@@ -49,7 +49,8 @@ public class OptimizationStage implements JmmOptimization {
         String ollirCode = generator.visit(root).stream().map(inst -> inst.toString("")).collect(Collectors.joining());
 
         try {
-            Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".ollir", "ollir", ollirCode);
+            Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".symbol", "generated/symbol", semanticsResult.getSymbolTable().print());
+            Utils.saveFile(semanticsResult.getSymbolTable().getClassName() + ".ollir", "generated/ollir", ollirCode);
         } catch (Exception e) {
             reports.add(StyleReport.newError(Stage.LLIR, "Exception during Ollir code generation", e));
         }
