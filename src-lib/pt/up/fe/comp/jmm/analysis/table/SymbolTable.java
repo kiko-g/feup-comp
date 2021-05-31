@@ -85,7 +85,8 @@ public interface SymbolTable {
             var returnType = getReturnType(method);
             var params = getParameters(method);
             builder.append(" - " + returnType.print() + " " + method + "(");
-            var paramsString = params.stream().map(Symbol::print).collect(Collectors.joining(", "));
+            var paramsString = params.stream().map(param -> param != null ? param.print() : "<null param>")
+                    .collect(Collectors.joining(", "));
             builder.append(paramsString + ")\n");
         }
 

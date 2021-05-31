@@ -77,6 +77,10 @@ public class JasminResult {
      */
     public File compile() {
         File outputDir = SpecsIo.getTempFolder("jasmin");
+
+        // Clean all class files in folder
+        SpecsIo.deleteFolderContents(outputDir);
+
         return compile(outputDir);
     }
 
