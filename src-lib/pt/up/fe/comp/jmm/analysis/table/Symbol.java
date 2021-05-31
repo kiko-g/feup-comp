@@ -59,4 +59,11 @@ public class Symbol {
         return true;
     }
 
+    public String print() {
+        var builder = new StringBuilder();
+
+        builder.append(getType().print() + " " + getName());
+
+        return builder.toString();
+    }
 }

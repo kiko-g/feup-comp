@@ -56,4 +56,15 @@ public class Type {
         return true;
     }
 
+    public String print() {
+        var builder = new StringBuilder();
+
+        builder.append(getName());
+        if (isArray) {
+            builder.append("[]");
+        }
+
+        return builder.toString();
+    }
+
 }
