@@ -173,9 +173,9 @@ The development of the project was done in a collaborative manner using platform
 - [x] Comprehensive tests in [JmmTest class](https://git.fe.up.pt/compilers2021/comp2021-1a/-/blob/master/test/JMMTest.java)
 - [x] Storage of all steps
   - Saves .json AST file (`/generated/json`) while doing syntactic analysis.
+  - Saves .symbol file in (`/generated/symbol`) with the symbol table contents.
   - Saves .ollir file (`/generated/ollir`) while doing intermediate representation step.
   - Saves .j file in (`/generated/jasmin`) while doing code generation step.
-  - Saves .symbol file in (`/generated/symbol`) with the symbol table contents.
   - Saves .class file in (`/generated/class`) with the decompiled result.
     
 
