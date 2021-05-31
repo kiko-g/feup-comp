@@ -15,7 +15,7 @@ import jasmin.ClassFile;
  * @author Tiago Carvalho
  *
  */
-class JasminUtils {
+public class JasminUtils {
     /**
      * Extracted from Jasmin code
      */
@@ -75,7 +75,7 @@ class JasminUtils {
         } catch (jasError e) {
             throw new RuntimeException("JAS Error: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new RuntimeException("eXception: " + e.getMessage(), e);
+            throw new RuntimeException("Exception while assembling Jasmin file", e);
         }
 
     }
