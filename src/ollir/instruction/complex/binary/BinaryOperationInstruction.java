@@ -43,14 +43,14 @@ public class BinaryOperationInstruction extends ComplexInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String scope) {
         if (operation.getOperationType() == OperationType.EQUALS) {
             return lhs;
         }
 
         hasVariable = true;
 
-        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), "t" + ComplexInstruction.stackCounter++));
+        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), ComplexInstruction.getAuxVar(scope)));
         BinaryOperationInstruction newOperation = new BinaryOperationInstruction(this);
 
         lhs = saveVariable;

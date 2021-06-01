@@ -16,7 +16,7 @@ public class MainInstruction implements JmmInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String _s) {
         return new NullInstruction();
     }
 

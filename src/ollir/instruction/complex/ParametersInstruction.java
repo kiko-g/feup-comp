@@ -1,7 +1,6 @@
 package ollir.instruction.complex;
 import ollir.instruction.JmmInstruction;
 import ollir.instruction.TerminalInstruction;
-import ollir.instruction.complex.ComplexInstruction;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +9,7 @@ public class ParametersInstruction extends ComplexInstruction {
     private final List<JmmInstruction> instructions;
     private JmmInstruction terminalInstruction;
 
-    public ParametersInstruction(List<JmmInstruction> instructions) {
+    public ParametersInstruction(List<JmmInstruction> instructions, String scope) {
         this.instructions = instructions;
 
         terminalInstruction = instructions.get(instructions.size()-1);
@@ -19,12 +18,12 @@ public class ParametersInstruction extends ComplexInstruction {
             instructions.remove(terminalInstruction);
         }
         else {
-            terminalInstruction = terminalInstruction.getVariable();
+            terminalInstruction = terminalInstruction.getVariable(scope);
         }
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String _s) {
         return terminalInstruction;
     }
 

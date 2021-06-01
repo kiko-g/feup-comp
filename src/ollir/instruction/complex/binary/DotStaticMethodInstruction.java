@@ -22,7 +22,7 @@ public class DotStaticMethodInstruction extends BinaryOperationInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String scope) {
         if(operation.getResultType().getName().equals("void")) {
             return new NullInstruction();
         }
@@ -33,7 +33,7 @@ public class DotStaticMethodInstruction extends BinaryOperationInstruction {
 
         hasVariable = true;
 
-        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), "t" + ComplexInstruction.stackCounter++));
+        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(operation.getResultType(), ComplexInstruction.getAuxVar(scope)));
         BinaryOperationInstruction newOperation = new DotStaticMethodInstruction(importClass, methodName, params, operation.getResultType());
 
         lhs = saveVariable;

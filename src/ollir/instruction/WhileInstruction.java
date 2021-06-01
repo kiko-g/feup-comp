@@ -18,13 +18,13 @@ public class WhileInstruction implements JmmInstruction {
     protected JmmInstruction invertedConditionInstruction;
     protected int loopNum;
 
-    public WhileInstruction(List<JmmInstruction> condition, List<JmmInstruction> whileBody) {
+    public WhileInstruction(List<JmmInstruction> condition, List<JmmInstruction> whileBody, String scope) {
         this.conditionInstruction = condition.remove(condition.size() - 1);
         this.condition = condition;
 
         if (this.conditionInstruction instanceof DotMethodInstruction || this.conditionInstruction instanceof DotStaticMethodInstruction) {
             condition.add(this.conditionInstruction);
-            this.conditionInstruction = this.conditionInstruction.getVariable();
+            this.conditionInstruction = this.conditionInstruction.getVariable(scope);
         }
 
         this.invertedCondition = new ArrayList<>(condition);
@@ -43,10 +43,10 @@ public class WhileInstruction implements JmmInstruction {
                         condition.add(newLeftInstruction);
                         JmmInstruction newRightInstruction = new NotInstruction(ifCondition.getRhs());
                         condition.add(newRightInstruction);
-                        this.conditionInstruction = new BinaryOperationInstruction(newLeftInstruction.getVariable(), newRightInstruction.getVariable(), ifCondition.getOperation().inverseOperation());
+                        this.conditionInstruction = new BinaryOperationInstruction(newLeftInstruction.getVariable(scope), newRightInstruction.getVariable(scope), ifCondition.getOperation().inverseOperation());
                     }
                     case NOT -> {
-                        JmmInstruction instruction = ifCondition.getLhs().getVariable();
+                        JmmInstruction instruction = ifCondition.getLhs().getVariable(scope);
                         this.conditionInstruction = new BinaryOperationInstruction(instruction, instruction, new Operation(OperationType.AND, new Type("boolean", false)));
                     }
                     case LESS_THAN, NOT_EQUAL -> ifCondition.setOperation(ifCondition.getOperation().inverseOperation());
@@ -59,7 +59,7 @@ public class WhileInstruction implements JmmInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String _s) {
         return new NullInstruction();
     }
 

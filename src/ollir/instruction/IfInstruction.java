@@ -15,13 +15,13 @@ public class IfInstruction implements JmmInstruction {
     protected JmmInstruction conditionInstruction;
     protected int ifNum;
 
-    public IfInstruction(List<JmmInstruction> condition, List<JmmInstruction> ifBody, List<JmmInstruction> elseBody) {
+    public IfInstruction(List<JmmInstruction> condition, List<JmmInstruction> ifBody, List<JmmInstruction> elseBody, String scope) {
         this.conditionInstruction = condition.remove(condition.size() - 1);
         this.condition = condition;
 
         if (this.conditionInstruction instanceof DotMethodInstruction || this.conditionInstruction instanceof DotStaticMethodInstruction) {
             condition.add(this.conditionInstruction);
-            this.conditionInstruction = this.conditionInstruction.getVariable();
+            this.conditionInstruction = this.conditionInstruction.getVariable(scope);
         }
 
         if (this.conditionInstruction instanceof TerminalInstruction) {
@@ -34,7 +34,7 @@ public class IfInstruction implements JmmInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String _s) {
         return new NullInstruction();
     }
 

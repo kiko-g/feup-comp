@@ -2,7 +2,11 @@ package ollir;
 
 import analysis.ASTMethodGenerator;
 import analysis.table.AnalysisTable;
-import ollir.instruction.*;
+import ollir.instruction.ClassInstruction;
+import ollir.instruction.JmmInstruction;
+import ollir.instruction.MainInstruction;
+import ollir.instruction.MethodInstruction;
+import ollir.instruction.complex.ComplexInstruction;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
@@ -20,6 +24,8 @@ public class SethiUllmanGenerator extends AJmmVisitor<String, List<JmmInstructio
     public SethiUllmanGenerator(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
         this.expressionGenerator = new SethiUllmanExpressionGenerator(symbolTable);
+
+        ComplexInstruction.setStackCounter(0);
 
         addVisit("Class",       this::visitClass);
         addVisit("Method",      this::visitMethod);

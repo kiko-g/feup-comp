@@ -49,7 +49,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
     private List<JmmInstruction> visitIntArray(JmmNode node, String scope) {
         List<JmmInstruction> sizeInstructions = this.visit(node.getChildren().get(0), scope);
 
-        JmmInstruction sizeVar = getTerminalInstruction(sizeInstructions, sizeInstructions.get(sizeInstructions.size() - 1));
+        JmmInstruction sizeVar = getTerminalInstruction(sizeInstructions, sizeInstructions.get(sizeInstructions.size() - 1), scope);
 
         List<JmmInstruction> instructions = new ArrayList<>(sizeInstructions);
         instructions.add(new NewArrayInstruction(sizeVar));
@@ -60,7 +60,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
     private List<JmmInstruction> visitNot(JmmNode node, String scope) {
         List<JmmInstruction> notInstructions = this.visit(node.getChildren().get(0), scope);
 
-        JmmInstruction notVar = getTerminalInstruction(notInstructions, notInstructions.get(notInstructions.size() - 1));
+        JmmInstruction notVar = getTerminalInstruction(notInstructions, notInstructions.get(notInstructions.size() - 1), scope);
 
         List<JmmInstruction> instructions = new ArrayList<>(notInstructions);
         instructions.add(new NotInstruction(notVar));
@@ -70,7 +70,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
 
     private List<JmmInstruction> visitReturn(JmmNode node, String scope) {
         List<JmmInstruction> instructions = new ArrayList<>(visit(node.getChildren().get(0), scope));
-        JmmInstruction terminalVar = getTerminalInstruction(instructions, instructions.get(instructions.size() - 1));
+        JmmInstruction terminalVar = getTerminalInstruction(instructions, instructions.get(instructions.size() - 1), scope);
 
         instructions.add(new ReturnInstruction(terminalVar, this.symbolTable.getReturnType(scope)));
 
@@ -86,7 +86,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> instructions = new ArrayList<>();
 
         if (leftInstructions.size() != 0) {
-            leftInstruction = getTerminalInstruction(leftInstructions, leftInstructions.get(leftInstructions.size() - 1));
+            leftInstruction = getTerminalInstruction(leftInstructions, leftInstructions.get(leftInstructions.size() - 1), scope);
 
             instructions.addAll(leftInstructions);
 
@@ -118,7 +118,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
 
         for (JmmNode param : paramNode.getChildren()) {
             List<JmmInstruction> paramInstructions = visit(param, scope);
-            paramTerminals.add(getTerminalInstruction(paramInstructions, paramInstructions.get(paramInstructions.size() - 1)));
+            paramTerminals.add(getTerminalInstruction(paramInstructions, paramInstructions.get(paramInstructions.size() - 1), scope));
             instructions.addAll(paramInstructions);
         }
 
@@ -130,7 +130,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> instructions = new ArrayList<>();
 
         for(JmmNode child : children) {
-            instructions.add(new ParametersInstruction(visit(child, scope)));
+            instructions.add(new ParametersInstruction(visit(child, scope), scope));
         }
 
         return instructions;
@@ -169,8 +169,8 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
         List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1));
-        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1), scope);
+        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1), scope);
 
         instructions.addAll(instructionsLeft);
         instructions.addAll(instructionsRight);
@@ -205,9 +205,9 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         String className = node.getChildren().get(0).get("VALUE");
 
         if (className.equals(symbolTable.getClassName())) {
-            instructions.add(new NewObjectInstruction(className));
+            instructions.add(new NewObjectInstruction(className, scope));
         } else {
-            instructions.add(new NewObjectInstruction(getImport(className)));
+            instructions.add(new NewObjectInstruction(getImport(className), scope));
         }
 
         return instructions;
@@ -217,8 +217,8 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> instructionsLeft = this.visit(node.getChildren().get(0), scope);
         List<JmmInstruction> instructionsRight = this.visit(node.getChildren().get(1), scope);
 
-        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1));
-        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1));
+        JmmInstruction leftVar = getTerminalInstruction(instructionsLeft, instructionsLeft.get(instructionsLeft.size() - 1), scope);
+        JmmInstruction rightVar = getTerminalInstruction(instructionsRight, instructionsRight.get(instructionsRight.size() - 1), scope);
 
         if (rightVar instanceof ConstantInstruction) {
             ConstantInstruction rightConstant = (ConstantInstruction) rightVar;
@@ -232,7 +232,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
 
             instructionsRight.add(constantAssign);
 
-            rightVar = constantAssign.getVariable();
+            rightVar = constantAssign.getVariable(scope);
         }
 
         List<JmmInstruction> instructions = new ArrayList<>(instructionsLeft);
@@ -254,7 +254,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         JmmInstruction leftVar = instructionsLeft.get(instructionsLeft.size() - 1);
 
         if (leftVar instanceof GetFieldInstruction) {
-            rightVar = this.getTerminalInstruction(instructionsRight, rightVar);
+            rightVar = this.getTerminalInstruction(instructionsRight, rightVar, scope);
             instructionsLeft.remove(leftVar);
             instructions.addAll(instructionsRight);
             instructions.add(new PutFieldInstruction(((GetFieldInstruction) leftVar).getField(), rightVar));
@@ -264,14 +264,14 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         if (leftVar instanceof ArrayAccessInstruction) {
             instructionsLeft.remove(leftVar);
         } else {
-            leftVar = getTerminalInstruction(instructionsLeft, leftVar);
+            leftVar = getTerminalInstruction(instructionsLeft, leftVar, scope);
         }
 
         if (rightVar instanceof TerminalInstruction ||
                 (rightVar instanceof BinaryOperationInstruction && ((BinaryOperationInstruction) rightVar).getOperation().getOperationType() != OperationType.EQUALS)) {
             instructionsRight.remove(rightVar);
         } else {
-            rightVar = rightVar.getVariable();
+            rightVar = rightVar.getVariable(scope);
         }
 
         instructions.addAll(instructionsLeft);
@@ -299,7 +299,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> conditionTrueInstructions = visit(conditionTrue, scope);
         List<JmmInstruction> conditionFalseInstructions = visit(conditionFalse, scope);
 
-        instructions.add(new IfInstruction(conditionInstructions, conditionTrueInstructions, conditionFalseInstructions));
+        instructions.add(new IfInstruction(conditionInstructions, conditionTrueInstructions, conditionFalseInstructions, scope));
 
         return instructions;
     }
@@ -312,7 +312,7 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         List<JmmInstruction> conditionInstructions = visit(condition, scope);
         List<JmmInstruction> loopInstructions = visit(loop, scope);
 
-        instructions.add(new WhileInstruction(conditionInstructions, loopInstructions));
+        instructions.add(new WhileInstruction(conditionInstructions, loopInstructions, scope));
 
         return instructions;
     }
@@ -339,13 +339,13 @@ public class SethiUllmanExpressionGenerator extends AJmmVisitor<String, List<Jmm
         return importStatement.substring(delimiterIndex + 1);
     }
 
-    private JmmInstruction getTerminalInstruction(List<JmmInstruction> instructions, JmmInstruction var) {
+    private JmmInstruction getTerminalInstruction(List<JmmInstruction> instructions, JmmInstruction var, String scope) {
         if (var instanceof TerminalInstruction) {
             instructions.remove(var);
             return var;
         }
 
-        return var.getVariable();
+        return var.getVariable(scope);
     }
 
     private Type getVarType(JmmNode node, String scope) {

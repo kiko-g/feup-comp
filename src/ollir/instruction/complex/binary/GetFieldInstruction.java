@@ -20,14 +20,14 @@ public class GetFieldInstruction extends BinaryOperationInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String scope) {
         if (operation.getOperationType() == OperationType.EQUALS) {
             return lhs;
         }
 
         hasVariable = true;
 
-        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(field.getType(), "t" + ComplexInstruction.stackCounter++));
+        TerminalInstruction saveVariable = new TerminalInstruction(new Symbol(field.getType(), ComplexInstruction.getAuxVar(scope)));
         BinaryOperationInstruction newOperation = new GetFieldInstruction(this.field);
 
         lhs = saveVariable;

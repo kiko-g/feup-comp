@@ -15,7 +15,7 @@ public class TerminalInstruction implements JmmInstruction {
     }
 
     @Override
-    public JmmInstruction getVariable() {
+    public JmmInstruction getVariable(String _s) {
         return this;
     }
 

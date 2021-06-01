@@ -1,6 +1,6 @@
 package ollir.instruction;
 
 public interface JmmInstruction {
-    JmmInstruction getVariable();
+    JmmInstruction getVariable(String scope);
     String toString(String backspace);
 }
