@@ -13,7 +13,7 @@ Global grade of the project: 19
 ## Project Requirements
 
 - Java 15
-- Javacc
+- JavaCC
 - Gradle
 
 ## Compile
@@ -36,7 +36,7 @@ To run the JAR in Linux, do the following command:
 
 The possible flags that can be used are the following:
 
-- -r=N | Activate the -r optimization, relative to the liveness analysis and register allocation for local variables. Must be a positive integer, equal or higher than 1 (representing the maximum number of registers that each function can use for local variables). In case it's not possible to allocate N registers to local variables, the compiler will create a report.
+- -r=<num> | Activate the -r optimization, relative to the liveness analysis and register allocation for local variables. Must be a positive integer, equal or higher than 1 (representing the maximum number of registers that each function can use for local variables). In case it's not possible to allocate <num> registers to local variables, the compiler will create a report.
 - -o | Activates the -o optimizations. This optimization performs constant propagation, constant folding and dead code removal.
 
 ## Test
@@ -51,17 +51,17 @@ gradle test --tests "JMMTest"
 
 - Development of a compiler for .jmm files written in [Java--](https://www.cs.purdue.edu/homes/hosking/502/project/grammar.html), a subset of the Java language.
 - The compiler goes through 4 main steps:
-  1. The program parses a Java-- class file by performing **Lexical and Syntatic Analysis** and generates a JSON file with its representation.
+  1. The program parses a Java-- class file by performing **Lexical and Syntactic Analysis** and generates a JSON file with its representation.
   2. Performs a **Semantic Analysis** to check any potential semantic errors.
   3. Converts the Java-- class into a **Low Level Intermediate Representation**.
   4. Performs **Code Generation** step using JVM instructions accepted by Jasmin, generating .class files.
 
-## Syntatic Errors
+## Syntactic Errors
 
-- If the compiler finds a syntatic error inside a while statement it does not halt the execution and is able to recover from it, adding a Report with the error messages.
-- When detecting a syntatic error inside a while statement the compiler ignores every token until the next "{" or the next ")"
+- If the compiler finds a syntactic error inside a while statement it does not halt the execution and is able to recover from it, adding a Report with the error messages.
+- When detecting a syntactic error inside a while statement the compiler ignores every token until the next "{" or the next ")"
 - The generated `.json` file (in `/generated/json`) saves the AST if the program doesn't have errors otherwise it will save the list of reports.
-- All syntatic error messages include the line, column and expected token. One possible error message in the while statement is the following:
+- All syntactic error messages include the line, column and expected token. One possible error message in the while statement is the following:
 
 ```cmd
 ERROR@SYNTATIC, line 4, col 4: Error(1) detected during parsing process. Unexpected token ')' ....
@@ -84,9 +84,9 @@ ERROR@SYNTATIC, line 4, col 4: Error(1) detected during parsing process. Unexpec
 The compiler detects the following semantic errors:
 
 - Duplicated imports
-- Redeclarations of variables
-- Redeclarations of methods
-- Redeclarations of function parameters
+- Redeclaration of variables
+- Redeclaration of methods
+- Redeclaration of function parameters
 - Missing imports
 - Invalid Types used
 - Accessing length of a non array
@@ -94,9 +94,8 @@ The compiler detects the following semantic errors:
 - Invalid parameters to method
 - Types don't match
 - Array assignment to a non array variable
-- Array initialization with a Type different than int
-- Variable not initialized
-- Variables were not initialized
+- Array initialization with a Type different from int
+- Variables not initialized
 
 ## Intermediate Representation & Code Generation
 
@@ -124,11 +123,11 @@ The compiler detects the following semantic errors:
 - [x] `iinc` for incrementing/decrementing local variables by a constant value.
 - [x] `ishl`, `ishr` for using shifts with multiplications/division with a power of 2 number.
 - [x] `ineg` for subtracting a variable to 0.
-- [x] `iflt`, `iflt`, `ifge`, `ifgt`, `ifeq`, `ifneq` for if statements comparing with 0
+- [x] `iflt`, `ifge`, `ifgt`, `ifeq`, `ifneq` for if statements comparing with 0
 
 ### Optimizations
 
-All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+All the optimizations are done at the LLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
 
 #### Optimizations (-o)
 
@@ -145,7 +144,7 @@ All the optimizations are done at the OLLIR level either after the Semantic Anal
 
 ### Extra features
 
-All the optimizations are done at the OLLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
+All the optimizations are done at the LLIR level either after the Semantic Analysis or after the generation of the Intermediate Representation.
 
 - [x] Functions overload
 - [x] Variables with keyword names: array, i32, ret, bool, field, method and void
@@ -155,7 +154,7 @@ All the optimizations are done at the OLLIR level either after the Semantic Anal
 
 ## Task Distribution
 
-The development of the project was done in a collaborative manner using platforms such as Discord and VSCode live share. There was constant interchanging in tasks and the code many times was implemented in a pair-programming environment and constant discussions about algorithms efficiency, data structures where all members participated.
+The development of the project was done in a collaborative manner using platforms such as Discord and VSCode live share. There was constant interchanging in tasks, and the code many times was implemented in a pair-programming environment and constant discussions about algorithms efficiency, data structures where all members participated.
 
 ## Pros
 
