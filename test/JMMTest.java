@@ -298,6 +298,11 @@ public class JMMTest {
         test(Path.of("test/fixtures/private/semantic/method_verification/test_existence_import.jmm"), "", Stage.OTHER);
     }
 
+    @Test
+    public void testOptimizeConstants() {
+        test(Path.of("test/fixtures/private/OptimizeConstants.jmm"), "", Stage.OTHER);
+    }
+
     /**
      * Private Tests - Syntactic: Fail
      */

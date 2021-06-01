@@ -1,0 +1,15 @@
+class OptimizeConstants {
+    public static void main(String[] args) {
+        int c;
+        int a;
+        int b;
+        int d;
+        int f;
+
+        a = 10;
+        c = 1;
+        a = c;
+        b = 20 + a;
+        d = b;
+    }
+}
