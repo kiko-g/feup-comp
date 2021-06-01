@@ -11,12 +11,21 @@ public class AnalysisTable implements SymbolTable {
     public final static String CLASS_SCOPE = "";
     public final static String MAIN_SCOPE = "main";
     public final static String PARAM_SEPARATOR = "^";
+    private static AnalysisTable current;
 
     private final Map<String, Set<Symbol>> symbolTable = new HashMap<>();
     private final Map<Symbol, Set<Symbol>> methods = new HashMap<>();
     private final Set<String> imports = new HashSet<>();
     private String className;
     private String extension;
+
+    public AnalysisTable() {
+        current = this;
+    }
+
+    public static AnalysisTable getInstance() {
+        return current;
+    }
 
     public static String getMethodString(String methodName, List<Type> parameters) {
         StringBuilder builder = new StringBuilder();
@@ -27,6 +36,28 @@ public class AnalysisTable implements SymbolTable {
         }
 
         return builder.toString();
+    }
+
+    public boolean hasConflict(String var, String scope) {
+        for(Symbol param : this.getParameters(scope)) {
+            if (param.getName().equals(var)) {
+                return true;
+            }
+        }
+
+        for(Symbol localVar : this.getLocalVariables(scope)) {
+            if (localVar.getName().equals(var)) {
+                return true;
+            }
+        }
+
+        for(Symbol field : this.getFields()) {
+            if (field.getName().equals(var)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
