@@ -25,13 +25,13 @@ To compile the program, run `gradle build`. This will compile your classes to `c
 To run the JAR in Windows, do the following command:
 
 ```cmd
-.\comp2021-1a.bat Main [-r=<num>] [-o] <input_file.jmm>
+.\comp2021-1a.bat [-r=<num>] [-o] <input_file.jmm>
 ```
 
 To run the JAR in Linux, do the following command:
 
 ```bash
-./comp2021-1a Main [-r=<num>] [-o] <input_file.jmm>
+./comp2021-1a [-r=<num>] [-o] <input_file.jmm>
 ```
 
 The possible flags that can be used are the following:

@@ -11,15 +11,22 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.specs.util.SpecsIo;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.fail;
 
 
 public class JMMTest {
+    private static final List<String> classpath = new ArrayList<>(
+        Arrays.asList("generated/class",
+            "test/fixtures/libs/compiled"));
+
     protected static class CorrectStageError extends Exception { }
 
     private void compile(Path resource) {
@@ -44,7 +51,7 @@ public class JMMTest {
             TestUtils.noErrors(backendResult.getReports());
 
             backendResult.getReports().forEach(System.err::println);
-            backendResult.compile();
+            backendResult.compile(new File("generated/class"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -72,7 +79,7 @@ public class JMMTest {
             checkErrors(backendResult.getReports(), failStage);
 
             backendResult.getReports().forEach(System.err::println);
-            return backendResult.run(inputs);
+            return backendResult.run(new ArrayList<>(), classpath, inputs);
         } catch (CorrectStageError ignored) {
         } catch (Exception e) {
             fail(e.getMessage());

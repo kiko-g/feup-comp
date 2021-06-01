@@ -1,3 +1,4 @@
+import org.specs.comp.ollir.parser.ParseException;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
@@ -17,8 +18,13 @@ public class Main {
 	public static int NUM_REGISTERS = 0;
 	public static String INPUT_FILE;
 
-	public static void main(String[] args) throws ParseException {
-		parseArguments(args);
+	public static void main(String[] args) {
+		try {
+			parseArguments(args);
+		} catch(Exception e) {
+			System.err.println(e.getMessage());
+			return;
+		}
 
 		JmmParserResult parserResult = null;
 		JmmSemanticsResult semanticsResult = null;
@@ -32,7 +38,7 @@ public class Main {
 			jasminResult = BackendStage.run(ollirResult);
 			jasminResult.run();
 		} catch (IOException | RuntimeException e) {
-			System.err.println("Exception: " + e.getMessage());
+			e.printStackTrace();
 		} finally {
 			List<Report> reports = new ArrayList<>(parserResult.getReports());
             if(semanticsResult != null && semanticsResult.getReports().size() > reports.size()) {
@@ -53,14 +59,12 @@ public class Main {
 
 	private static void parseArguments(String[] args) throws ParseException {
 		if(args.length < 1) {
-			System.err.println("Not enough arguments provided.");
 			System.err.println("Usage: \"java -jar jmm.jar [-r=<num>] [-o] <input_file.jmm>\"");
-			return;
+			throw new ParseException("Not enough arguments provided.");
 		}
 
 		List<String> arguments = new ArrayList<>(Arrays.asList(args));
 
-		int optIndex;
 		Pattern p = Pattern.compile("-r=\\d");
 		Matcher m = p.matcher(arguments.get(0));
 		if(m.find())  {

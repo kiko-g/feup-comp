@@ -6,4 +6,4 @@ SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-java -cp "$SCRIPTPATH/comp2021-1a.jar:$SCRIPTPATH/libs/utils.jar:$SCRIPTPATH/libs/gson-2.8.2.jar:$SCRIPTPATH/libs/ollir.jar:$SCRIPTPATH/libs/jasmin.jar" "$@"
+java -cp "$SCRIPTPATH/comp2021-1a.jar:$SCRIPTPATH/libs/utils.jar:$SCRIPTPATH/libs/gson-2.8.2.jar:$SCRIPTPATH/libs/ollir.jar:$SCRIPTPATH/libs/jasmin.jar" Main "$@"

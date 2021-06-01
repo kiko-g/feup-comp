@@ -1,5 +1,4 @@
 import ollir.SethiUllmanGenerator;
-import ollir.SethiUllmanLabeler;
 import optimizations.ast.ConstantPropagator;
 import optimizations.ollir.GraphPainterException;
 import optimizations.ollir.RegisterAllocater;
@@ -40,9 +39,6 @@ public class OptimizationStage implements JmmOptimization {
     public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize, int nRegisters) {
         JmmNode root = semanticsResult.getRootNode();
         List<Report> reports = new ArrayList<>();
-
-        SethiUllmanLabeler labeler = new SethiUllmanLabeler();
-        labeler.visit(root);
 
         // Convert the AST to a String containing the equivalent OLLIR code
         SethiUllmanGenerator generator = new SethiUllmanGenerator(semanticsResult.getSymbolTable());

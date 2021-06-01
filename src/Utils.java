@@ -33,7 +33,7 @@ public class Utils {
     public static void saveFile(String fileName, String folder, String content) throws IOException {
         Path path = Path.of(folder);
         if (!Files.exists(path)) {
-            Files.createDirectory(path);
+            Files.createDirectories(path);
         }
 
         Path jsonFile = Path.of(path.toString(), fileName);
