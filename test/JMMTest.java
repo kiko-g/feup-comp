@@ -23,9 +23,7 @@ import static org.junit.Assert.fail;
 
 
 public class JMMTest {
-    private static final List<String> classpath = new ArrayList<>(
-        Arrays.asList("generated/class",
-            "test/fixtures/libs/compiled"));
+    private static final List<String> classpath = new ArrayList<>(Arrays.asList("generated/class", TestUtils.getLibsClasspath()));
 
     protected static class CorrectStageError extends Exception { }
 

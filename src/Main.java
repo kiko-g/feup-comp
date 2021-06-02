@@ -1,4 +1,5 @@
 import org.specs.comp.ollir.parser.ParseException;
+import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
@@ -17,7 +18,7 @@ public class Main {
 	public static boolean OPTIMIZATIONS;
 	public static int NUM_REGISTERS = 0;
 	public static String INPUT_FILE;
-	public static ArrayList<String> classpath = new ArrayList<>(Arrays.asList("generated/class", "test/fixtures/libs/compiled"));
+	public static ArrayList<String> classpath = new ArrayList<>(Arrays.asList("generated/class", TestUtils.getLibsClasspath()));
 
 	public static void main(String[] args) {
 		try {
