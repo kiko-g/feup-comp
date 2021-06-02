@@ -27,16 +27,21 @@ public class OptimizationStage implements JmmOptimization {
             optStage.optimize(semanticsResult);
         }
 
-        OllirResult ollirRes = optStage.toOllir(semanticsResult, optimize, nRegisters);
+        OllirResult ollirRes = optStage.toOllir(semanticsResult, optimize);
 
         if(optimize) {
             ollirRes = optStage.optimize(ollirRes);
         }
 
+        if (nRegisters > 0) {
+            ollirRes = optStage.allocateRegisters(ollirRes, nRegisters);
+        }
+
         return ollirRes;
     }
 
-    public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize, int nRegisters) {
+    @Override
+    public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize) {
         JmmNode root = semanticsResult.getRootNode();
         List<Report> reports = new ArrayList<>();
 
@@ -61,16 +66,7 @@ public class OptimizationStage implements JmmOptimization {
             reports.add(StyleReport.newError(Stage.LLIR, "Exception during Ollir code generation", e));
         }
 
-        if (nRegisters > 0) {
-            ollirRes = allocateRegisters(ollirRes, nRegisters);
-        }
-
         return ollirRes;
-    }
-
-    @Override
-    public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize) {
-        return toOllir(semanticsResult, optimize, 0);
     }
 
     public OllirResult allocateRegisters(OllirResult ollirResult, int nRegisters) {

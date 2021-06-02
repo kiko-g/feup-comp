@@ -130,6 +130,7 @@ public class BackendStage implements JasminBackend {
                     .append(this.generateStackLimits())
                     .append(this.generateLocalLimits())
                     .append(body)
+                    .append(this.generatePops())
                     .append("\t\treturn\n");
             }
 
@@ -150,7 +151,7 @@ public class BackendStage implements JasminBackend {
                     .append(body);
 
                 if(method.getReturnType().getTypeOfElement() == ElementType.VOID) {
-                    classMethodsCode.append("\t\treturn");
+                    classMethodsCode.append(this.generatePops()).append("\t\treturn");
                 }
 
                 classMethodsCode.append("\n");
@@ -566,7 +567,7 @@ public class BackendStage implements JasminBackend {
 
                 this.instrCurrStackSize -= (instr.getListOfOperands().size() + 1);
                 builder.append(generateMethodCallBody(instr, first, (LiteralElement) second));
-                this.instrCurrStackSize += instr.getReturnType().getTypeOfElement() != ElementType.VOID ? 1 : 0;
+                this.instrCurrStackSize += (instr.getReturnType().getTypeOfElement() != ElementType.VOID ? 1 : 0);
 
                 return builder.toString();
             }
@@ -825,7 +826,7 @@ public class BackendStage implements JasminBackend {
         StringBuilder pop = new StringBuilder();
 
         for(int i = this.instrCurrStackSize; i > 0; i--) {
-            if(this.instrCurrStackSize > 1) {
+            if(i > 1) {
                 pop.append("\t\tpop2\n");
                 i--;
             } else {

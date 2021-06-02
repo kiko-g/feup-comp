@@ -9,6 +9,7 @@ public class VarNode {
     private final Descriptor descriptor;
     private int id = -1;
     private boolean deleted = false;
+    private boolean unused = true;
 
     public VarNode(String variable, Descriptor descriptor) {
         this.variable = variable;
@@ -37,6 +38,14 @@ public class VarNode {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isUnused() {
+        return unused;
+    }
+
+    public void setUnused(boolean unused) {
+        this.unused = unused;
     }
 
     @Override

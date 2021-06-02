@@ -24,7 +24,13 @@ public class LivenessAnalysis {
 
             // Set up vars list
             for (Map.Entry<String, Descriptor> entry : method.getVarTable().entrySet()) {
-                vars.add(new VarNode(entry.getKey(), entry.getValue()));
+                VarNode node = new VarNode(entry.getKey(), entry.getValue());
+
+                if (entry.getValue().getScope() != VarScope.LOCAL) {
+                    node.setUnused(false);
+                }
+
+                vars.add(node);
             }
 
             // Set up liveness nodes list
@@ -89,10 +95,17 @@ public class LivenessAnalysis {
                 this.updateNode(method, vars, node, ((BinaryOpInstruction) instr).getRightOperand(), LivenessNode::getUse);
             }
             case CALL -> {
-                this.updateNode(method, vars, node, ((CallInstruction) instr).getFirstArg(), LivenessNode::getUse);
-                this.updateNode(method, vars, node, ((CallInstruction) instr).getSecondArg(), LivenessNode::getUse);
-                for (Element elem : ((CallInstruction) instr).getListOfOperands()) {
-                    this.updateNode(method, vars, node, elem, LivenessNode::getUse);
+                if (((CallInstruction) instr).getInvocationType() == CallType.invokevirtual ||
+                    ((CallInstruction) instr).getInvocationType() == CallType.invokespecial ||
+                    ((CallInstruction) instr).getInvocationType() == CallType.arraylength
+                ) {
+                    this.updateNode(method, vars, node, ((CallInstruction) instr).getFirstArg(), LivenessNode::getUse);
+                }
+
+                if (((CallInstruction) instr).getListOfOperands() != null) {
+                    for (Element elem : ((CallInstruction) instr).getListOfOperands()) {
+                        this.updateNode(method, vars, node, elem, LivenessNode::getUse);
+                    }
                 }
             }
             case GETFIELD -> {
@@ -143,7 +156,10 @@ public class LivenessAnalysis {
     }
 
     private void updateNode(Method method, List<VarNode> vars, LivenessNode node, Element element, Function<LivenessNode, Set<VarNode>> accessor) {
-        if(!(element instanceof Operand) || element.getType().getTypeOfElement() == ElementType.THIS) {
+        if(!(element instanceof Operand) ||
+            element.getType().getTypeOfElement() == ElementType.THIS || element.getType().getTypeOfElement() == ElementType.CLASS ||
+                (element.getType().getTypeOfElement() == ElementType.BOOLEAN &&
+                (((Operand) element).getName().equals("true") || ((Operand) element).getName().equals("false")))) {
             return;
         }
 
@@ -153,7 +169,7 @@ public class LivenessAnalysis {
                 updateNode(method, vars, node, elem, LivenessNode::getUse);
             }
 
-            return;
+            accessor = LivenessNode::getUse;
         }
 
         Descriptor descriptor = method.getVarTable().get(operand.getName());

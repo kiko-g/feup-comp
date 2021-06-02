@@ -19,7 +19,7 @@ public class GraphPainter {
     public void paint(int nColours) throws GraphPainterException {
         for (Map.Entry<Method, Map<VarNode, Set<VarNode>>> methodEntry : this.interferenceGraph.entrySet()) {
             if (!paint(methodEntry.getValue(), nColours)) {
-                throw new GraphPainterException("There are not enough registers to allocate to local variables in method \"" + this.methodToString(methodEntry.getKey()));
+                throw new GraphPainterException("There are not enough registers to allocate to local variables in method \"" + this.methodToString(methodEntry.getKey()) + "\"");
             }
         }
     }
@@ -31,7 +31,7 @@ public class GraphPainter {
 
         while (stack.size() != graph.size()) {
             graph.forEach((node, edges) -> {
-                if (node.isDeleted() || edges.stream().filter(VarNode::isDeleted).count() >= nColours) {
+                if (node.isDeleted() || edges.stream().filter(varNode -> !varNode.isDeleted()).count() >= nColours) {
                     return;
                 }
 

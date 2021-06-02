@@ -17,6 +17,7 @@ public class Main {
 	public static boolean OPTIMIZATIONS;
 	public static int NUM_REGISTERS = 0;
 	public static String INPUT_FILE;
+	public static ArrayList<String> classpath = new ArrayList<>(Arrays.asList("generated/class", "test/fixtures/libs/compiled"));
 
 	public static void main(String[] args) {
 		try {
@@ -36,9 +37,8 @@ public class Main {
             semanticsResult = Analysis.run(parserResult);
 			ollirResult = OptimizationStage.run(semanticsResult, OPTIMIZATIONS, NUM_REGISTERS);
 			jasminResult = BackendStage.run(ollirResult);
-			jasminResult.run();
-		} catch (IOException | RuntimeException e) {
-			e.printStackTrace();
+			jasminResult.run(new ArrayList<>(), classpath);
+		} catch (IOException | RuntimeException ignored) {
 		} finally {
 			List<Report> reports = new ArrayList<>(parserResult.getReports());
             if(semanticsResult != null && semanticsResult.getReports().size() > reports.size()) {

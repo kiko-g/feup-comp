@@ -9,12 +9,20 @@ import java.util.*;
 public class InterferenceGraphMaker {
     public Map<Method, Map<VarNode, Set<VarNode>>> create(Map<Method, List<LivenessNode>> livenessAnalysis) {
         Map<Method, Map<VarNode, Set<VarNode>>> methodGraph = new HashMap<>();
-        
+
         for(Map.Entry<Method, List<LivenessNode>> entry: livenessAnalysis.entrySet()) {
             Map<VarNode, Set<VarNode>> graph = new HashMap<>();
 
             for (LivenessNode node : entry.getValue()) {
                 this.updateGraph(graph, node);
+            }
+
+            for (VarNode node : graph.keySet()){
+                for (LivenessNode livenessNode : entry.getValue()) {
+                    if (livenessNode.getUse().contains(node) || livenessNode.getIn().contains(node) || livenessNode.getOut().contains(node)) {
+                        node.setUnused(false);
+                    }
+                }
             }
 
             methodGraph.put(entry.getKey(), graph);
@@ -24,25 +32,25 @@ public class InterferenceGraphMaker {
     }
 
     private void updateGraph(Map<VarNode, Set<VarNode>> graph, LivenessNode node) {
-        addNodes(graph, node.getUse());
         addNodes(graph, node.getDef());
+        addNodes(graph, node.getUse());
+        addNodes(graph, node.getOut());
+        addNodes(graph, node.getIn());
 
-        for (VarNode outNode : node.getOut()) {
-            Set<VarNode> connections = graph.get(outNode);
+        for (VarNode inNode : node.getIn()) {
+            Set<VarNode> connections = graph.get(inNode);
 
-            for (VarNode inNode : node.getIn()) {
-                if (!inNode.equals(outNode)) {
+            if (!node.getOut().contains(inNode)) {
+                continue;
+            }
+
+            for (VarNode outNode : node.getOut()) {
+                if (outNode.equals(inNode)) {
                     continue;
                 }
 
-                for (VarNode inNodeAdd : node.getIn()) {
-                    if (inNodeAdd.equals(outNode)) {
-                        continue;
-                    }
-
-                    connections.add(inNodeAdd);
-                    graph.get(inNodeAdd).add(outNode);
-                }
+                connections.add(outNode);
+                graph.get(outNode).add(inNode);
             }
         }
     }
