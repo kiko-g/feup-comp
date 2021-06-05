@@ -10,3 +10,5 @@ gradlew.bat
 /ollir
 /jasmin
 .project
+.classpath
+*build*

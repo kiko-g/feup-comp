@@ -43,8 +43,15 @@ The possible flags that can be used are the following:
 
 To run all tests, enter the following command. All the tests are located in `test/JMMTest.java`
 
-```cmd
+```bash
 gradle test --tests "JMMTest"
+```
+
+To run a specific test, enter the following command:
+
+```bash
+# all test names are inside test/JMMTest class
+gradle test --tests "JMMTest.<testName>" 
 ```
 
 ## Summary
